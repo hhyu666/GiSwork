@@ -1,0 +1,42 @@
+if (nameasset!=contentDeviceFeature.nameasset&&namelocation!=contentDeviceFeature.namelocation)  {        
+    AddList[counter++] = {
+        'globalid': contentDeviceFeature.gid,
+        'attributes': {
+            'nameasset': nameasset,
+            'namelocation' : namelocation
+        }
+    }
+}
+else if(nameasset!=contentDeviceFeature.nameasset){
+    AddList[counter++] = {
+        'globalid': contentDeviceFeature.gid,
+        'attributes': {
+            'nameasset': nameasset
+        }
+    }                      
+}
+else if(namelocation!=contentDeviceFeature.namelocation){
+    AddList[counter++] = {
+        'globalid': contentDeviceFeature.gid,
+        'attributes': {
+            'namelocation' : namelocation
+        }
+    }
+}
+
+
+
+var updateObject = {}
+var attributes = {}
+if (nameasset!=contentDeviceFeature.nameasset){
+    attributes["nameasset"] = nameasset
+}
+if(namelocation!=contentDeviceFeature.namelocation){
+    attributes["namelocation"] = namelocation
+}
+updateObject["GLOBALID"] = contentDeviceFeature.gid
+updateObject["attributes"] = attributes
+
+
+
+

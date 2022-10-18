@@ -1,0 +1,206 @@
+var numberof924 = 0;
+var numberof774 = 0;
+var Array924=[];
+var Array774=[];
+var sqlExpression1 = "className = 'MapLine'"
+var sqlExpression2 = "className = 'MapDevice'"
+var allContent = FeatureSetByAssociation ($feature, "content");
+var devicesRows1 = Filter(allContent, sqlExpression1);
+var devicesRows2 = Filter(allContent, sqlExpression2);
+var updateAttributes = {}
+
+
+
+if($feature.ASSETGROUP==911){
+        if(Count(devicesRows1) > 0 && Count(devicesRows2) > 0){
+        for (var devicesRows in devicesRows1) {    
+            Push(Array924, devicesRows.globalId)
+            }
+
+        for (var index in Array924){
+                var gid = Array924[index]
+                var sqlExpression = "globalId = @gid"
+                var line =FeatureSetByName($datastore,"MapLine");
+                var lineRows = Filter(line, sqlExpression);
+                var lineRow = first(lineRows)
+                if (lineRow.ASSETGROUP==924){
+                    numberof924=numberof924+1;
+                }      
+        }
+
+        for (var devicesRows in devicesRows2) {        
+            Push(Array774, devicesRows.globalId)
+            }
+
+        for (var index in Array774){
+                var gid = Array774[index]
+                var sqlExpression = "globalId = @gid"
+                var line =FeatureSetByName($datastore,"MapDevice");
+                var lineRows = Filter(line, sqlExpression);
+                var lineRow = first(lineRows)
+                if (lineRow.ASSETGROUP==774){
+                    numberof774=numberof774+1;
+                }      
+        }
+        if(numberof774 == 1 && numberof924 == 1){
+            updateAttributes["referencereport"] = "ture";
+
+        }
+        else{
+            updateAttributes["referencereport"] = "false";
+        }
+    }
+    else{
+        updateAttributes["referencereport"] = "false";
+    }
+    return { 
+        "result": {
+            "attributes": updateAttributes
+        }
+    }
+}
+
+
+
+
+
+
+
+return {
+    'edit': [{
+        'className': 'MapDevice',
+        'updates': [{
+            'globalID': '{FEEC4EFE-3C23-4D89-8F56-107E3D2EF057}',
+            'attributes': {
+                'referencereport': "1"
+            }
+        }]
+    }]
+}
+
+
+
+
+var nameasset = $feature.nameasset
+var namelocation = $feature.namelocation
+var allContent = FeatureSetByAssociation ($feature, "content");
+var ASSETGROUP=[924,925]
+
+if (!IsEmpty(nameasset)&&!IsEmpty(namelocation)&&Count(allContent)>0){
+    if($feature.ASSETGROUP==904){
+
+        var MapLine =FeatureSetByName($datastore,"MapLine");
+        var counter = 0
+        var AddList = []    
+
+        for (var Content in allContent) {
+            var gid = Content.globalId
+            var Point_className = Content.className
+            var sqlExpression = "globalId = @gid"
+
+            if(Point_className=="MapLine"){
+                var lineRows = Filter(MapLine, sqlExpression);
+                var lineRow = first(lineRows)
+                if (Includes(ASSETGROUP,lineRow.ASSETGROUP)){               
+                    AddList[counter] = {
+                        'globalid': gid,
+                        'attributes': {
+                            'nameasset': nameasset,
+                            'namelocation' : namelocation
+                        }
+                    }
+                    counter++
+                }      
+            }
+           
+        }
+
+        return {              
+            "edit": [{
+                "className": "MapLine",
+                'updates': AddList
+            }]
+        } 
+    }
+}
+
+var nameasset = $feature.nameasset
+var namelocation = $feature.namelocation
+var allContent = FeatureSetByAssociation ($feature, "content");
+var ASSETGROUP=[966,967]
+
+if (!IsEmpty(nameasset)&&!IsEmpty(namelocation)&&Count(allContent)>0){
+    if($feature.ASSETGROUP==904){
+       
+        var MapJunction =FeatureSetByName($datastore,"MapJunction");
+        var counter = 0
+        var AddList = []    
+
+        for (var Content in allContent) {
+            var gid = Content.globalId
+            var Point_className = Content.className
+            var sqlExpression = "globalId = @gid"
+
+            if(Point_className=="MapJunction"){
+                var lineRows = Filter(MapJunction, sqlExpression);
+                var lineRow = first(lineRows)
+                if (Includes(ASSETGROUP,lineRow.ASSETGROUP)){
+                    AddList[counter] = {
+                        'globalid': gid,
+                        'attributes': {
+                            'nameasset': nameasset,
+                            'namelocation' : namelocation
+                        }
+                    }
+                    counter++
+                }      
+            }
+           
+        }
+
+        return {              
+            "edit": [{
+                "className": "MapJunction",
+                'updates': AddList
+            }]
+        } 
+    }
+}
+
+var lifecyclestatus = $feature.lifecyclestatus
+var allContent = FeatureSetByAssociation ($feature, "content");
+var featureASSETGROUP=[923,921,920,755]
+var lineRowASSETGROUP=[776,777,778,779]
+
+if (!IsEmpty(lifecyclestatus)&&Count(allContent)>0){
+    if(Includes(featureASSETGROUP,$feature.ASSETGROUP)){
+        var MapJunction =FeatureSetByName($datastore,"MapJunction");
+        var counter=0;
+        var AddList = []
+        for (var Content in allContent) {
+            var gid = Content.globalId;
+            var sqlExpression = "globalId = @gid";
+            var Point_className = Content.className ;
+            if (Point_className=="MapJunction"){
+                var lineRows = Filter(MapJunction, sqlExpression);
+                var lineRow = first(lineRows);
+                if (Includes(lineRowASSETGROUP,lineRow.ASSETGROUP)){
+                    AddList[counter] = {
+                        'globalid': gid,
+                        'attributes': {
+                            'lifecyclestatus': lifecyclestatus,
+                            
+                        }
+                    }
+                    counter++
+                }
+            }                            
+        }
+        return {              
+            "edit": [{
+                "className": "MapJunction",
+                'updates': AddList
+            }]
+        } 
+    }
+}

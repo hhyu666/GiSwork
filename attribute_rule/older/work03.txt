@@ -1,0 +1,604 @@
+var lifecyclestatus = $feature.lifecyclestatus
+var allContent = FeatureSetByAssociation ($feature, "content");
+var Array_Point=[]
+var Array_className=[]
+
+if (!IsEmpty(lifecyclestatus)&&Count(allContent)>0){
+    if($feature.ASSETGROUP==762){
+        for (var Content in allContent) {    
+            Push(Array_Point, Content.globalId)
+            Push(Array_className,Content.className)
+        }
+        for (var index in Array_Point){
+            var gid = Array_Point[index]
+            var Point_className=Array_className[index]
+            
+            return {              
+                "edit": [{
+                    "className": Point_className,
+                    "updates": [{
+                        'globalID': gid,
+                        'attributes': {
+                            'lifecyclestatus': lifecyclestatus
+                        }
+                    }]
+                }]
+            }                      
+        }
+    }
+}
+
+var lifecyclestatus = $feature.lifecyclestatus
+var allContent = FeatureSetByAssociation ($feature, "content");
+
+
+if (IsEmpty(lifecyclestatus)||Count(allContent)<1){
+    
+}
+else if($feature.ASSETGROUP==923||$feature.ASSETGROUP==921||$feature.ASSETGROUP==920||$feature.ASSETGROUP==755){
+    var counter=0;
+    var AddList = []
+    for (var Content in allContent) {
+        var gid = Content.globalId
+        var Point_className = Content.className 
+        AddList[counter] = {
+            'globalid': gid,
+            'attributes': {
+                'lifecyclestatus': lifecyclestatus
+            }
+        }
+        counter++                   
+    }
+    return {              
+        "edit": [{
+            "className": Point_className,
+            'updates': AddList
+        }]
+    }   
+}
+
+
+var lifecyclestatus = $feature.lifecyclestatus
+var allContent = FeatureSetByAssociation ($feature, "content");
+
+
+if (!IsEmpty(lifecyclestatus)&&Count(allContent)>0){
+    if($feature.ASSETGROUP==762){
+        var counter=0;
+        var AddList = []
+        for (var Content in allContent) {
+            var gid = Content.globalId
+            var Point_className = Content.className 
+            AddList[counter] = {
+                'globalid': gid,
+                'attributes': {
+                    'lifecyclestatus': lifecyclestatus
+                }
+            }
+            counter++                   
+        }
+        return {              
+            "edit": [{
+                "className": Point_className,
+                'updates': AddList
+            }]
+        } 
+    }
+}
+
+
+var lifecyclestatus = $feature.lifecyclestatus
+var namefeaturetype=152
+var allContent = FeatureSetByAssociation ($feature, "content");
+
+if (!IsEmpty(lifecyclestatus)&&Count(allContent)>0){
+    if($feature.ASSETGROUP==759){
+        var counter=0;
+        var AddList = []
+        for (var Content in allContent) {
+            var gid = Content.globalId
+            var Point_className = Content.className 
+            AddList[counter] = {
+                'globalid': gid,
+                'attributes': {
+                    'lifecyclestatus': lifecyclestatus,
+                    'namefeaturetype': namefeaturetype
+                }
+            }
+            counter++                   
+        }
+        return {              
+            "edit": [{
+                "className": Point_className,
+                'updates': AddList
+            }]
+        } 
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+var lifecyclestatus = $feature.lifecyclestatus
+var namefeaturetype=152
+var allContent = FeatureSetByAssociation ($feature, "content");
+var Array_Point=[]
+var Array_className=[]
+
+if (!IsEmpty(lifecyclestatus)&&Count(allContent)>0){
+    if($feature.ASSETGROUP==180){
+        for (var Content in allContent) {    
+            Push(Array_Point, Content.globalId)
+            Push(Array_className,Content.className)
+        }
+        for (var index in Array_Point){
+            var gid = Array_Point[index]
+            var Point_className=Array_className[index]
+            
+            return {              
+                "edit": [{
+                    "className": Point_className,
+                    "updates": [{
+                        'globalID': gid,
+                        'attributes': {
+                            'lifecyclestatus': lifecyclestatus,
+                            'namefeaturetype' : namefeaturetype
+                        }
+                    }]
+                }]
+            }                      
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+var nameasset = $feature.nameasset
+var allContent = FeatureSetByAssociation ($feature, "content");
+
+if (!IsEmpty(nameasset)&&Count(allContent)>0){
+    if($feature.ASSETGROUP==780){
+
+        var SchematicLine =FeatureSetByName($datastore,"SchematicLine");
+        var SchematicJunction =FeatureSetByName($datastore,"SchematicJunction");
+        var SchematicDevice = FeatureSetByName($datastore,"SchematicDevice");
+        var counter = 0
+        var AddList = []    
+
+        for (var Content in allContent) {
+            var gid = Content.globalId
+            var Point_className = Content.className
+            var sqlExpression = "globalId = @gid"
+
+            if(Point_className=="SchematicDevice"){
+                var lineRows = Filter(SchematicDevice, sqlExpression);
+                var lineRow = first(lineRows)
+                if (lineRow.ASSETGROUP==850||lineRow.ASSETGROUP==774||lineRow.ASSETGROUP==808){
+                    AddList[counter] = {
+                        'globalid': gid,
+                        'attributes': {
+                            'nameasset': nameasset
+                        }
+                    }
+                    counter++
+                }      
+            }
+           
+        }
+
+        return {              
+            "edit": [{
+                "className": "SchematicDevice",
+                'updates': AddList
+            }]
+        } 
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+var nameasset = $feature.nameasset
+var namelocation = $feature.namelocation
+var allContent = FeatureSetByAssociation ($feature, "content");
+
+if (!IsEmpty(nameasset)&&!IsEmpty(namelocation)&&Count(allContent)>0){
+    if($feature.ASSETGROUP==904){
+
+        var MapLine =FeatureSetByName($datastore,"MapLine");
+        var MapJunction =FeatureSetByName($datastore,"MapJunction");
+        var MapDevice = FeatureSetByName($datastore,"MapDevice");
+        var counter = 0
+        var AddList = []    
+
+        for (var Content in allContent) {
+            var gid = Content.globalId
+            var Point_className = Content.className
+            var sqlExpression = "globalId = @gid"
+
+            if(Point_className=="MapLine"){
+                var lineRows = Filter(MapLine, sqlExpression);
+                var lineRow = first(lineRows)
+                if (lineRow.ASSETGROUP==924||lineRow.ASSETGROUP==925){
+                    AddList[counter] = {
+                        'globalid': gid,
+                        'attributes': {
+                            'nameasset': nameasset,
+                            'namelocation' : namelocation
+                        }
+                    }
+                    counter++
+                }      
+            }
+
+            if(Point_className=="MapJunction"){
+                var lineRows = Filter(MapJunction, sqlExpression);
+                var lineRow = first(lineRows)
+                if (lineRow.ASSETGROUP==966||lineRow.ASSETGROUP==967){
+                    AddList[counter] = {
+                        'globalid': gid,
+                        'attributes': {
+                            'nameasset': nameasset,
+                            'namelocation' : namelocation
+                        }
+                    }
+                    counter++
+                }      
+            }
+
+            if(Point_className=="MapDevice"){
+                var lineRows = Filter(MapDevice, sqlExpression);
+                var lineRow = first(lineRows)
+                if (lineRow.ASSETGROUP==771||lineRow.ASSETGROUP==775||lineRow.ASSETGROUP==808||lineRow.ASSETGROUP==774||lineRow.ASSETGROUP==850||lineRow.ASSETGROUP==801){
+                    AddList[counter] = {
+                        'globalid': gid,
+                        'attributes': {
+                            'nameasset': nameasset,
+                            'namelocation' : namelocation
+                        }
+                    }
+                    counter++
+                }      
+            }
+        }
+
+        return {              
+            "edit": [{
+                "className": Point_className,
+                'updates': AddList
+            }]
+        } 
+    }
+}
+
+
+
+
+
+
+
+
+
+var lifecyclestatus = $feature.lifecyclestatus
+var namefeaturetype=152
+var allContent = FeatureSetByAssociation ($feature, "content");
+
+if (!IsEmpty(lifecyclestatus)&&Count(allContent)>0){
+    if($feature.ASSETGROUP==180){
+
+        var StructureJunction =FeatureSetByName($datastore,"StructureJunction");
+        
+
+
+        var counter=0;
+        var AddList = []
+        for (var Content in allContent) {
+            var gid = Content.globalId;
+            var sqlExpression = "globalId = @gid";
+            var Point_className = Content.className ;
+            if (Point_className=="StructureJunction"){
+                var lineRows = Filter(StructureJunction, sqlExpression);
+                var lineRow = first(lineRows);
+                if (lineRow.ASSETGROUP==753){
+                    AddList[counter] = {
+                        'globalid': gid,
+                        'attributes': {
+                            'lifecyclestatus': lifecyclestatus,
+                            'namefeaturetype': namefeaturetype
+                        }
+                    }
+                    counter++
+                }
+            }                            
+        }
+        return {              
+            "edit": [{
+                "className": "StructureJunction",
+                'updates': AddList
+            }]
+        } 
+    }
+}
+
+var lifecyclestatus = $feature.lifecyclestatus
+var allContent = FeatureSetByAssociation ($feature, "content");
+
+if (!IsEmpty(lifecyclestatus)&&Count(allContent)>0){
+    if($feature.ASSETGROUP==923||$feature.ASSETGROUP==921||$feature.ASSETGROUP==920||$feature.ASSETGROUP==755){
+        var MapJunction =FeatureSetByName($datastore,"MapJunction");
+        var counter=0;
+        var AddList = []
+        for (var Content in allContent) {
+            var gid = Content.globalId;
+            var sqlExpression = "globalId = @gid";
+            var Point_className = Content.className ;
+            if (Point_className=="MapJunction"){
+                var lineRows = Filter(MapJunction, sqlExpression);
+                var lineRow = first(lineRows);
+                if (lineRow.ASSETGROUP==776||lineRow.ASSETGROUP==777||lineRow.ASSETGROUP==778||lineRow.ASSETGROUP==779){
+                    AddList[counter] = {
+                        'globalid': gid,
+                        'attributes': {
+                            'lifecyclestatus': lifecyclestatus,
+                            
+                        }
+                    }
+                    counter++
+                }
+            }                            
+        }
+        return {              
+            "edit": [{
+                "className": "MapJunction",
+                'updates': AddList
+            }]
+        } 
+    }
+}
+
+
+
+
+
+
+
+
+
+
+return { //creates two new Structure Junction Objects and creates an association between them using a tag
+    "edit": [{
+        //create two junction objects and identify them uniquely with a tag
+        "className": "StructureJunctionObject",
+        "adds": [{
+            "tag": "jo1", //unique identifier for new feature in the Structure Junction Object class
+            "attributes": {
+                "AssetGroup": 1,
+                "AssetType": 2
+            }
+        }, {
+            "tag": "jo2", //unique identifier for new feature in the Structure Junction Object class
+            "attributes": {
+                "AssetGroup": 1,
+                "AssetType": 2
+            }
+        }]
+    }, {
+        "className": "^UN_Association", //edit the association table create a attachment association between the new junction objects
+        "adds": [{
+            "fromClass": "StructureJunctionObject",
+            "fromGlobalId": "jo1.globalID",
+            "toClass": "StructureJunctionObject",
+            "toGlobalId": "jo2.globalID",
+            "associationType": "attachment"
+        }]
+    }]
+}
+---------------------------------------1
+var line =FeatureSetByName($datastore,"MapLine");
+var intersectlines=Intersects(line, $feature) ;
+if($feature.ASSETGROUP==778){
+    if (Count(intersectlines)>0){
+        for (var intersectline in intersectlines){
+            var line_assetgroup =intersectline.ASSETGROUP;
+            var line_gid=intersectline.GLOBALID
+            if(line_assetgroup==920){
+                return { 
+                    "edit": [{
+                        "className": "^UN_Association", 
+                        "adds": [{
+                            "fromClass": "MapLine",
+                            "fromGlobalId": line_gid,
+                            "toClass": "MapJunction",
+                            "toGlobalId": $feature.GLOBALID,
+                            "associationType": "containment"
+                        }]
+                    }]
+                }
+            }
+        } 
+    }
+}
+-----------------------------------------------------2
+var line =FeatureSetByName($datastore,"MapLine");
+var intersectlines=Intersects(line, $feature) ;
+if($feature.ASSETGROUP==779){
+    if (Count(intersectlines)>0){
+        for (var intersectline in intersectlines){
+            var line_assetgroup =intersectline.ASSETGROUP;
+            var line_gid=intersectline.GLOBALID
+            if(line_assetgroup==755){
+                return { 
+                    "edit": [{
+                        "className": "^UN_Association", 
+                        "adds": [{
+                            "fromClass": "MapLine",
+                            "fromGlobalId": line_gid,
+                            "toClass": "MapJunction",
+                            "toGlobalId": $feature.GLOBALID,
+                            "associationType": "containment"
+                        }]
+                    }]
+                }
+            }
+        } 
+    }
+}
+-----------------------------------------------------3
+var line =FeatureSetByName($datastore,"MapLine");
+var intersectlines=Intersects(line, $feature) ;
+if($feature.ASSETGROUP==776){
+    if (Count(intersectlines)>0){
+        for (var intersectline in intersectlines){
+            var line_assetgroup =intersectline.ASSETGROUP;
+            var line_gid=intersectline.GLOBALID
+            if(line_assetgroup==923){
+                return { 
+                    "edit": [{
+                        "className": "^UN_Association", 
+                        "adds": [{
+                            "fromClass": "MapLine",
+                            "fromGlobalId": line_gid,
+                            "toClass": "MapJunction",
+                            "toGlobalId": $feature.GLOBALID,
+                            "associationType": "containment"
+                        }]
+                    }]
+                }
+            }
+        } 
+    }
+}
+-----------------------------------------------------------4
+var line =FeatureSetByName($datastore,"PilotLine");
+var intersectlines=Intersects(line, $feature) ;
+if($feature.ASSETGROUP==767){
+    if (Count(intersectlines)>0){
+        for (var intersectline in intersectlines){
+            var line_assetgroup =intersectline.ASSETGROUP;
+            var line_gid=intersectline.GLOBALID
+            if(line_assetgroup==762){
+                return { 
+                    "edit": [{
+                        "className": "^UN_Association", 
+                        "adds": [{
+                            "fromClass": "PilotLine",
+                            "fromGlobalId": line_gid,
+                            "toClass": "PilotJunction",
+                            "toGlobalId": $feature.GLOBALID,
+                            "associationType": "containment"
+                        }]
+                    }]
+                }
+            }
+        } 
+    }
+}
+-------------------------------------------5
+if($feature.ASSETGROUP==753){
+
+    var allline =FeatureSetByName($datastore,"StructureBoundary");
+    var sqlExpression = "ASSETGROUP = 180 or ASSETGROUP = 174";
+    var line_ductboundary = Filter(allline, sqlExpression);
+    var intersectlines=Touches(line_ductboundary, $feature);
+    if (Count(intersectlines)>0){
+        for (var intersectline in intersectlines){
+            var line_assetgroup =intersectline.ASSETGROUP;
+            var line_gid=intersectline.GLOBALID
+            if(line_assetgroup==180){
+                return {
+                    
+                     
+                    "result": true,
+                    "edit": [{
+                        "className": "^UN_Association", 
+                        "adds": [{
+                            "fromClass": "StructureBoundary",
+                            "fromGlobalId": line_gid,
+                            "toClass": "StructureJunction",
+                            "toGlobalId": $feature.GLOBALID,
+                            "associationType": "containment"
+                        }]
+                    }]
+                }
+            }            
+        }       
+    }
+    else{
+        return false;
+    }
+}
+----------------------------------------------------------6
+if($feature.ASSETGROUP==753){
+
+    var allline =FeatureSetByName($datastore,"StructureBoundary");
+    var sqlExpression = "ASSETGROUP = 174";
+    var line_ductboundary = Filter(allline, sqlExpression);
+    var intersectlines=Touches(line_ductboundary, $feature);
+    if (Count(intersectlines)>0){
+        for (var intersectline in intersectlines){
+            var line_assetgroup =intersectline.ASSETGROUP;
+            var line_gid=intersectline.GLOBALID
+            
+                return { 
+                    "edit": [{
+                        "className": "^UN_Association", 
+                        "adds": [{
+                            "fromClass": "StructureBoundary",
+                            "fromGlobalId": line_gid,
+                            "toClass": "StructureJunction",
+                            "toGlobalId": $feature.GLOBALID,
+                            "associationType": "containment"
+                        }]
+                    }]
+                }
+                        
+        }       
+    }
+    
+}
+
+
+-----------------------------------------------------
+if($feature.ASSETGROUP==753){
+
+    var allline =FeatureSetByName($datastore,"StructureBoundary");
+    var sqlExpression = "ASSETGROUP = 180 or ASSETGROUP = 174";
+    var line_ductboundary = Filter(allline, sqlExpression);
+    var intersectlines=Touches(line_ductboundary, $feature);
+    if (Count(intersectlines)>0){
+       return true;      
+    }
+    else{
+        return false;
+    }
+}
+
+
+
+
+
+return {
+    "result": true
+}

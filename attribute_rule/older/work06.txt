@@ -1,0 +1,754 @@
+var nameasset = $feature.nameasset
+var namelocation = $feature.namelocation
+var allContent = FeatureSetByAssociation ($feature, "content")
+var ASSETGROUP=[924,925]
+
+if (!IsEmpty(nameasset)&&!IsEmpty(namelocation)&&Count(allContent)>0){
+    if($feature.ASSETGROUP==904){
+        var MapLine =FeatureSetByName($datastore,"MapLine")
+        var counter = 0
+        var AddList = []
+        var globalIDIndex = 0
+
+        var contentFeatureGlobalIDArray = []
+
+        for (var contentFeature in allContent) {
+            contentFeatureGlobalIDArray[globalIDIndex++] = contentFeature.globalid
+        }
+
+        var contentFeatureGlobalIDtupe = replace(replace(replace(Text(contentFeatureGlobalIDArray), "[", "("), "]", ")"), '"', "'")
+        whereClause = "GLOBALID in " + contentFeatureGlobalIDtupe
+
+        var contentDeviceFeatures = Filter(MapLine, whereClause)
+        if (count(contentDeviceFeatures) > 0) {
+            for (var contentDeviceFeature in contentDeviceFeatures) {
+                if(contentDeviceFeature.className=="MapLine"&&Includes(ASSETGROUP,contentDeviceFeature.ASSETGROUP)){
+                    
+
+                    if(nameasset!=contentDeviceFeature.nameasset||namelocation!=contentDeviceFeature.namelocation){
+                        var updateObject = {}
+                        var attributes = {}
+                        if (nameasset!=contentDeviceFeature.nameasset){
+                            attributes["nameasset"] = nameasset
+                        }
+                        if(namelocation!=contentDeviceFeature.namelocation){
+                            attributes["namelocation"] = namelocation
+                        }
+                        updateObject["GLOBALID"] = contentDeviceFeature.gid
+                        updateObject["attributes"] = attributes
+                        AddList[counter++]=updateObject
+                    }
+
+                    
+                }              
+            }
+        }
+        
+        if (count(AddList) > 0) {
+            return {              
+                "edit": [{
+                    "className": "MapLine",
+                    'updates': AddList
+                }]
+            }   
+        }
+    }
+}
+
+
+
+
+
+
+
+var nameasset = $feature.nameasset
+var namelocation = $feature.namelocation
+var allContent = FeatureSetByAssociation ($feature, "content")
+var ASSETGROUP=[966,967]
+
+if (!IsEmpty(nameasset)&&!IsEmpty(namelocation)&&Count(allContent)>0){
+    if($feature.ASSETGROUP==904){
+       
+        var MapJunction =FeatureSetByName($datastore,"MapJunction")
+        var counter = 0
+        var AddList = []    
+
+        for (var Content in allContent) {
+            var gid = Content.globalId
+            var Point_className = Content.className
+            var sqlExpression = "globalId = @gid"
+
+            if(Point_className=="MapJunction"){
+                var lineRows = Filter(MapJunction, sqlExpression)
+                var lineRow = first(lineRows)
+                if (Includes(ASSETGROUP,lineRow.ASSETGROUP)){
+                    if (nameasset!=lineRow.nameasset||namelocation!=lineRow.namelocation)  { 
+                        AddList[counter] = {
+                            'globalid': gid,
+                            'attributes': {
+                                'nameasset': nameasset,
+                                'namelocation' : namelocation
+                            }
+                        }
+                        counter++
+                    }
+                }      
+            }
+           
+        }
+
+        return {              
+            "edit": [{
+                "className": "MapJunction",
+                'updates': AddList
+            }]
+        } 
+    }
+}
+
+var nameasset = $feature.nameasset
+var namelocation = $feature.namelocation
+var allContent = FeatureSetByAssociation ($feature, "content")
+var ASSETGROUP=[771,775,808,774,850,801]
+
+if (!IsEmpty(nameasset)&&!IsEmpty(namelocation)&&Count(allContent)>0){
+    if($feature.ASSETGROUP==904){
+
+        var MapLine =FeatureSetByName($datastore,"MapLine")
+        var MapJunction =FeatureSetByName($datastore,"MapJunction")
+        var MapDevice = FeatureSetByName($datastore,"MapDevice")
+        var counter = 0
+        var AddList = []    
+
+        for (var Content in allContent) {
+            var gid = Content.globalId
+            var Point_className = Content.className
+            var sqlExpression = "globalId = @gid"
+
+            if(Point_className=="MapDevice"){
+                var lineRows = Filter(MapDevice, sqlExpression)
+                var lineRow = first(lineRows)
+                if (Includes(ASSETGROUP,lineRow.ASSETGROUP){
+                    if (nameasset!=lineRow.nameasset||namelocation!=lineRow.namelocation)  { 
+                        AddList[counter] = {
+                            'globalid': gid,
+                            'attributes': {
+                                'nameasset': nameasset,
+                                'namelocation' : namelocation
+                            }
+                        }
+                        counter++
+                    }
+                }      
+            }
+           
+        }
+
+        return {              
+            "edit": [{
+                "className": "MapDevice",
+                'updates': AddList
+            }]
+        } 
+    }
+}
+
+
+var nameasset = $feature.nameasset
+var namelocation = $feature.namelocation
+var allContent = FeatureSetByAssociation ($feature, "content")
+var ASSETGROUP=[771,775,808,774,850,801]
+
+if (!IsEmpty(nameasset)&&!IsEmpty(namelocation)&&Count(allContent)>0){
+    if($feature.ASSETGROUP==904){
+        var MapDevice =FeatureSetByName($datastore,"MapDevice")
+        var counter = 0
+        var AddList = []
+        var globalIDIndex = 0
+
+        var contentFeatureGlobalIDArray = []
+
+        for (var contentFeature in allContent) {
+            contentFeatureGlobalIDArray[globalIDIndex++] = contentFeature.globalid
+        }
+
+        var contentFeatureGlobalIDtupe = replace(replace(replace(Text(contentFeatureGlobalIDArray), "[", "("), "]", ")"), '"', "'")
+        whereClause = "GLOBALID in " + contentFeatureGlobalIDtupe
+
+        var contentDeviceFeatures = Filter(MapDevice, whereClause)
+        if (count(contentDeviceFeatures) > 0) {
+            for (var contentDeviceFeature in contentDeviceFeatures) {
+                if(contentDeviceFeature.className=="MapDevice"&&Includes(ASSETGROUP,contentDeviceFeature.ASSETGROUP)){
+                    
+
+                    if(nameasset!=contentDeviceFeature.nameasset||namelocation!=contentDeviceFeature.namelocation){
+                        var updateObject = {}
+                        var attributes = {}
+                        if (nameasset!=contentDeviceFeature.nameasset){
+                            attributes["nameasset"] = nameasset
+                        }
+                        if(namelocation!=contentDeviceFeature.namelocation){
+                            attributes["namelocation"] = namelocation
+                        }
+                        updateObject["GLOBALID"] = contentDeviceFeature.gid
+                        updateObject["attributes"] = attributes
+                        AddList[counter++]=updateObject
+                    }
+
+                    
+                }              
+            }
+        }
+        
+        if (count(AddList) > 0) {
+            return {              
+                "edit": [{
+                    "className": "MapDevice",
+                    'updates': AddList
+                }]
+            }   
+        }
+    }
+}
+
+var lifecyclestatus = $feature.lifecyclestatus
+var allContent = FeatureSetByAssociation ($feature, "content")
+var featureASSETGROUP=[923,921,920,755]
+var lineRowASSETGROUP=[776,777,778,779]
+
+if (!IsEmpty(lifecyclestatus)&&Count(allContent)>0){
+    if(Includes(featureASSETGROUP,$feature.ASSETGROUP)){
+        var MapJunction =FeatureSetByName($datastore,"MapJunction")
+        var counter=0
+        var AddList = []
+        var globalIDIndex = 0
+        var contentFeatureGlobalIDArray = []
+
+        for (var contentFeature in allContent) {
+            contentFeatureGlobalIDArray[globalIDIndex++] = contentFeature.globalid
+        }
+
+        var contentFeatureGlobalIDtupe = replace(replace(replace(Text(contentFeatureGlobalIDArray), "[", "("), "]", ")"), '"', "'")
+        whereClause = "GLOBALID in " + contentFeatureGlobalIDtupe
+
+        var contentDeviceFeatures = Filter(MapJunction, whereClause)
+        if (count(contentDeviceFeatures) > 0) {
+            for (var contentDeviceFeature in contentDeviceFeatures) {
+                if(contentDeviceFeature.className=="MapJunction"&&Includes(ASSETGROUP,contentDeviceFeature.ASSETGROUP)){
+                    if(lifecyclestatus!=contentDeviceFeature.lifecyclestatus){
+                        
+                        AddList[counter] = {
+                            'globalid': contentDeviceFeature.gid,
+                            'attributes': {
+                                'lifecyclestatus': lifecyclestatus,
+                                
+                            }
+                        }
+                        counter++   
+                    
+                    }                   
+                }              
+            }
+        }
+        if (count(AddList) > 0) {
+            return {              
+                "edit": [{
+                    "className": "MapJunction",
+                    'updates': AddList
+                }]
+            } 
+        }
+    }
+}
+
+var lifecyclestatus = $feature.lifecyclestatus
+var allContent = FeatureSetByAssociation ($feature, "content")
+
+if (!IsEmpty(lifecyclestatus)&&Count(allContent)>0){
+    if($feature.ASSETGROUP==762){
+        var PilotJunction =FeatureSetByName($datastore,"PilotJunction")
+        var counter=0
+        var AddList = []
+        var globalIDIndex = 0
+        var contentFeatureGlobalIDArray = []
+
+        for (var contentFeature in allContent) {
+            contentFeatureGlobalIDArray[globalIDIndex++] = contentFeature.globalid
+        }
+
+        var contentFeatureGlobalIDtupe = replace(replace(replace(Text(contentFeatureGlobalIDArray), "[", "("), "]", ")"), '"', "'")
+        whereClause = "GLOBALID in " + contentFeatureGlobalIDtupe
+
+        var contentDeviceFeatures = Filter(PilotJunction, whereClause)
+        if (count(contentDeviceFeatures) > 0) {
+            for (var contentDeviceFeature in contentDeviceFeatures) {
+                if(contentDeviceFeature.className=="PilotJunction"&&lineRow.ASSETGROUP==767){
+                    if(lifecyclestatus!=contentDeviceFeature.lifecyclestatus){
+                        
+                        AddList[counter] = {
+                            'globalid': contentDeviceFeature.gid,
+                            'attributes': {
+                                'lifecyclestatus': lifecyclestatus                                
+                            }
+                        }
+                        counter++   
+                    
+                    }                   
+                }              
+            }
+        }
+        if (count(AddList) > 0) {
+            return {              
+                "edit": [{
+                    "className": "PilotJunction",
+                    'updates': AddList
+                }]
+            } 
+        }
+    }
+}
+
+
+var nameasset = $feature.nameasset
+var allContent = FeatureSetByAssociation ($feature, "content")
+var ASSETGROUP=[850,774,808]
+if (!IsEmpty(nameasset)&&Count(allContent)>0){
+    if($feature.ASSETGROUP==780){
+
+        var SchematicDevice =FeatureSetByName($datastore,"SchematicDevice")
+        var counter = 0
+        var AddList = []  
+        var globalIDIndex = 0
+        var contentFeatureGlobalIDArray = []
+
+        for (var contentFeature in allContent) {
+            contentFeatureGlobalIDArray[globalIDIndex++] = contentFeature.globalid
+        }
+
+        var contentFeatureGlobalIDtupe = replace(replace(replace(Text(contentFeatureGlobalIDArray), "[", "("), "]", ")"), '"', "'")
+        whereClause = "GLOBALID in " + contentFeatureGlobalIDtupe
+
+        var contentDeviceFeatures = Filter(SchematicDevice, whereClause)
+        if (count(contentDeviceFeatures) > 0) {
+            for (var contentDeviceFeature in contentDeviceFeatures) {
+                if(contentDeviceFeature.className=="SchematicDevice"&&Includes(ASSETGROUP,contentDeviceFeature.ASSETGROUP)){
+                    if(lifecyclestatus!=contentDeviceFeature.lifecyclestatus){
+                        
+                        AddList[counter] = {
+                            'globalid': contentDeviceFeature.gid,
+                            'attributes': {
+                                'nameasset': nameasset                               
+                            }
+                        }
+                        counter++   
+                    
+                    }                   
+                }              
+            }
+        }  
+        if (count(AddList) > 0) {
+            return {              
+                "edit": [{
+                    "className": "SchematicDevice",
+                    'updates': AddList
+                }]
+            } 
+        }
+    }
+}
+
+
+
+
+
+var nameasset = $feature.nameasset
+var allContent = FeatureSetByAssociation ($feature, "content")
+var ASSETGROUP=[850,774,808]
+
+if (!IsEmpty(nameasset)&&Count(allContent)>0){
+    if($feature.ASSETGROUP==780){
+
+        var SchematicLine =FeatureSetByName($datastore,"SchematicLine")
+        var SchematicJunction =FeatureSetByName($datastore,"SchematicJunction")
+        var SchematicDevice = FeatureSetByName($datastore,"SchematicDevice")
+        var counter = 0
+        var AddList = []    
+
+        for (var Content in allContent) {
+            var gid = Content.globalId
+            var Point_className = Content.className
+            var sqlExpression = "globalId = @gid"
+
+            if(Point_className=="SchematicDevice"){
+                var lineRows = Filter(SchematicDevice, sqlExpression)
+                var lineRow = first(lineRows)
+                if (Includes(lineRowASSETGROUP,lineRow.ASSETGROUP)){
+                    if(nameasset!=lineRow.nameasset){
+                        AddList[counter] = {
+                            'globalid': gid,
+                            'attributes': {
+                                'nameasset': nameasset
+                            }
+                        }
+                        counter++    
+                    }
+                    
+                }      
+            }
+           
+        }
+
+        return {              
+            "edit": [{
+                "className": "SchematicDevice",
+                'updates': AddList
+            }]
+        } 
+    }
+}
+
+
+var lifecyclestatus = $feature.lifecyclestatus
+var namefeaturetype= 155
+var allContent = FeatureSetByAssociation ($feature, "content")
+
+if (!IsEmpty(lifecyclestatus)&&Count(allContent)>0){
+    if($feature.ASSETGROUP==174){
+
+        var StructureJunction =FeatureSetByName($datastore,"StructureJunction")
+        
+        var counter=0
+        var AddList = []
+        var globalIDIndex = 0
+
+        var contentFeatureGlobalIDArray = []
+
+        for (var contentFeature in allContent) {
+            contentFeatureGlobalIDArray[globalIDIndex++] = contentFeature.globalid
+        }
+
+        var contentFeatureGlobalIDtupe = replace(replace(replace(Text(contentFeatureGlobalIDArray), "[", "("), "]", ")"), '"', "'")
+        whereClause = "GLOBALID in " + contentFeatureGlobalIDtupe
+
+        var contentDeviceFeatures = Filter(StructureJunction, whereClause)
+        if (count(contentDeviceFeatures) > 0) {
+            for (var contentDeviceFeature in contentDeviceFeatures) {
+                if(contentDeviceFeature.className=="StructureJunction"&&contentDeviceFeature.ASSETGROUP==753){
+                    
+
+                    if(lifecyclestatus!=contentDeviceFeature.lifecyclestatus||namefeaturetype!=contentDeviceFeature.namefeaturetype){
+                        var updateObject = {}
+                        var attributes = {}
+                        if (lifecyclestatus!=contentDeviceFeature.lifecyclestatus){
+                            attributes["lifecyclestatus"] = lifecyclestatus
+                        }
+                        if(namefeaturetype!=contentDeviceFeature.namefeaturetype){
+                            attributes["namefeaturetype"] = namefeaturetype
+                        }
+                        updateObject["GLOBALID"] = contentDeviceFeature.gid
+                        updateObject["attributes"] = attributes
+                        AddList[counter++]=updateObject
+                    }
+
+                    
+                }              
+            }
+        }
+        if (count(AddList) > 0) {
+            return {              
+                "edit": [{
+                    "className": "StructureJunction",
+                    'updates': AddList
+                }]
+            } 
+        }
+    }
+}
+
+
+
+var lifecyclestatus = $feature.lifecyclestatus
+var namefeaturetype=155
+var allContent = FeatureSetByAssociation ($feature, "content")
+
+if (!IsEmpty(lifecyclestatus)&&Count(allContent)>0){
+    if($feature.ASSETGROUP==174){
+
+        var StructureJunction =FeatureSetByName($datastore,"StructureJunction")
+        
+
+
+        var counter=0
+        var AddList = []
+        for (var Content in allContent) {
+            var gid = Content.globalId
+            var sqlExpression = "globalId = @gid"
+            var Point_className = Content.className 
+            if (Point_className=="StructureJunction"){
+                var lineRows = Filter(StructureJunction, sqlExpression)
+                var lineRow = first(lineRows)
+                if (lineRow.ASSETGROUP==753){
+                    if(namefeaturetype!=lineRow.namefeaturetype||lifecyclestatus!=lineRow.lifecyclestatus){
+                        AddList[counter] = {
+                            'globalid': gid,
+                            'attributes': {
+                                'lifecyclestatus': lifecyclestatus,
+                                'namefeaturetype': namefeaturetype
+                            }
+                        }
+                        counter++
+                    }
+                }
+            }                            
+        }
+        return {              
+            "edit": [{
+                "className":"StructureJunction",
+                'updates': AddList
+            }]
+        } 
+    }
+}
+
+
+var line =FeatureSetByName($datastore,"MapLine")
+var intersectnumber=Intersects(line, $feature) 
+var intersect=first(intersectnumber)
+if($feature.ASSETGROUP==778){
+    if (Count(intersectnumber)>0){
+        var line_assetgroup =intersect.ASSETGROUP
+        var line_gid=intersect.GLOBALID
+        if(line_assetgroup==920){
+
+            var allContent = FeatureSetByAssociation ($feature, "content")
+            if(Count(allContent)>0){
+               for (var Content in allContent) {
+                    var gid = Content.globalId
+                    if(gid==line_gid){
+                        return null
+                    }
+                }    
+            }
+            
+            return { 
+                "edit": [{
+                    "className": "^UN_Association", 
+                    "adds": [{
+                        "fromClass": "MapJunction",
+                        "fromGlobalId": $feature.GLOBALID,
+                        "toClass": "MapLine",
+                        "toGlobalId": line_gid,
+                        "associationType": "containment"
+                    }]
+                }]
+            }    
+        }
+    }
+}
+
+
+var line =FeatureSetByName($datastore,"MapLine")
+var intersectlines=Intersects(line, $feature) 
+var intersect=first(intersectlines)
+if($feature.ASSETGROUP==779){
+    if (Count(intersectlines)>0){
+        
+        var line_assetgroup =intersect.ASSETGROUP
+        var line_gid=intersect.GLOBALID
+        if(line_assetgroup==755){
+            
+            var allContent = FeatureSetByAssociation ($feature, "content")
+            if(Count(allContent)>0){
+                for (var Content in allContent) {
+                    var gid = Content.globalId
+                    if(gid==line_gid){
+                        return null
+                    }
+                } 
+            }
+            
+            return { 
+                "edit": [{
+                    "className": "^UN_Association", 
+                    "adds": [{
+                        "fromClass": "MapLine",
+                        "fromGlobalId": line_gid,
+                        "toClass": "MapJunction",
+                        "toGlobalId": $feature.GLOBALID,
+                        "associationType": "containment"
+                    }]
+                }]
+            }
+        }
+        
+    }
+}
+
+
+var line =FeatureSetByName($datastore,"MapLine")
+var intersectlines=Intersects(line, $feature) 
+var intersect=first(intersectlines)
+if($feature.ASSETGROUP==776){
+    if (Count(intersectlines)>0){       
+        var line_assetgroup =intersect.ASSETGROUP
+        var line_gid=intersect.GLOBALID
+        if(line_assetgroup==923){
+            var allContent = FeatureSetByAssociation ($feature, "content")
+            if(Count(allContent)>0){
+                for (var Content in allContent) {
+                    var gid = Content.globalId
+                    if(gid==line_gid){
+                        return null
+                    }
+                }  
+            }
+            return { 
+                "edit": [{
+                    "className": "^UN_Association", 
+                    "adds": [{
+                        "fromClass": "MapLine",
+                        "fromGlobalId": line_gid,
+                        "toClass": "MapJunction",
+                        "toGlobalId": $feature.GLOBALID,
+                        "associationType": "containment"
+                    }]
+                }]
+            }
+        }
+    }
+}
+
+
+
+
+var line =FeatureSetByName($datastore,"PilotLine")
+var intersectlines=Intersects(line, $feature) 
+var intersect=first(intersectlines)
+if($feature.ASSETGROUP==767){
+    if (Count(intersectlines)>0){
+       
+        var line_assetgroup =intersect.ASSETGROUP
+        var line_gid=intersect.GLOBALID
+        if(line_assetgroup==762){
+
+            var allContent = FeatureSetByAssociation ($feature, "content")
+            if(Count(allContent)>0){
+                for (var Content in allContent) {
+                    var gid = Content.globalId
+                    if(gid==line_gid){
+                        return null
+                    }
+                }    
+            }
+            return { 
+                "edit": [{
+                    "className": "^UN_Association", 
+                    "adds": [{
+                        "fromClass": "PilotLine",
+                        "fromGlobalId": line_gid,
+                        "toClass": "PilotJunction",
+                        "toGlobalId": $feature.GLOBALID,
+                        "associationType": "containment"
+                    }]
+                }]
+            }
+        }
+        
+    }
+}
+
+
+
+if($feature.ASSETGROUP==753){
+
+    var allline =FeatureSetByName($datastore,"StructureBoundary")
+    var sqlExpression = "ASSETGROUP = 174"
+    var line_ductboundary = Filter(allline, sqlExpression)
+    var intersectlines=Touches(line_ductboundary, $feature)
+    var intersect=first(intersectlines)
+
+    if (Count(intersectlines)>0){
+        
+        var line_assetgroup =intersect.ASSETGROUP
+        var line_gid=intersect.GLOBALID
+        
+        var allContent = FeatureSetByAssociation ($feature, "content")
+        if(Count(allContent)>0){
+            for (var Content in allContent) {
+                var gid = Content.globalId
+                if(gid==line_gid){
+                    return null
+                }
+            }    
+        }
+        return { 
+            "edit": [{
+                "className": "^UN_Association", 
+                "adds": [{
+                    "fromClass": "StructureBoundary",
+                    "fromGlobalId": line_gid,
+                    "toClass": "StructureJunction",
+                    "toGlobalId": $feature.GLOBALID,
+                    "associationType": "containment"
+                }]
+            }]
+        }     
+    }
+    
+}
+
+
+if($feature.ASSETGROUP==753){
+
+    var allline =FeatureSetByName($datastore,"StructureBoundary")
+    var sqlExpression = "ASSETGROUP = 180"
+    var line_ductboundary = Filter(allline, sqlExpression)
+    var intersectlines=Touches(line_ductboundary, $feature)
+    var intersect=first(intersectlines)
+    if (Count(intersectlines)>0){
+        
+            var line_assetgroup =intersect.ASSETGROUP
+            var line_gid=intersect.GLOBALID
+
+            var allContent = FeatureSetByAssociation ($feature, "content")
+            if(Count(allContent)>0){
+                for (var Content in allContent) {
+                    var gid = Content.globalId
+                    if(gid==line_gid){
+                        return null
+                    }
+                }   
+            }
+            return { 
+                "edit": [{
+                    "className": "^UN_Association", 
+                    "adds": [{
+                        "fromClass": "StructureBoundary",
+                        "fromGlobalId": line_gid,
+                        "toClass": "StructureJunction",
+                        "toGlobalId": $feature.GLOBALID,
+                        "associationType": "containment"
+                    }]
+                }]
+            }
+                        
+              
+    }
+    
+}
+
+
+
+if($feature.ASSETGROUP==753){
+
+    var allline =FeatureSetByName($datastore,"StructureBoundary")
+    var sqlExpression = "ASSETGROUP = 180 or ASSETGROUP = 174"
+    var line_ductboundary = Filter(allline, sqlExpression)
+    var intersectlines=Touches(line_ductboundary, $feature)
+    if (Count(intersectlines)>0){
+        return true       
+    }
+    else{
+        return false
+    }
+}

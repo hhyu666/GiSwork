@@ -1,0 +1,56 @@
+if($feature.ASSETGROUP==753){
+    var allContent = FeatureSetByAssociation ($feature, "container");
+    if (count(allContent)>0){
+        return first(allContent)
+    }
+    else{
+        return count(allContent)
+    }
+}
+
+
+
+
+if($feature.ASSETGROUP==753){
+    var StructureBoundary=FeatureSetByName($datastore,"StructureBoundary");
+    var allContent = FeatureSetByAssociation ($feature, "container");
+    if (count(allContent)>0){
+
+        for (var Content in allContent) {
+            var gid = Content.globalId;
+            var sqlExpression = "globalId = @gid";
+            var Point_className = Content.className ;
+            if (Point_className=="StructureBoundary"){
+                var lineRows = Filter(StructureBoundary, sqlExpression);
+                var lineRow = first(lineRows);
+                if (lineRow.ASSETGROUP==180){
+                    var intersectlines=Intersects(lineRows, $feature) ;
+                    if(Count(intersectlines)>0){
+                        return true;
+                    }
+                    else{
+                        return false;
+                    }
+                }
+            }                            
+        }
+    } 
+}
+
+
+
+
+
+if($feature.ASSETGROUP==753){
+    var StructureBoundary=FeatureSetByName($datastore,"StructureBoundary");
+    var sqlExpression = "ASSETGROUP = 174";
+    var lineRows = Filter(StructureBoundary, sqlExpression);     
+    var intersectlines=Touches(lineRows, $feature) ;
+    if(Count(intersectlines)>0){
+        return true;
+    }
+    else{
+        return false;
+    }  
+}
+

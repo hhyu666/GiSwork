@@ -1,0 +1,137 @@
+var sqlExpression_MapDevice = "className = 'MapDevice'";
+var sqlExpression_MapLine = "className = 'MapLine'";
+var sqlExpression_MapAssembly = "className = 'MapAssembly'";
+
+var Array_MapDevice=[];
+var Array_MapLine=[];
+var Array_MapAssembly=[];
+var LVswitchgear=false;
+var MVswitchgear=false;
+var LVdisconnector=false;
+var LVbusbar=false;
+var MVbusbar=false;
+var RMV=false
+
+var updateAttributes = {};
+
+if($feature.ASSETGROUP==904){
+    var allContent = FeatureSetByAssociation ($feature, "content");
+    var devicesRows = Filter(allContent, sqlExpression_MapAssembly);
+    if(Count(devicesRows) > 0){
+        for (var devicesRow in devicesRows) {        
+            Push(Array_MapAssembly, devicesRow.globalId)
+        }
+
+        for (var index in Array_MapAssembly){
+            var gid = Array_MapAssembly[index]
+            var sqlExpression_MapAssembly = "globalId = @gid"
+            var line =FeatureSetByName($datastore,"MapAssembly");
+            var lineRows = Filter(line, sqlExpression_MapAssembly);
+            var lineRow = first(lineRows)
+            if (lineRow.ASSETGROUP==914){
+                var allContent2 = FeatureSetByAssociation (lineRow, "content");
+                var devicesRows2 = Filter(allContent2, sqlExpression_MapDevice);
+                if(Count(devicesRows2) > 0){
+                    for (var devicesRow in devicesRows2) {        
+                        Push(Array_MapDevice, devicesRow.globalId)
+                    }
+
+                    for (var index in Array_MapDevice){
+                        var gid = Array_MapDevice[index]
+                        var sqlExpression_MapDevice2 = "globalId = @gid"
+                        var line =FeatureSetByName($datastore,"MapDevice");
+                        var lineRows = Filter(line, sqlExpression_MapDevice2);
+                        var lineRow = first(lineRows)
+                        
+                        if (lineRow.ASSETGROUP==775){
+                            RMV=true;
+                        }                      
+                    }
+                }
+            }  
+        }        
+    }
+
+    var devicesRows = Filter(allContent, sqlExpression_MapDevice);
+    if(Count(devicesRows) > 0){
+        var Array_MapDevice=[]
+        for (var devicesRow in devicesRows) {        
+            Push(Array_MapDevice, devicesRow.globalId)
+        }
+
+        for (var index in Array_MapDevice){
+            var gid = Array_MapDevice[index]
+            var sqlExpression_MapDevice = "globalId = @gid"
+            var line =FeatureSetByName($datastore,"MapDevice");
+            var lineRows = Filter(line, sqlExpression_MapDevice);
+            var lineRow = first(lineRows)
+            if (lineRow.ASSETGROUP==774){
+                LVswitchgear=true;                 
+            } 
+            else if (lineRow.ASSETGROUP==775){
+                MVswitchgear=true;
+            }
+            else if (lineRow.ASSETGROUP==850){
+                LVdisconnector=true;                 
+            } 
+        }        
+    }
+    else{
+        return false;
+    }
+    
+    var devicesRows = Filter(allContent, sqlExpression_MapLine);
+    if(Count(devicesRows) > 0){
+        for (var devicesRow in devicesRows) {        
+            Push(Array_MapLine, devicesRow.globalId)
+        }
+
+        for (var index in Array_MapLine){
+            var gid = Array_MapLine[index]
+            var sqlExpression_MapLine = "globalId = @gid"
+            var line =FeatureSetByName($datastore,"MapLine");
+            var lineRows = Filter(line, sqlExpression_MapLine);
+            var lineRow = first(lineRows)
+            if (lineRow.ASSETGROUP==924){
+                LVbusbar=true;                 
+            } 
+            else if (lineRow.ASSETGROUP==925){
+                MVbusbar=true;                 
+            } 
+        }        
+    }
+    else{
+        return false;
+    }
+
+    if(LVswitchgear&&MVbusbar&&LVdisconnector&&LVbusbar&&(MVswitchgear||RMV)){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
