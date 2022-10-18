@@ -1,0 +1,319 @@
+﻿NAME,DESCRIPTION,TYPE,SUBTYPE,FIELD,ISEDITABLE,TRIGGERINSERT,TRIGGERDELETE,TRIGGERUPDATE,SCRIPTEXPRESSION,ERRORNUMBER,ERRORMESSAGE,EXCLUDECLIENTEVALUATION,ISENABLED,BATCH,SEVERITY,TAGS,CATEGORY,CHECKPARAMETERS
+GetColour,Get colour from table,CALCULATION,,symbolcolor,True,True,False,True,"var colourTable = FeatureSetByName($datastore,""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour"",[""*""],false)
+//Changed
+// GetColour (HV_SWG) -- Medium voltage Switchgear
+if ($feature.assetgroup == 775) {
+ var colorkey = 14
+ //Testing
+ //read color from table
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 22}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+ else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 12}
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(colourTable,sql))
+ return result.Colour
+}
+// GetColour (HV_BKR) -- Medium voltage Circuit breaker primary
+if ($feature.assetgroup == 771) {
+ var colorkey = 14
+ //read color from table
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 22}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+ else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 12}
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(colourTable,sql))
+ return result.Colour
+}
+// GetColour (HV_SWG)1 -- Medium voltage Meter point
+if ($feature.assetgroup == 819) {
+ var colorkey = 14
+ //read color from table
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 22}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+ else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 12}
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(colourTable,sql))
+ return result.Colour
+}
+// GetColour (HV_TRF) -- Medium voltage 2 winding power transformer
+if ($feature.assetgroup == 801) {
+ var colorkey = 14
+ //read color from table
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 22}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(colourTable,sql))
+ return result.Colour
+}
+// GetColour (LV_IO) -- Low voltage Cutout
+if ($feature.assetgroup == 773) {
+ var colorkey = 14
+ //read color from table
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+ else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 12}
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(colourTable,sql))
+ return result.Colour
+}
+// GetColour (LV_SWG) -- Low voltage Switchgear
+if ($feature.assetgroup == 774) {
+ var colorkey = 14
+ //read color from table
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+ else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 12}
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(colourTable,sql))
+ return result.Colour
+}
+// GetColour (LV_ISO) -- Low voltage Disconnector
+if ($feature.assetgroup == 850) {
+ var colorkey = 14
+ //read color from table
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+ else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 12}
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(colourTable,sql))
+ return result.Colour
+}
+// GetColour (LV_TRF) -- Low voltage Transformer end
+if ($feature.assetgroup == 808) {
+ var colorkey = 14
+ //read color from table
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+ else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 12}
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(colourTable,sql))
+ return result.Colour
+}
+// GetColour (TR_SWG) -- Transmission Switchgear
+if ($feature.assetgroup == 781) {
+ var colorkey = 14
+ //read color from table
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){
+  if ($feature.voltagelimitmaxoperating == 33000 || $feature.voltagelimitmaxoperating == 66000){colorkey = 10}
+  else if ($feature.voltagelimitmaxoperating == 132000){colorkey = 19}
+  else{colorkey = 27}
+ }else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 23}
+ else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 10}
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(colourTable,sql))
+ return result.Colour
+}",,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+GetSymbolID,Return appropriate symbolid for given attribute,CALCULATION,,symbolfid,True,True,False,True,"// SymbolID (for HV_TRF) -- Medium voltage 2 winding power transformer
+if ($feature.assetgroup == 801) {
+ var symid = 13
+ if (DomainName($feature, ""nameproductvariant"") == ""Rectifier""){
+   symid = 12}
+ else{
+   symid = 13}
+ return symid
+}
+// SymbolID (for HV_SWG) -- Medium voltage Switchgear
+if ($feature.assetgroup == 775) {
+ var symid = 8
+ if (DomainName($feature,""nameproductvariant"") == ""GVS - Gas Vacuum Switch"" || DomainName($feature,""nameproductvariant"") == ""Breaker"" || DomainName($feature,""nameproductvariant"") == ""Bus Breaker""){
+   symid = 7}
+ else if (DomainName($feature,'nameproductvariant') == ""AVF - Air Vacuum Feeder""){
+   symid = 9
+ }else{
+   symid = 8
+ }
+ return symid
+}
+// SymbolID (For HV_BKR) -- Medium voltage Circuit breaker primary
+if ($feature.assetgroup == 771) {
+ return 7
+}
+// SymbolID (for HV_SWG_4) -- Medium voltage Meter point
+if ($feature.assetgroup == 819) {
+ var symid = 15
+ if (DomainName($feature,'nameproductvariant') == ""AMP - Air Metering Panel"" || DomainName($feature,'nameproductvariant') == ""GMP - Gas Metering Panel""){symid = 15}
+ else{symid = 17}
+ return symid
+}
+// SymbolID (for LV_IO) -- Low voltage Cutout
+if ($feature.assetgroup == 773) {
+ var symid = 30
+ return symid
+}
+// SymbolID (for LV_SWG) -- Low voltage Switchgear
+if ($feature.assetgroup == 774) {
+ var symid = 0
+ if (DomainName($feature,""statusswitchingnormal"") == ""Closed""){symid=15}
+ else{symid=16}
+ return symid
+}
+// SymbolID (for LV_ISO) -- Low voltage Disconnector
+if ($feature.assetgroup == 850) {
+ var symid = 8
+ return symid
+}
+// SymbolID (for LV_TRF) -- Low voltage Transformer end
+if ($feature.assetgroup == 808) {
+ var symid = 19
+ return symid
+}
+// SymbolID (for TR_SWG) -- Transmission Circuit Breaker
+if ($feature.assetgroup == 781) {
+ var symid = 76
+ return symid
+}
+// SymbolID (for TR_TRF) -- Transmission Transformer
+if ($feature.assetgroup == 803) {
+ var symid = 77
+ return symid
+}
+// SymbolID (for TR) -- Transmission Regulator
+if ($feature.assetgroup == 825) {
+ var symid = 78
+ return symid
+}
+// SymbolID (for TR) -- Transmission Source Point
+if ($feature.assetgroup == 817) {
+ var symid = 79
+ return symid
+}",,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Post processing commissioning date,Update the commissioning date and the date flag,CALCULATION,,,True,True,False,True,"var rep_date = $feature.datecommissionedrep;
+var year = Number(Mid(rep_date ,0,4))
+var month = Number(Mid(rep_date ,4,2))
+var day  = Number(Mid(rep_date ,6,2))
+var big_month = [1,3,5,7,8,10,12]
+var small_month = [4,6,9,11]
+if (year >= 1900) {
+    if (includes(big_month, month) == true) {
+        if ((day > 0) && (day < 32)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (includes(small_month, month) == true) {
+        if ((day > 0) && (day < 31)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (month == 2) {
+        if (year % 4 == 0) {
+            if ((day > 0) && (day < 30)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else{
+                var date = Date(year, (month - 1),1,8,0,0,0)
+                var acc = 2
+            }
+        }
+        else {
+            if ((day > 0) && (day < 29)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else {
+                var date = Date(year, (month - 1), 1, 8,0,0,0)
+                var acc = 2
+            }
+        }
+    }
+    else if (month == 0 && day == 0){
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+    else {
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+}
+else {
+    var date = Null
+    var acc = 0
+}
+return {
+    'result': {
+        ""attributes"": {
+            ""datecommissioned"": ToLocal(date),
+            ""datecommissionedacc"" : acc
+        }
+    }
+}",,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Post processing retired date and date flag,Update retired date and date flag,CALCULATION,,,True,True,False,True,"var rep_date = $feature.dateretiredrep;
+var year = Number(Mid(rep_date ,0,4))
+var month = Number(Mid(rep_date ,4,2))
+var day  = Number(Mid(rep_date ,6,2))
+var big_month = [1,3,5,7,8,10,12]
+var small_month = [4,6,9,11]
+if (year >= 1900) {
+    if (includes(big_month, month) == true) {
+        if ((day > 0) && (day < 32)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (includes(small_month, month) == true) {
+        if ((day > 0) && (day < 31)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (month == 2) {
+        if (year % 4 == 0) {
+            if ((day > 0) && (day < 30)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else{
+                var date = Date(year, (month - 1),1,8,0,0,0)
+                var acc = 2
+            }
+        }
+        else {
+            if ((day > 0) && (day < 29)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else {
+                var date = Date(year, (month - 1), 1, 8,0,0,0)
+                var acc = 2
+            }
+        }
+    }
+    else if (month == 0 && day == 0){
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+    else {
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+}
+else {
+    var date = Null
+    var acc = 0
+}
+return {
+    'result': {
+        ""attributes"": {
+            ""dateretired"": ToLocal(date),
+            ""dateretiredacc"" : acc
+        }
+    }
+}",,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"

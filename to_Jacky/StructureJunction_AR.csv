@@ -1,0 +1,283 @@
+﻿NAME,DESCRIPTION,TYPE,SUBTYPE,FIELD,ISEDITABLE,TRIGGERINSERT,TRIGGERDELETE,TRIGGERUPDATE,SCRIPTEXPRESSION,ERRORNUMBER,ERRORMESSAGE,EXCLUDECLIENTEVALUATION,ISENABLED,BATCH,SEVERITY,TAGS,CATEGORY,CHECKPARAMETERS
+GetColour,Get colour from table,CALCULATION,,symbolcolor,True,True,False,True,"// GetColour (LV_POL) -- Pole
+if ($feature.assetgroup == 102) {
+ var colorkey = 14
+ 
+ //read color from table
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+ else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 12}
+ 
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+ 
+ 
+ return result.Colour
+}
+
+// GetColour (ID_BALL) -- Marker
+if ($feature.assetgroup == 118) {
+ var colorkey = 14
+ 
+ var attach = FeatureSetByAssociation($feature,'attached')
+ if (Count(attach) > 0){
+     var attach_o = First(attach)
+     var fs_list = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.MapJunction"")
+     var target_gid = attach_o['globalid']
+     var fs = Filter(fs_list, ""globalid = @target_gid"");
+     if (Count(fs) > 0) {
+         fs = First(fs)
+         var attach_ag = DomainName(fs, 'assetgroup')
+         if (attach_ag == 'Medium voltage Line end' || attach_ag == 'Low voltage Line end') {
+             return fs.symbolcolor
+         }
+     }
+ }
+ 
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+ 
+ 
+ return result.Colour
+}",,,False,True,False,,,,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+GetSymbolID,Return appropriate symbolid for given attribute,CALCULATION,,symbolfid,True,True,False,True,"// SymbolID (LV_POL) -- Pole
+if ($feature.assetgroup == 102) {
+ var symid = 0
+ if ($feature.nameproductvariant == ""Aerial Bundled Cable Pole""){symid = 38}
+ else if ($feature.nameproductvariant == ""Path Lighting Pole""){symid = 39}
+ else if ($feature.nameproductvariant == ""Central Metering Pole""){symid = 40}
+ else if ($feature.nameproductvariant == ""Aerial Bundled Central Metering Pole""){symid = 41}
+ else {symid = 42}
+ 
+ return symid
+}
+
+// SymbolID -- Duct End
+if ($feature.assetgroup == 759) {
+ var symid = 88
+ 
+ return symid
+}",,,False,True,False,,,,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+StructureJunction_Cal_02,Calcuate X corrdinate (3 d.p.) and save in Grid X1 Coordinate field,CALCULATION,,envelopex1,True,True,False,True,Geometry($feature).x,,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+StructureJunction_Cal_03,Calcuate y corrdinate of point feature (3 d.p.) and save in Grid Y1 Coordinate field,CALCULATION,,envelopey1,True,True,False,True,Geometry($feature).y,,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Post processing retired date and date flag,Update retired date and date flag,CALCULATION,,,True,True,False,True,"var rep_date = $feature.dateretiredrep;
+var year = Number(Mid(rep_date ,0,4))
+var month = Number(Mid(rep_date ,4,2))
+var day  = Number(Mid(rep_date ,6,2))
+var big_month = [1,3,5,7,8,10,12]
+var small_month = [4,6,9,11]
+if (year >= 1900) {
+    if (includes(big_month, month) == true) {
+        if ((day > 0) && (day < 32)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (includes(small_month, month) == true) {
+        if ((day > 0) && (day < 31)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (month == 2) {
+        if (year % 4 == 0) {
+            if ((day > 0) && (day < 30)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else{
+                var date = Date(year, (month - 1),1,8,0,0,0)
+                var acc = 2
+            }
+        }
+        else {
+            if ((day > 0) && (day < 29)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else {
+                var date = Date(year, (month - 1), 1, 8,0,0,0)
+                var acc = 2
+            }
+        }
+    }
+    else if (month == 0 && day == 0){
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+    else {
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+}
+else {
+    var date = Null
+    var acc = 0
+}
+return {
+    'result': {
+        ""attributes"": {
+            ""dateretired"": ToLocal(date),
+            ""dateretiredacc"" : acc
+        }
+    }
+}",,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Survey_point_Cal_01,Update is shallow and nameproduct,CALCULATION,Survey point,,True,True,False,True,"var assetGroup = $feature.ASSETGROUP
+
+var environment = $feature.environment
+
+var nameproductvariant = $feature.surveypointtype
+
+var survetypeTable = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.C_SURVETYPE"", ['*'], false)
+
+var targetUpdateRows = Filter(survetypeTable, ""nameproductvariant = @nameproductvariant AND ENVIRONMENT = @environment"")
+
+if (count(targetUpdateRows) == 1) {
+    var updateObject = {}
+
+    var featuredepthValue = $feature.dimdepth
+
+    var featureIsshallow = $feature.isshallow
+
+    var featureNameproduct = $feature.nameproduct
+
+    var featureShallowValue = $feature.distancesafetyrequirement
+
+    var targetUpdateRow = First(targetUpdateRows)
+
+    var targetUpateShallowValue = targetUpdateRow.distancesafetyrequirement
+
+    var targetUpateNameproduct = targetUpdateRow.nameproduct
+
+    var targetUpdateIsshallow = """"
+
+    if (featureShallowValue != targetUpateShallowValue) {
+        updateObject[""distancesafetyrequirement""] = targetUpateShallowValue
+    }
+
+    if (featuredepthValue < targetUpateShallowValue) {
+        var targetUpdateIsshallow = ""Yes""
+
+        if (featureIsshallow != targetUpdateIsshallow) {
+            updateObject[""isshallow""] = targetUpdateIsshallow
+        }
+    } else {
+        var targetUpdateIsshallow = ""No""
+        if (featureIsshallow != targetUpdateIsshallow) {
+            updateObject[""isshallow""] = targetUpdateIsshallow
+        }
+    }
+
+    if (featureNameproduct != targetUpateNameproduct) {
+        updateObject[""nameproduct""] = targetUpateNameproduct
+    }
+
+    for (var i in updateObject) { }
+
+    if (IsEmpty(i) != true) {
+        return {
+            ""result"": {
+                'attributes': updateObject
+            }
+        }
+    }
+}",,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Post processing surveyingz date and date flag,Update surveyingz date and date flag,CALCULATION,,,True,True,False,True,"var rep_date = $feature.datesurveyingzrep;
+var year = Number(Mid(rep_date ,0,4))
+var month = Number(Mid(rep_date ,4,2))
+var day  = Number(Mid(rep_date ,6,2))
+var big_month = [1,3,5,7,8,10,12]
+var small_month = [4,6,9,11]
+if (year >= 1900) {
+    if (includes(big_month, month) == true) {
+        if ((day > 0) && (day < 32)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (includes(small_month, month) == true) {
+        if ((day > 0) && (day < 31)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (month == 2) {
+        if (year % 4 == 0) {
+            if ((day > 0) && (day < 30)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else{
+                var date = Date(year, (month - 1),1,8,0,0,0)
+                var acc = 2
+            }
+        }
+        else {
+            if ((day > 0) && (day < 29)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else {
+                var date = Date(year, (month - 1), 1, 8,0,0,0)
+                var acc = 2
+            }
+        }
+    }
+    else if (month == 0 && day == 0){
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+    else {
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+}
+else {
+    var date = Null
+    var acc = 0
+}
+return {
+    'result': {
+        ""attributes"": {
+            ""datesurveyingz"": ToLocal(date),
+            ""datesurveyingzacc"" : acc
+        }
+    }
+}",,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Duct_end_Con_01,Constrain that a duct end must be placed on a duct boundary outline.,CONSTRAINT,Duct end,,True,True,False,True,"var ductBoundaryAssetGroup = 180
+var structureBoundaryFeatures = FeatureSetByName($datastore,""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.StructureBoundary"",[""*""],true)
+var ductBoundaryFeatures = Filter(structureBoundaryFeatures, ""ASSETGROUP = @ductBoundaryAssetGroup"")
+var touchedDuctEnd = touches(ductBoundaryFeatures, Geometry($feature))
+if(count(touchedDuctEnd)>0){
+    return true
+}else{
+    return false
+}",99202,The Duct end must place on the duct boundary outline,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Survey_point_Val_01,Check if the feature in StructureJunction without containment .,VALIDATION,Survey point,,True,False,False,False,"var containerFeatures = FeatureSetByAssociation($feature,""container"")
+if(count(containerFeatures)>0){
+    return true
+}else{
+    return false
+}",99301,Invalid feature(Orphan),False,True,True,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Marker_Val_01,Check if the feature in StructureJunction without attachment.,VALIDATION,Marker,,True,False,False,False,"var attachFeatures = FeatureSetByAssociation($feature,""attached"")
+if(count(attachFeatures)>0){
+    return true
+}else{
+    return false
+}",99301,Invalid feature(Orphan),False,True,True,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"

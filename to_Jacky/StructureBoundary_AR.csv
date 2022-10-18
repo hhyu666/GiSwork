@@ -1,0 +1,265 @@
+﻿NAME,DESCRIPTION,TYPE,SUBTYPE,FIELD,ISEDITABLE,TRIGGERINSERT,TRIGGERDELETE,TRIGGERUPDATE,SCRIPTEXPRESSION,ERRORNUMBER,ERRORMESSAGE,EXCLUDECLIENTEVALUATION,ISENABLED,BATCH,SEVERITY,TAGS,CATEGORY,CHECKPARAMETERS
+GetColour,Get colour from table,CALCULATION,,symbolcolor,True,True,False,True,"// GetColour (For LV_DPM) -- Cabinet boundary
+if ($feature.assetgroup == 171) {
+ var colorkey = 14
+ 
+ //read color from table
+ 
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+ else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 24}
+ 
+ 
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+ 
+ 
+ return result.Colour
+}
+
+// GetColour (For DT_SEG) -- Duct boundary
+if ($feature.assetgroup == 180) {
+ var colorkey = 14
+ 
+ //read color from table
+ 
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 13}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+ 
+ 
+ 
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+ 
+ 
+ return result.Colour
+}
+
+// GetColour (For DT_PIT) -- Underground structure boundary
+if ($feature.assetgroup == 174) {
+ var colorkey = 14
+ 
+ //read color from table
+ 
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 13}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+ 
+ if ($feature.assettype == 190) {
+ colorkey = 27
+ }
+ 
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+ 
+ 
+ return result.Colour
+}
+
+// GetColour (For ADM_ADR) -- Building boundary
+if ($feature.assetgroup == 176) {
+ var colorkey = 2
+ 
+ //read color from table
+ 
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 2}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+ else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 12}
+ 
+ 
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+ 
+ 
+ return result.Colour
+}",,,False,True,False,,,,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+GetSymbolID,Return appropriate symbolid for given attribute,CALCULATION,,symbolfid,True,True,False,True,"// SymbolID (for LV_DPM) -- Cabinet boundary
+if ($feature.assetgroup == 171) {
+ var symid = 1
+ 
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 670}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 671}
+ else if (DomainName($feature,'lifecyclestatus') == ""RES""){symid = 672}
+ 
+ return symid
+}
+
+// SymbolID (for DT_SEG) -- Duct boundary
+if ($feature.assetgroup == 180) {
+ var symid = 707
+ 
+ return symid
+}
+
+// SymbolID (for DT_PIT) -- Underground structure boundary
+if ($feature.assetgroup == 174) {
+ var symid = 670
+ 
+ return symid
+}
+
+// SymbolID (for ADM_ADR) -- Building boundary
+if ($feature.assetgroup == 176) {
+ var symid = 1
+ 
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 670}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 671}
+ else if (DomainName($feature,'lifecyclestatus') == ""RES""){symid = 672}
+ 
+ return symid
+}",,,False,True,False,,,,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Post processing commissioning date,Update the commissioning date and the date flag,CALCULATION,,,True,True,False,True,"var rep_date = $feature.datecommissionedrep;
+var year = Number(Mid(rep_date ,0,4))
+var month = Number(Mid(rep_date ,4,2))
+var day  = Number(Mid(rep_date ,6,2))
+var big_month = [1,3,5,7,8,10,12]
+var small_month = [4,6,9,11]
+if (year >= 1900) {
+    if (includes(big_month, month) == true) {
+        if ((day > 0) && (day < 32)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (includes(small_month, month) == true) {
+        if ((day > 0) && (day < 31)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (month == 2) {
+        if (year % 4 == 0) {
+            if ((day > 0) && (day < 30)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else{
+                var date = Date(year, (month - 1),1,8,0,0,0)
+                var acc = 2
+            }
+        }
+        else {
+            if ((day > 0) && (day < 29)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else {
+                var date = Date(year, (month - 1), 1, 8,0,0,0)
+                var acc = 2
+            }
+        }
+    }
+    else if (month == 0 && day == 0){
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+    else {
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+}
+else {
+    var date = Null
+    var acc = 0
+}
+return {
+    'result': {
+        ""attributes"": {
+            ""datecommissioned"": ToLocal(date),
+            ""datecommissionedacc"" : acc
+        }
+    }
+}",,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Post processing retired date and date flag,Update retired date and date flag,CALCULATION,,,True,True,False,True,"var rep_date = $feature.dateretiredrep;
+var year = Number(Mid(rep_date ,0,4))
+var month = Number(Mid(rep_date ,4,2))
+var day  = Number(Mid(rep_date ,6,2))
+var big_month = [1,3,5,7,8,10,12]
+var small_month = [4,6,9,11]
+if (year >= 1900) {
+    if (includes(big_month, month) == true) {
+        if ((day > 0) && (day < 32)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (includes(small_month, month) == true) {
+        if ((day > 0) && (day < 31)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (month == 2) {
+        if (year % 4 == 0) {
+            if ((day > 0) && (day < 30)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else{
+                var date = Date(year, (month - 1),1,8,0,0,0)
+                var acc = 2
+            }
+        }
+        else {
+            if ((day > 0) && (day < 29)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else {
+                var date = Date(year, (month - 1), 1, 8,0,0,0)
+                var acc = 2
+            }
+        }
+    }
+    else if (month == 0 && day == 0){
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+    else {
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+}
+else {
+    var date = Null
+    var acc = 0
+}
+return {
+    'result': {
+        ""attributes"": {
+            ""dateretired"": ToLocal(date),
+            ""dateretiredacc"" : acc
+        }
+    }
+}",,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Building_boundary_Cal_02,Calcuate the centroid X of building boundary,CALCULATION,Building boundary,envelopexcentroid,True,True,False,True,centroid(Geometry($feature)).x,,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Building_boundary_Cal_03,Calcuate the centroid Y of building boundary,CALCULATION,Building boundary,envelopeycentroid,True,True,False,True,centroid(Geometry($feature)).y,,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+StructureBoundary_Cal_03,Calculate envelope max X coordinate and save in this field,CALCULATION,,envelopex2,True,True,False,True,extent(Geometry($feature)).xmax,,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+StructureBoundary_Cal_04,Calculate envelope max Y coordinate and save in this field,CALCULATION,,envelopey2,True,True,False,True,extent(Geometry($feature)).ymax,,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+StructureBoundary_Cal_05,Calculate envelope min X coordinate and save in this field,CALCULATION,,envelopex1,True,True,False,True,extent(Geometry($feature)).xmin,,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+StructureBoundary_Cal_06,Calculate envelope min Y coordinate and save in this field,CALCULATION,,envelopey1,True,True,False,True,extent(Geometry($feature)).ymin,,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Underground_structure_boundary_Cal_021,"Based on C_PITCOVER, update materialcode",CALCULATION,Underground structure boundary,materialcode,True,True,False,True,"var environment = $feature.environment
+var trPitEnvironment = ""1000""
+if(environment == trPitEnvironment){
+    var material = $feature.material
+    var mappingTableRows = FeatureSetByName($datastore,""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.C_PITCOVER"",[""*""],false)
+    var targetRows = Filter(mappingTableRows, ""material = @material"")
+    if(count(targetRows) == 1){
+        return first(targetRows).materialcode
+    }
+}",,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"

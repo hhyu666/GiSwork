@@ -1,0 +1,346 @@
+﻿NAME,DESCRIPTION,TYPE,SUBTYPE,FIELD,ISEDITABLE,TRIGGERINSERT,TRIGGERDELETE,TRIGGERUPDATE,SCRIPTEXPRESSION,ERRORNUMBER,ERRORMESSAGE,EXCLUDECLIENTEVALUATION,ISENABLED,BATCH,SEVERITY,TAGS,CATEGORY,CHECKPARAMETERS
+GetColour,Get colour from table,CALCULATION,,symbolcolor,True,True,False,True,"// GetColour (for HV Sch Busbar) -- Medium voltage Busbar
+if ($feature.assetgroup == 925) {
+ var colorkey = 14
+ 
+ //read color from table
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 22}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+ 
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+ 
+ 
+ return result.Colour
+}
+
+// GetColour (for HV Sch Cable) -- Medium voltage Conductor
+if ($feature.assetgroup == 921) {
+ var colorkey = 14
+ 
+ //read color from table
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 22}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+ 
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+ 
+ 
+ return result.Colour
+}
+
+// GetColour (for HV Sch Connector) -- Medium voltage Connector line
+if ($feature.assetgroup == 929) {
+ var colorkey = 14
+ 
+ //read color from table
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 22}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+ 
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+ 
+ 
+ return result.Colour
+}
+
+// GetColour (for LV Sch Cable) -- Low voltage Conductor
+if ($feature.assetgroup == 920) {
+ var colorkey = 14
+ 
+ //read color from table
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+ 
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+ 
+ 
+ return result.Colour
+}
+
+// GetColour (for LV Sch Busbar) -- Low voltage Busbar
+if ($feature.assetgroup == 924) {
+ var colorkey = 14
+ 
+ //read color from table
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+ 
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+ 
+ 
+ return result.Colour
+}
+
+// GetColour (for LV Sch Connector) -- Low voltage Connector line
+if ($feature.assetgroup == 928) {
+ var colorkey = 14
+ 
+ //read color from table
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+ 
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+ 
+ 
+ return result.Colour
+}",,,False,True,False,,,,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+GetSymbolID,Return appropriate symbolid for given attribute,CALCULATION,,symbolfid,True,True,False,True,"// SymbolID (for HV Sch Cable) -- Medium voltage Conductor
+if ($feature.assetgroup == 921) {
+ var symid = 1
+ 
+ //read color from table
+ if (DomainName($feature,""circuittype"") == ""Interconnector""){
+     if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 683}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 684}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 685}
+ }else{
+     if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 686}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 687}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 688}
+ }
+ 
+ return symid
+}
+
+// SymbolID (for LV Sch Cable) -- Low voltage Conductor
+if ($feature.assetgroup == 920) {
+ var symid = 7
+ if ($feature.ASSETTYPE == 0){ //UNKNOWN
+     if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 689}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 690}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 691}
+ }else if ($feature.ASSETTYPE == 880){ //UNDERGROUND
+     if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 692}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 693}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 694}
+ }else if ($feature.ASSETTYPE == 881){ //OVERHEAD
+     if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 695}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 696}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 697}
+ }else if ($feature.ASSETTYPE == 886){ // SUBMARINE
+     if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 698}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 699}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 700}
+ }else if ($feature.namefeaturetype == 573){ // Interconnector
+     if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 683}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 684}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 685}
+ }else{
+     if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 701}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 702}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 703}
+ }
+ return symid
+}
+
+// SymbolID (for HV busbar) -- Medium voltage Busbar
+if ($feature.assetgroup == 925) {
+ var symid = 682
+ return symid
+}
+
+// SymbolID (for LV busbar) -- Low voltage Busbar
+if ($feature.assetgroup == 924) {
+ var symid = 682
+ return symid
+}
+
+// SymbolID (for LV Sch Cable/Connector) -- Low voltage Connector line
+if ($feature.assetgroup == 928) {
+ var symid = 7
+ if ($feature.ASSETTYPE == 0){ //UNKNOWN
+     if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 689}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 690}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 691}
+ }else if ($feature.ASSETTYPE == 880){ //UNDERGROUND
+     if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 692}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 693}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 694}
+ }else if ($feature.ASSETTYPE == 881){ //OVERHEAD
+     if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 695}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 696}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 697}
+ }else if ($feature.ASSETTYPE == 886){ // SUBMARINE
+     if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 698}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 699}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 700}
+ }else{
+     if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 101}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 702}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 703}
+ }
+ return symid
+}",,,False,True,False,,,,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicLine_Cal_02,Copy X coordinate of the start vertex (part 1) of the line feature to this field,CALCULATION,,envelopex1,False,True,False,True,Geometry($feature).paths[0][0].x,,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicLine_Cal_03,Copy X coordinate of the end vertex (part 1) of the line feature to this field,CALCULATION,,envelopex2,False,True,False,True,Geometry($feature).paths[0][-1].x,,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicLine_Cal_04,Copy Y coordinate of the end vertex (part 1) of the line feature to this field,CALCULATION,,envelopey2,False,True,False,True,Geometry($feature).paths[0][-1].y,,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicLine_Cal_05,Copy Y coordinate of the start vertex (part 1) of the line feature to this field,CALCULATION,,envelopey1,False,True,False,True,Geometry($feature).paths[0][0].y,,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Post processing commissioning date,Update the commissioning date and the date flag,CALCULATION,,,True,True,False,True,"var rep_date = $feature.datecommissionedrep;
+var year = Number(Mid(rep_date ,0,4))
+var month = Number(Mid(rep_date ,4,2))
+var day  = Number(Mid(rep_date ,6,2))
+var big_month = [1,3,5,7,8,10,12]
+var small_month = [4,6,9,11]
+if (year >= 1900) {
+    if (includes(big_month, month) == true) {
+        if ((day > 0) && (day < 32)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (includes(small_month, month) == true) {
+        if ((day > 0) && (day < 31)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (month == 2) {
+        if (year % 4 == 0) {
+            if ((day > 0) && (day < 30)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else{
+                var date = Date(year, (month - 1),1,8,0,0,0)
+                var acc = 2
+            }
+        }
+        else {
+            if ((day > 0) && (day < 29)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else {
+                var date = Date(year, (month - 1), 1, 8,0,0,0)
+                var acc = 2
+            }
+        }
+    }
+    else if (month == 0 && day == 0){
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+    else {
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+}
+else {
+    var date = Null
+    var acc = 0
+}
+return {
+    'result': {
+        ""attributes"": {
+            ""datecommissioned"": ToLocal(date),
+            ""datecommissionedacc"" : acc
+        }
+    }
+}",,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Post processing retired date and date flag,Update retired date and date flag,CALCULATION,,,True,True,False,True,"var rep_date = $feature.dateretiredrep;
+var year = Number(Mid(rep_date ,0,4))
+var month = Number(Mid(rep_date ,4,2))
+var day  = Number(Mid(rep_date ,6,2))
+var big_month = [1,3,5,7,8,10,12]
+var small_month = [4,6,9,11]
+if (year >= 1900) {
+    if (includes(big_month, month) == true) {
+        if ((day > 0) && (day < 32)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (includes(small_month, month) == true) {
+        if ((day > 0) && (day < 31)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (month == 2) {
+        if (year % 4 == 0) {
+            if ((day > 0) && (day < 30)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else{
+                var date = Date(year, (month - 1),1,8,0,0,0)
+                var acc = 2
+            }
+        }
+        else {
+            if ((day > 0) && (day < 29)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else {
+                var date = Date(year, (month - 1), 1, 8,0,0,0)
+                var acc = 2
+            }
+        }
+    }
+    else if (month == 0 && day == 0){
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+    else {
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+}
+else {
+    var date = Null
+    var acc = 0
+}
+return {
+    'result': {
+        ""attributes"": {
+            ""dateretired"": ToLocal(date),
+            ""dateretiredacc"" : acc
+        }
+    }
+}",,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Conductor_Cal_01,based on C_LVCIRRATE_57. nameproductvariant is CODETEXT and selected by user. Currentapproved is CODERATE and updated by attribute rule. materialcore is CODECODE and updated by attribute rule,CALCULATION,Low voltage Conductor,,True,True,False,True,"var nameProductVariant = $feature.nameproductvariant
+var lvCirRateRows = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.C_LVCIRRATE"", [""*""], false)
+var targetRows = Filter(lvCirRateRows, ""nameproductvariant = @nameProductVariant"")
+if (count(targetRows) == 1) {
+    var updateObject = {}
+    var row = first(targetRows)
+    var currentApproved = row.currentapproved
+    var materialCore = row.materialcore
+    var existCurrentApproved = $feature.currentapproved
+    var existMaterialCore = $feature.materialcore
+    if (existCurrentApproved != currentApproved) {
+        updateObject[""currentApproved""] = currentApproved
+    }
+    if (existMaterialCore != materialCore) {
+        updateObject[""materialCore""] = materialCore
+    }
+    for (var i in updateObject) { }
+    if (isEmpty(i) != true) {
+        return {
+            'result': {
+                'attributes': updateObject
+            }
+        }
+    }
+}",,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"

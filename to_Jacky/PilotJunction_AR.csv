@@ -1,0 +1,301 @@
+﻿NAME,DESCRIPTION,TYPE,SUBTYPE,FIELD,ISEDITABLE,TRIGGERINSERT,TRIGGERDELETE,TRIGGERUPDATE,SCRIPTEXPRESSION,ERRORNUMBER,ERRORMESSAGE,EXCLUDECLIENTEVALUATION,ISENABLED,BATCH,SEVERITY,TAGS,CATEGORY,CHECKPARAMETERS
+GetColour,Get colour from table,CALCULATION,,symbolcolor,True,True,False,True," var colorkey = 26
+
+// GetColour (for PR) -- Pilot Cable end
+// GetColour (for PT_HUB) -- Pilot Network hub
+// GetColour (for PT_DEPTH) -- Pilot Survey point
+// GetColour (for PR_JNT) -- Pilot Cable joint
+if ($feature.assetgroup == 764 || $feature.assetgroup == 766 || $feature.assetgroup == 767 || $feature.assetgroup == 763) {
+    if ($feature.lifecyclestatus == 11) {
+        colorkey = 12
+    }
+}
+
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+ 
+ 
+ return result.Colour",,,False,True,False,,,,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+GetSymbolID,Return appropriate symbolid for given attribute,CALCULATION,,symbolfid,True,True,False,True,"// SymbolID (for PT_HUB) -- Pilot Network hub
+if ($feature.assetgroup == 766) {
+ return 48
+}
+
+// SymbolID (for PT_JNT) -- Pilot Cable joint
+if ($feature.assetgroup == 763) {
+ return 60
+}
+
+// SymbolID -- Pilot Line End
+if ($feature.assetgroup == 764) {
+ return 86
+}
+
+
+// SymbolID -- Pilot Depth Marker
+if ($feature.assetgroup == 767) {
+ return 87
+}",,,False,True,False,,,,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+GetAngle,// Find the first intersecting line from the intersecting class,CALCULATION,Pilot Cable end,symbolrotation,True,True,False,True,"// Find the first intersecting line from the intersecting class
+var lineClass = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.MapLine"", [""objectid""], true)
+var line = First(Intersects(lineClass, $feature))
+
+// If no feature was found, return the original value
+if (line == null)
+   return $feature.symbolrotation
+
+// Buffer the point by a small amount to extract the segment
+var search = Extent(Buffer($feature, .01, ""meter""))
+var segment = Clip(line, search)[""paths""][0]
+
+// Get angle of line using the start and end vertex
+return Angle(segment[0], segment[-1])",,,False,True,False,,,,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+PilotJunction_Cal_01,Calcuate X corrdinate (3 d.p.) and save in Grid X1 Coordinate field,CALCULATION,,envelopex1,True,True,False,True,Geometry($feature).x,,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+PilotJunction_Cal_02,Calcuate y corrdinate of point feature (3 d.p.) and save in Grid Y1 Coordinate field,CALCULATION,,envelopey1,True,True,False,True,Geometry($feature).y,,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Post processing commissioning date,Update the commissioning date and the date flag,CALCULATION,,,True,True,False,True,"var rep_date = $feature.datecommissionedrep;
+var year = Number(Mid(rep_date ,0,4))
+var month = Number(Mid(rep_date ,4,2))
+var day  = Number(Mid(rep_date ,6,2))
+var big_month = [1,3,5,7,8,10,12]
+var small_month = [4,6,9,11]
+if (year >= 1900) {
+    if (includes(big_month, month) == true) {
+        if ((day > 0) && (day < 32)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (includes(small_month, month) == true) {
+        if ((day > 0) && (day < 31)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (month == 2) {
+        if (year % 4 == 0) {
+            if ((day > 0) && (day < 30)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else{
+                var date = Date(year, (month - 1),1,8,0,0,0)
+                var acc = 2
+            }
+        }
+        else {
+            if ((day > 0) && (day < 29)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else {
+                var date = Date(year, (month - 1), 1, 8,0,0,0)
+                var acc = 2
+            }
+        }
+    }
+    else if (month == 0 && day == 0){
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+    else {
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+}
+else {
+    var date = Null
+    var acc = 0
+}
+return {
+    'result': {
+        ""attributes"": {
+            ""datecommissioned"": ToLocal(date),
+            ""datecommissionedacc"" : acc
+        }
+    }
+}",,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Post processing installed date and date flag,Update installed date and date flag,CALCULATION,,,True,True,False,True,"var rep_date = $feature.dateinstalledrep;
+var year = Number(Mid(rep_date ,0,4))
+var month = Number(Mid(rep_date ,4,2))
+var day  = Number(Mid(rep_date ,6,2))
+var big_month = [1,3,5,7,8,10,12]
+var small_month = [4,6,9,11]
+if (year >= 1900) {
+    if (includes(big_month, month) == true) {
+        if ((day > 0) && (day < 32)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (includes(small_month, month) == true) {
+        if ((day > 0) && (day < 31)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (month == 2) {
+        if (year % 4 == 0) {
+            if ((day > 0) && (day < 30)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else{
+                var date = Date(year, (month - 1),1,8,0,0,0)
+                var acc = 2
+            }
+        }
+        else {
+            if ((day > 0) && (day < 29)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else {
+                var date = Date(year, (month - 1), 1, 8,0,0,0)
+                var acc = 2
+            }
+        }
+    }
+    else if (month == 0 && day == 0){
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+    else {
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+}
+else {
+    var date = Null
+    var acc = 0
+}
+return {
+    'result': {
+        ""attributes"": {
+            ""dateinstalled"": ToLocal(date),
+            ""dateinstalledacc"" : acc
+        }
+    }
+}",,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Post processing retired date and date flag,Update retired date and date flag,CALCULATION,,,True,True,False,True,"var rep_date = $feature.dateretiredrep;
+var year = Number(Mid(rep_date ,0,4))
+var month = Number(Mid(rep_date ,4,2))
+var day  = Number(Mid(rep_date ,6,2))
+var big_month = [1,3,5,7,8,10,12]
+var small_month = [4,6,9,11]
+if (year >= 1900) {
+    if (includes(big_month, month) == true) {
+        if ((day > 0) && (day < 32)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (includes(small_month, month) == true) {
+        if ((day > 0) && (day < 31)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (month == 2) {
+        if (year % 4 == 0) {
+            if ((day > 0) && (day < 30)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else{
+                var date = Date(year, (month - 1),1,8,0,0,0)
+                var acc = 2
+            }
+        }
+        else {
+            if ((day > 0) && (day < 29)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else {
+                var date = Date(year, (month - 1), 1, 8,0,0,0)
+                var acc = 2
+            }
+        }
+    }
+    else if (month == 0 && day == 0){
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+    else {
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+}
+else {
+    var date = Null
+    var acc = 0
+}
+return {
+    'result': {
+        ""attributes"": {
+            ""dateretired"": ToLocal(date),
+            ""dateretiredacc"" : acc
+        }
+    }
+}",,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+PT_Survey_point_Cal_01,"Base on C_SURETYPE to assign is shallow, name product and distancesafetyrequirement",CALCULATION,Pilot Survey point,,True,True,False,True,"var environment = $feature.environment
+    var nameproductvariant = $feature.surveypointtype
+    var survetypeTable = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.C_SURVETYPE"",['*'],false)
+    var targetUpdateRows = Filter(survetypeTable, ""nameproductvariant = @nameproductvariant AND ENVIRONMENT = @environment"")
+    if(count(targetUpdateRows)==1){
+        var updateObject = {}
+        var featuredepthValue = $feature.dimdepth
+        var featureIsshallow =  $feature.isshallow
+        var featureNameproduct = $feature.nameproduct
+        var targetUpdateRow = First(targetUpdateRows)
+        var targetUpateNameproduct = targetUpdateRow.nameproduct
+        var targetUpateShallowValue = targetUpdateRow.distancesafetyrequirement
+        var targetUpdateIsshallow = """"
+
+        if(featuredepthValue < targetUpateShallowValue){
+            var targetUpdateIsshallow = ""Yes""
+            if(featureIsshallow != targetUpdateIsshallow){
+                updateObject[""isshallow""] = targetUpdateIsshallow
+            }
+        }else{
+            var targetUpdateIsshallow = ""No""
+            if(featureIsshallow!= targetUpdateIsshallow){
+                updateObject[""isshallow""] = targetUpdateIsshallow
+            }
+        }
+        if(featureNameproduct != targetUpateNameproduct){
+            updateObject[""nameproduct""] = targetUpateNameproduct
+        }
+        for(var i in updateObject){}
+        if(IsEmpty(i) != true){
+            return{
+                ""result"":{
+                    'attributes':updateObject
+                }
+            }
+        }
+    }",,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"

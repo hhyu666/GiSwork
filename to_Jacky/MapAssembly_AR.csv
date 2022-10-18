@@ -1,0 +1,259 @@
+﻿NAME,DESCRIPTION,TYPE,SUBTYPE,FIELD,ISEDITABLE,TRIGGERINSERT,TRIGGERDELETE,TRIGGERUPDATE,SCRIPTEXPRESSION,ERRORNUMBER,ERRORMESSAGE,EXCLUDECLIENTEVALUATION,ISENABLED,BATCH,SEVERITY,TAGS,CATEGORY,CHECKPARAMETERS
+GetSymbolID,Return appropriate symbolid for given attribute,CALCULATION,,symbolfid,True,True,False,True,"// SymbolID (for LV_DPM) -- Electric switching location Low voltage
+if ($feature.assetgroup == 911) {
+ return 6
+}
+
+// SymbolID (for HV_SUBM) -- Electric substation Medium voltage
+if ($feature.assetgroup == 904) {
+ return 64
+}
+
+// SymbolID (for LV_IO) -- Controls assembly Low voltage
+if ($feature.assetgroup == 915) {
+ var symid = 0
+ if (DomainName($feature,""isratingverified"") == ""Yes""){symid = 36}
+ else {symid = 37}
+ 
+ return symid
+}
+
+// SymbolID (for MV_IO) -- Controls assembly Medium voltage
+if ($feature.assetgroup == 914) {
+ return 64
+}",,,False,True,False,,,,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+GetColour,Get colour from table,CALCULATION,,symbolcolor,True,True,False,True,"// GetColour (for TR_SUB) -- Electric substation Transmission
+if ($feature.assetgroup == 902) {
+ var colorkey = 14
+ 
+ //read color from table
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){
+     if(DomainName($feature,'voltagelimitmaxoperating') == '33 kV' || DomainName($feature,'voltagelimitmaxoperating') == '66 kV'){colorkey = 10}
+     else if (DomainName($feature,'voltagelimitmaxoperating') == '132 kV'){colorkey = 430}
+     else{colorkey = 27}}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 431}
+ else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 12}
+ 
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+ 
+ 
+ return result.Colour
+}
+
+// GetColour (for HV_SUBM) -- Electric substation Medium voltage
+if ($feature.assetgroup == 904) {
+ var colorkey = 14
+ 
+ //read color from table
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 22}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+ else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 12}
+ 
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+ 
+ 
+ return result.Colour
+}
+
+// GetColour (for LV_DPM) -- Electric switching location Low voltage
+if ($feature.assetgroup == 911) {
+ var colorkey = 14
+ 
+ //read color from table
+ 
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+ else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 12}
+ 
+ 
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+ 
+ 
+ return result.Colour
+}
+
+// GetColour (for LV_IO) -- Controls assembly Low voltage
+if ($feature.assetgroup == 915) {
+ var colorkey = 14
+ 
+ //read color from table
+ 
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+ else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 12}
+ 
+ 
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+ 
+ 
+ return result.Colour
+}
+
+// GetColour (for HV_SUBM) -M -- Controls assembly Medium voltage
+if ($feature.assetgroup == 914) {
+ var colorkey = 14
+ 
+ //read color from table
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 22}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+ else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 22}
+ 
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+ 
+ 
+ return result.Colour
+}",,,False,True,False,,,,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Post Processing commissiondate,Update the datecommissioned and the datecommissionedacc according to datecommissionedrep.,CALCULATION,,,True,True,False,True,"var rep_date = $feature.datecommissionedrep;
+var year = Number(Mid(rep_date ,0,4))
+var month = Number(Mid(rep_date ,4,2))
+var day  = Number(Mid(rep_date ,6,2))
+var big_month = [1,3,5,7,8,10,12]
+var small_month = [4,6,9,11]
+if (year >= 1900) {
+    if (includes(big_month, month) == true) {
+        if ((day > 0) && (day < 32)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (includes(small_month, month) == true) {
+        if ((day > 0) && (day < 31)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (month == 2) {
+        if (year % 4 == 0) {
+            if ((day > 0) && (day < 30)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else{
+                var date = Date(year, (month - 1),1,8,0,0,0)
+                var acc = 2
+            }
+        }
+        else {
+            if ((day > 0) && (day < 29)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else {
+                var date = Date(year, (month - 1), 1, 8,0,0,0)
+                var acc = 2
+            }
+        }
+    }
+    else if (month == 0 && day == 0){
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+    else {
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+}
+else {
+    var date = Null
+    var acc = 0
+}
+return {
+    'result': {
+        ""attributes"": {
+            ""datecommissioned"": ToLocal(date),
+            ""datecommissionedacc"" : acc
+        }
+    }
+}",,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Control_assembly_LV_Cal_01,"Base on C_LVIOTYPE, update nameproduct",CALCULATION,Controls assembly Low voltage,nameproduct,True,True,False,True,"var nameproductvariant = $feature.nameproductvariant
+var lvIOMappingTable = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.C_LVIOTYPE"",[""*""],false)
+var mappedRecords = Filter(lvIOMappingTable, ""nameproductvariant = @nameproductvariant"")
+if(count(mappedRecords)==1){
+    return first(mappedRecords).nameproduct
+}",,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Post Processing retaireddate,,CALCULATION,,,True,True,False,True,"var rep_date = $feature.dateretiredrep;
+var year = Number(Mid(rep_date ,0,4))
+var month = Number(Mid(rep_date ,4,2))
+var day  = Number(Mid(rep_date ,6,2))
+var big_month = [1,3,5,7,8,10,12]
+var small_month = [4,6,9,11]
+if (year >= 1900) {
+    if (includes(big_month, month) == true) {
+        if ((day > 0) && (day < 32)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (includes(small_month, month) == true) {
+        if ((day > 0) && (day < 31)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (month == 2) {
+        if (year % 4 == 0) {
+            if ((day > 0) && (day < 30)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else{
+                var date = Date(year, (month - 1),1,8,0,0,0)
+                var acc = 2
+            }
+        }
+        else {
+            if ((day > 0) && (day < 29)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else {
+                var date = Date(year, (month - 1), 1, 8,0,0,0)
+                var acc = 2
+            }
+        }
+    }
+    else if (month == 0 && day == 0){
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+    else {
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+}
+else {
+    var date = Null
+    var acc = 0
+}
+return {
+    'result': {
+        ""attributes"": {
+            ""dateretired"": ToLocal(date),
+            ""dateretiredacc"" : acc
+        }
+    }
+}",,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MapAssembly_Cal_02,Calcuate X corrdinate (3 d.p.) and save in Grid X1 Coordinate field,CALCULATION,,envelopex1,True,True,False,True,Geometry($feature).x,,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MapAssembly_Cal_03,Calcuate y corrdinate of point feature (3 d.p.) and save in Grid Y1 Coordinate field,CALCULATION,,envelopey1,True,True,False,True,Geometry($feature).y,,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+New Rule,,VALIDATION,,,True,False,False,False,return false,1654,Generate,False,True,True,5,,,"{""type"":""PropertySet"",""propertySetItems"":[]}"

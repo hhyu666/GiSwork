@@ -1,0 +1,393 @@
+﻿NAME,DESCRIPTION,TYPE,SUBTYPE,FIELD,ISEDITABLE,TRIGGERINSERT,TRIGGERDELETE,TRIGGERUPDATE,SCRIPTEXPRESSION,ERRORNUMBER,ERRORMESSAGE,EXCLUDECLIENTEVALUATION,ISENABLED,BATCH,SEVERITY,TAGS,CATEGORY,CHECKPARAMETERS
+GetColour,Get colour from table,CALCULATION,,symbolcolor,True,True,False,True,"// GetColour (HV_SWG) -- Medium voltage Switchgear
+if ($feature.assetgroup == 775) {
+ var colorkey = 14
+ //read color from table
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 22}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+ 
+ return result.Colour
+}
+
+// GetColour (HV_BKR) -- Medium voltage Circuit breaker primary
+if ($feature.assetgroup == 771) {
+ var colorkey = 14
+ //read color from table
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 22}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+ 
+ return result.Colour
+}
+
+// GetColour (HV_TRF) -- Medium voltage 2 winding power transformer
+if ($feature.assetgroup == 801) {
+ var colorkey = 14
+ //read color from table
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 22}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+ 
+ return result.Colour
+}
+
+// GetColour (LV_TRF) -- Low voltage Transformer end
+if ($feature.assetgroup == 808) {
+ var colorkey = 14
+ //read color from table
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+ 
+ return result.Colour
+}
+
+// GetColour (HV_SWG)1 -- Medium voltage Meter point
+if ($feature.assetgroup == 819) {
+ var colorkey = 14
+ //read color from table
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 22}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+ 
+ return result.Colour
+}
+
+// GetColour (LV_SWG) -- Low voltage Switchgear
+if ($feature.assetgroup == 774) {
+ var colorkey = 14
+ //read color from table
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+ 
+ return result.Colour
+}
+
+// GetColour (LV_ISO) -- Low voltage Disconnector
+if ($feature.assetgroup == 850) {
+ var colorkey = 14
+ //read color from table
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+ 
+ return result.Colour
+}
+
+// GetColour (LV_IO) -- Low voltage Cutout
+if ($feature.assetgroup == 773) {
+ var colorkey = 14
+ //read color from table
+ if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+ else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+ var sql = 'OBJECTID = ' + colorkey
+ var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+ 
+ return result.Colour
+}",,,False,True,False,,,,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+GetSymbolID,Return appropriate symbolid for given attribute,CALCULATION,,symbolfid,True,True,False,True,"// SymbolID (for HV_TRF) -- Medium voltage 2 winding power transformer
+if ($feature.assetgroup == 801) {
+ var symid = 513
+ if (DomainName($feature, ""nameproductvariant"") == ""Rectifier""){
+   symid = 512}
+ else{
+   symid = 513}
+ return symid
+}
+
+// SymbolID (for HV_SWG) -- Medium voltage Switchgear
+if ($feature.assetgroup == 775) {
+ var symid = 508
+ if (DomainName($feature,""nameproductvariant"") == ""GVS - Gas Vacuum Switch"" || DomainName($feature,""nameproductvariant"") == ""Breaker"" || DomainName($feature,""nameproductvariant"") == ""Bus Breaker""){
+   symid = 507}
+ else if (DomainName($feature,'nameproductvariant') == ""AVF - Air Vacuum Feeder""){
+   symid = 509
+ }else{
+   symid = 508
+ }
+ return symid
+}
+
+// SymbolID (For HV_BKR) -- Medium voltage Circuit breaker primary
+if ($feature.assetgroup == 771) {
+ return 514
+}
+
+// SymbolID (for HV_SWG_4) -- Medium voltage Meter point
+if ($feature.assetgroup == 819) {
+ var symid = 515
+ var deg = round($feature.symbolrotation * 180/3.1415926)
+ if (DomainName($feature,'nameproductvariant') == ""AMP - Air Metering Panel"" || DomainName($feature,'nameproductvariant') == ""GMP - Gas Metering Panel""){
+   if (deg == 90 || deg == -90){symid = 516}
+   else if (deg == 0 || deg == 180){symid = 515}
+ }else{
+   if (deg == 90 || deg == -90){symid = 518}
+   else if (deg == 0 || deg == 180){symid = 517}
+   else {symid = 17}
+ }
+ return symid
+}
+
+// SymbolID (for LV_SWG) -- Low voltage Switchgear
+if ($feature.assetgroup == 774) {
+ var symid = 0
+ if (DomainName($feature,""statusswitchingnormal"") == ""Closed""){symid=574}
+ else{symid=573}
+ return symid
+}
+
+// SymbolID (for LV_ISO) -- Low voltage Disconnector
+if ($feature.assetgroup == 850) {
+ var symid = 572
+ return symid
+}
+
+// SymbolID (for LV_TRF) -- Low voltage Transformer end
+if ($feature.assetgroup == 808) {
+ var symid = 519
+ return symid
+}
+
+// SymbolID (for LV_IO) -M -- Low voltage Cutout
+if ($feature.assetgroup == 773) {
+ // Cutout fuse - Low voltage
+ var symid = 558
+ if ($feature.ASSETTYPE == 354) {
+ if (DomainName($feature, 'statusswitchingnormal') == 'Open') {
+  return 550
+ } else if (DomainName($feature, 'statusswitchingnormal') == 'Closed') {
+  return 551
+ }
+ } else if (Includes([352,353,355,356,357], $feature.ASSETTYPE)) {
+     if (DomainName($feature,""statusswitchingnormal"") == ""Closed""){symid=558}
+     else{symid=559}
+ 
+ }
+ 
+ return symid
+}",,,False,True,False,,,,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+GetAngle (For HV_TRF),Get angle between point and intercept line,CALCULATION,Medium voltage 2 winding power transformer,symbolrotation,True,True,False,True,"// Find the first intersecting line from the intersecting class
+var lineClass = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.SchematicLine"", [""objectid""], true)
+var line = First(Intersects(lineClass, $feature))
+// If no feature was found, return the original value
+if (line == null)
+   return $feature.symbolrotation
+// Buffer the point by a small amount to extract the segment
+var search = Extent(Buffer($feature, .01, ""meter""))
+var segment = Clip(line, search)[""paths""][0]
+// Get angle of line using the start and end vertex
+return Angle(segment[0], segment[-1])",,,False,True,False,,,,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+GetAngle (LV_IO),Get angle between point and intercept line,CALCULATION,Low voltage Cutout,symbolrotation,True,True,False,True,"// Cutout fuse - Low voltage
+
+var angle = 0
+var x = Geometry($feature).x
+var y = Geometry($feature).y
+var o_s = """"
+if (Includes([352,353,355,356,357, 354], $feature.ASSETTYPE)) {
+    // find same nameasset
+    var nameasset = $feature.nameasset;
+    var sql = ""nameasset = @nameasset"";
+
+    var result = (Filter(FeatureSetByName($datastore,""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.SchematicDevice"",[""*""],false),sql));
+    for (var i in result) {
+         o_s += Text(Geometry(i))
+         var cx = Geometry(i)
+         if ( Abs(y - cx.y) > 0.1) {
+            if ((y - cx.y) < 0){
+                if ($feature.ASSETTYPE == 354) {
+                    return 180
+                }
+            } else {
+                if ($feature.ASSETTYPE != 354){
+                    return 180
+                }
+            }
+         } 
+           
+    }
+
+}
+return 0",,,False,True,False,,,,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicDevice_Cal_02,Calcuate y corrdinate of point feature (3 d.p.) and save in Grid Y1 Coordinate field,CALCULATION,,envelopey1,True,True,False,True,Geometry($feature).y,,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicDevice_Cal_03,Calcuate x corrdinate of point feature (3 d.p.) and save in Grid X1 Coordinate field,CALCULATION,,envelopex1,True,True,False,True,Geometry($feature).x,,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Post processing commissioning date,Update the commissioning date and the date flag,CALCULATION,,,True,True,False,True,"var rep_date = $feature.datecommissionedrep;
+var year = Number(Mid(rep_date ,0,4))
+var month = Number(Mid(rep_date ,4,2))
+var day  = Number(Mid(rep_date ,6,2))
+var big_month = [1,3,5,7,8,10,12]
+var small_month = [4,6,9,11]
+if (year >= 1900) {
+    if (includes(big_month, month) == true) {
+        if ((day > 0) && (day < 32)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (includes(small_month, month) == true) {
+        if ((day > 0) && (day < 31)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (month == 2) {
+        if (year % 4 == 0) {
+            if ((day > 0) && (day < 30)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else{
+                var date = Date(year, (month - 1),1,8,0,0,0)
+                var acc = 2
+            }
+        }
+        else {
+            if ((day > 0) && (day < 29)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else {
+                var date = Date(year, (month - 1), 1, 8,0,0,0)
+                var acc = 2
+            }
+        }
+    }
+    else if (month == 0 && day == 0){
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+    else {
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+}
+else {
+    var date = Null
+    var acc = 0
+}
+return {
+    'result': {
+        ""attributes"": {
+            ""datecommissioned"": ToLocal(date),
+            ""datecommissionedacc"" : acc
+        }
+    }
+}",,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Post processing retired date and date flag,Update retired date and date flag,CALCULATION,,,True,True,False,True,"var rep_date = $feature.dateretiredrep;
+var year = Number(Mid(rep_date ,0,4))
+var month = Number(Mid(rep_date ,4,2))
+var day  = Number(Mid(rep_date ,6,2))
+var big_month = [1,3,5,7,8,10,12]
+var small_month = [4,6,9,11]
+if (year >= 1900) {
+    if (includes(big_month, month) == true) {
+        if ((day > 0) && (day < 32)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (includes(small_month, month) == true) {
+        if ((day > 0) && (day < 31)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (month == 2) {
+        if (year % 4 == 0) {
+            if ((day > 0) && (day < 30)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else{
+                var date = Date(year, (month - 1),1,8,0,0,0)
+                var acc = 2
+            }
+        }
+        else {
+            if ((day > 0) && (day < 29)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else {
+                var date = Date(year, (month - 1), 1, 8,0,0,0)
+                var acc = 2
+            }
+        }
+    }
+    else if (month == 0 && day == 0){
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+    else {
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+}
+else {
+    var date = Null
+    var acc = 0
+}
+return {
+    'result': {
+        ""attributes"": {
+            ""dateretired"": ToLocal(date),
+            ""dateretiredacc"" : acc
+        }
+    }
+}",,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Sch_Circuit_breaker_primary_Cal_01,Based on C_SUBNAME update substation name,CALCULATION,Medium voltage Circuit breaker primary,namelocation,True,True,False,True,"var referenceObjectParentid = $feature.referenceobjectparentid
+    var subNameTable = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.C_SUBNAME"",[""*""],false)
+    var targetSubNameRows = Filter(subNameTable,""nameasset = @referenceObjectParentid"")
+    if(count(targetSubNameRows) == 1){
+        var updateNameLocation = first(targetSubNameRows).namelocationdetailssubstation
+        return updateNameLocation
+    }",,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Disconnector_Cal_01,Update currentlimitmaxrating and Nameproductmanufacturer,CALCULATION,Low voltage Disconnector,,True,True,False,True,"var nameProductVariant = DomainName($feature,""nameproductvariant"",$feature.nameproductvariant)
+var existCurrentLimitMaxRating = $feature.currentlimitmaxrating
+var existNameProductManufacturer = $feature.nameproductmanufacturer
+var lvPanRaBvFeatures = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.C_LVPANRABV"", [""*""], false)
+var rows = Filter(lvPanRaBvFeatures, ""nameproductvariant = @nameProductVariant"")
+if (count(rows) == 1) {
+    var updateObject = {}
+    var row = first(rows)
+    var nameProductManufacturer = row.nameproductmanufacturer
+    var currentLimitMaxRating = row.currentlimitmaxrating
+    if (nameProductManufacturer != existNameProductManufacturer) {
+        updateObject[""nameproductmanufacturer""] = nameProductManufacturer
+    }
+    if (currentLimitMaxRating != existCurrentLimitMaxRating) {
+        updateObject[""currentlimitmaxrating""] = currentLimitMaxRating
+    }
+    for (var i in updateObject) { }
+    if (isEmpty(i) != true) {
+        return {
+            ""result"": {
+                ""attributes"": updateObject
+            }
+        }
+    }
+}",,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"

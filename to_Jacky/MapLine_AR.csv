@@ -1,0 +1,585 @@
+﻿NAME,DESCRIPTION,TYPE,SUBTYPE,FIELD,ISEDITABLE,TRIGGERINSERT,TRIGGERDELETE,TRIGGERUPDATE,SCRIPTEXPRESSION,ERRORNUMBER,ERRORMESSAGE,EXCLUDECLIENTEVALUATION,ISENABLED,BATCH,SEVERITY,TAGS,CATEGORY,CHECKPARAMETERS
+GetSymbolID,Return appropriate symbolid for given attribute,CALCULATION,,symbolfid,True,True,False,True,"// SymbolID (HV_SEC) -- Medium voltage Conductor
+if ($feature.assetgroup == 921) {
+ var symid = 1
+ 
+ //read color from table
+ if ($feature.Assettype == 900 ){ //Submarine
+     if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 601}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 602}
+     else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 603}
+ }else if ($feature.Assettype == 901 || $feature.Assettype == 906){ //Underground
+     if (DomainName($feature,'nametype') == ""Unknown Route""){
+         if (DomainName($feature,'shortlengthpilc') == ""Show""){
+             if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 604}
+             else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 605}
+             else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 606}
+         }else if (DomainName($feature, 'watertree') == 'Yes'){
+             if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 607}
+             else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 608}
+             else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 609}
+         }else if (DomainName($feature, 'wateringress') == 'Yes'){
+             if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 610}
+             else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 611}
+             else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 612}
+         }else{
+             if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 613}
+             else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 614}
+             else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 615}
+         }
+     }else{
+         if (DomainName($feature,'voltagelimitmaxrating') == '22 kV'){
+             if (DomainName($feature,'shortlengthpilc') == ""Show""){
+                 if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 616}
+                 else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 617}
+                 else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 618}
+             }else if (DomainName($feature, 'watertree') == 'Yes'){
+                 if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 619}
+                 else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 620}
+                 else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 621}
+             }else if (DomainName($feature, 'wateringress') == 'Yes'){
+                 if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 622}
+                 else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 623}
+                 else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 624}
+             }else{
+                 if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 625}
+                 else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 626}
+                 else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 627}
+         }
+         }else if (DomainName($feature,'voltagelimitmaxrating') == '33 kV'){
+             if (DomainName($feature,'shortlengthpilc') == ""Show""){
+                 if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 628}
+                 else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 629}
+                 else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 630}
+             }else if (DomainName($feature, 'watertree') == 'Yes'){
+                 if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 631}
+                 else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 632}
+                 else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 633}
+             }else if (DomainName($feature, 'wateringress') == 'Yes'){
+                 if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 634}
+                 else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 635}
+                 else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 636}
+             }else{
+                 if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 637}
+                 else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 638}
+                 else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 639}
+         }
+         }else{
+             if (DomainName($feature,'shortlengthpilc') == ""Show""){
+                 if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 640}
+                 else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 641}
+                 else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 642}
+             }else if (DomainName($feature, 'watertree') == 'Yes'){
+                 if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 643}
+                 else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 644}
+                 else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 645}
+             }else if (DomainName($feature, 'wateringress') == 'Yes'){
+                 if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 646}
+                 else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 647}
+                 else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 648}
+             }else{
+                 if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 649}
+                 else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 650}
+                 else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 651}
+             }
+         }
+     }
+ }else{
+     if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 652}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 653}
+     else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 654}
+ }
+ return symid
+}
+
+// SymbolID (for HV_BUS) -- Medium voltage Busbar
+if ($feature.assetgroup == 925) {
+ var symid = 682
+ return symid
+}
+
+// SymbolID (for LV_SEC) -- Low voltage Conductor
+if ($feature.assetgroup == 920) {
+ var symid = 1
+ 
+ //read color from table
+ if ($feature.Assettype == 886 ){ //Submarine
+  if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 655}
+  else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 656}
+  else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 657}
+ }else if ($feature.Assettype == 883){symid = 670
+ }else if ($feature.Assettype == 881){ //overhead
+  if (DomainName($feature,'nametype') == ""Aerial Bundled Cable""){
+   if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 673}
+         else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 674}
+         else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 675}
+  }else{
+   if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 676}
+         else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 677}
+         else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 678}
+  } 
+ }else{
+  if (DomainName($feature,'nametype') == ""Unknown Route""){
+   if (DomainName($feature, 'watertree') == 'Yes'){
+    if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 658}
+             else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 659}
+             else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 660}
+   }else if (DomainName($feature, 'wateringress') == 'Yes'){
+    if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 661}
+             else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 662}
+             else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 663}
+   }else{
+    if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 679}
+             else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 680}
+             else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 681}
+   }
+  }else{
+   if (DomainName($feature, 'watertree') == 'Yes'){
+    if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 664}
+             else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 665}
+             else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 666}
+   }else if (DomainName($feature, 'wateringress') == 'Yes'){
+    if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 667}
+             else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 668}
+             else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 669}
+   }else{
+    if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 670}
+             else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 671}
+             else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 672}
+   }
+  }
+ }
+ 
+ return symid
+}
+
+// SymbolID (for LV_PAN) -- Low voltage Busbar
+if ($feature.assetgroup == 924) {
+ return 682
+}
+
+// SymbolID (for SK_SEC) -- Solkor Line segment
+if ($feature.assetgroup == 755) {
+ var symid = 1
+ 
+ //read color from table
+ if (DomainName($feature,'nametype') == ""Submarine Cable"" ){
+  if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 655}
+  else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 656}
+  else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 657}
+ }else{
+  if (DomainName($feature,'nametype') == ""Unknown Route""){
+   if (DomainName($feature, 'wateringress') == 'Yes'){
+    if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 661}
+             else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 662}
+             else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 663}
+   }else{
+    if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 679}
+             else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 680}
+             else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 681}
+   }
+  }else{
+   if (DomainName($feature, 'wateringress') == 'Yes'){
+    if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 667}
+             else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 668}
+             else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 669}
+   }else{
+    if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 670}
+             else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 671}
+             else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 672}
+   }
+  }
+ }
+ 
+ return symid
+}
+
+// SymbolID (for TR_SEC) -- Transmission Conductor
+if ($feature.assetgroup == 923) {
+ var symid = 670
+ 
+ //read color from table
+ if ($feature.assettype == 955){//submarine
+     if (DomainName($feature,'lifecyclestatus') == ""INS"" || DomainName($feature,'lifecyclestatus') == ""SP""){symid = 655}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 656}
+     else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 657}
+ }else if ($feature.assettype == 0){//unknown route
+     if (DomainName($feature,'lifecyclestatus') == ""INS"" || DomainName($feature,'lifecyclestatus') == ""SP""){symid = 679}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 680}
+     else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 681}
+ }else if ($feature.assettype == 957){//overhead
+     if (DomainName($feature,'lifecyclestatus') == ""INS"" || DomainName($feature,'lifecyclestatus') == ""SP""){symid = 704}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 6105}
+     else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 706}
+ }else{
+     if (DomainName($feature,'lifecyclestatus') == ""INS"" || DomainName($feature,'lifecyclestatus') == ""SP""){symid = 670}
+     else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 671}
+     else if (DomainName($feature, 'lifecyclestatus') == ""RES""){symid = 672}
+ }
+  
+ 
+ return symid
+}
+
+// SymbolID (HV_SEC)1 -- Medium voltage Connector line
+if ($feature.assetgroup == 929) {
+ return 670
+}
+
+// SymbolID (for LV_SEC)1 -- Low voltage Connector line
+if ($feature.assetgroup == 928) {
+ return 670
+}
+
+// SymbolID (for TR_SEC)1 -- Transmission Connector line
+if ($feature.assetgroup == 931) {
+ return 670
+}",,,False,True,False,,,,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+GetColour,Return colour setting of subtype group,CALCULATION,,symbolcolor,True,True,False,True,"// GetColour (for LV_SEC) -- Low voltage Conductor
+var colourTable = FeatureSetByName($datastore,""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour"")
+var colorkey = 14
+
+if ($feature.assetgroup == 920) {
+    //Testing
+    //read color from table
+    if ($feature.ASSETTYPE != 883){
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+        else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 24}
+    }else{colorkey = 24}
+    
+
+}
+
+// GetColour (for HV_SEC) -- Medium voltage Conductor
+if ($feature.assetgroup == 921) {
+    
+    //read color from table
+    if (DomainName($feature,'lifecyclestatus') == ""INS""){
+        if (DomainName($feature,'voltagelimitmaxoperating') == '22 kV' || $feature.voltagelimitmaxoperating == 22000){colorkey = 23}
+        else{colorkey = 22}}
+    else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+    else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 22}
+    
+
+}
+
+// GetColour (for HV_BUS) -- Medium voltage Busbar
+if ($feature.assetgroup == 925) {
+    
+    //read color from table
+    if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 22}
+    else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+    else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 22}
+
+}
+
+// GetColour (for LV_PAN) -- Low voltage Busbar
+if ($feature.assetgroup == 924) {
+    
+    //read color from table
+    if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+    else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+    else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 22}
+
+}
+
+// GetColour (for SK_SEC) -- Solkor Line segment
+if ($feature.assetgroup == 755) {
+    
+    //read color from table
+    if (DomainName($feature,'lifecyclestatus') == ""INS""){
+    colorkey = 23}
+    else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 23}
+    else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 23}
+    
+}
+
+// GetColour (for TR_SEC) -- Transmission Conductor
+if ($feature.assetgroup == 923) {
+    
+    //read color from table
+    if (DomainName($feature,'lifecyclestatus') == ""INS""){
+     if ($feature.voltagelimitmaxoperating == 33000 || $feature.voltagelimitmaxoperating == 66000){colorkey = 10}
+     else if ($feature.voltagelimitmaxoperating == 132000){colorkey = 19}
+     else{colorkey = 27}
+    }else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 23}
+    else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 10}
+
+}
+
+// GetColour (for LV_SEC)1 -- Low voltage Connector line
+if ($feature.assetgroup == 928) {
+    
+    //read color from table
+    if ($feature.ASSETTYPE != 883){
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+        else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 24}
+    }else{colorkey = 24}
+
+}
+
+// GetColour (for HV_SEC)1 -- Medium voltage Connector line
+if ($feature.assetgroup == 929) {
+    
+    //read color from table
+    if (DomainName($feature,'lifecyclestatus') == ""INS""){
+        if (DomainName($feature,'voltagelimitmaxoperating') == '22 kV' || $feature.voltagelimitmaxoperating == 22000){colorkey = 23}
+        else{colorkey = 22}}
+    else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+    else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 22}
+
+}
+
+// GetColour (for TR_SEC)1 -- Transmission Connector line
+if ($feature.assetgroup == 931) {
+    
+    //read color from table
+    if (DomainName($feature,'lifecyclestatus') == ""INS""){
+     if ($feature.voltagelimitmaxoperating == 33000 || $feature.voltagelimitmaxoperating == 66000){colorkey = 10}
+     else if ($feature.voltagelimitmaxoperating == 132000){colorkey = 19}
+     else{colorkey = 27}
+    }else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 23}
+    else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 10}
+    
+}
+
+
+
+var sql = 'OBJECTID = ' + colorkey
+var result = First(Filter(colourTable,sql))
+
+
+return result.Colour",,,False,True,False,,,,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Post processing commissioning date,Update the commissioning date and the date flag,CALCULATION,,,True,True,False,True,"var rep_date = $feature.datecommissionedrep;
+var year = Number(Mid(rep_date ,0,4))
+var month = Number(Mid(rep_date ,4,2))
+var day  = Number(Mid(rep_date ,6,2))
+var big_month = [1,3,5,7,8,10,12]
+var small_month = [4,6,9,11]
+if (year >= 1900) {
+    if (includes(big_month, month) == true) {
+        if ((day > 0) && (day < 32)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (includes(small_month, month) == true) {
+        if ((day > 0) && (day < 31)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (month == 2) {
+        if (year % 4 == 0) {
+            if ((day > 0) && (day < 30)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else{
+                var date = Date(year, (month - 1),1,8,0,0,0)
+                var acc = 2
+            }
+        }
+        else {
+            if ((day > 0) && (day < 29)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else {
+                var date = Date(year, (month - 1), 1, 8,0,0,0)
+                var acc = 2
+            }
+        }
+    }
+    else if (month == 0 && day == 0){
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+    else {
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+}
+else {
+    var date = Null
+    var acc = 0
+}
+return {
+    'result': {
+        ""attributes"": {
+            ""datecommissioned"": ToLocal(date),
+            ""datecommissionedacc"" : acc
+        }
+    }
+}",,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Post processing completedconstruction date,Update the datecompletedconstruction and the date flag,CALCULATION,,,True,True,False,True,"var rep_date = $feature.datecompletedconstructionrep;
+var year = Number(Mid(rep_date ,0,4))
+var month = Number(Mid(rep_date ,4,2))
+var day  = Number(Mid(rep_date ,6,2))
+var big_month = [1,3,5,7,8,10,12]
+var small_month = [4,6,9,11]
+if (year >= 1900) {
+    if (includes(big_month, month) == true) {
+        if ((day > 0) && (day < 32)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (includes(small_month, month) == true) {
+        if ((day > 0) && (day < 31)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (month == 2) {
+        if (year % 4 == 0) {
+            if ((day > 0) && (day < 30)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else{
+                var date = Date(year, (month - 1),1,8,0,0,0)
+                var acc = 2
+            }
+        }
+        else {
+            if ((day > 0) && (day < 29)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else {
+                var date = Date(year, (month - 1), 1, 8,0,0,0)
+                var acc = 2
+            }
+        }
+    }
+    else if (month == 0 && day == 0){
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+    else {
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+}
+else {
+    var date = Null
+    var acc = 0
+}
+return {
+    'result': {
+        ""attributes"": {
+            ""datecompletedconstruction"": ToLocal(date),
+            ""datecompletedconstructionacc"" : acc
+        }
+    }
+}",,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Post processing retired date and date flag,Update retired date and date flag,CALCULATION,,,True,True,False,True,"var rep_date = $feature.dateretiredrep;
+var year = Number(Mid(rep_date ,0,4))
+var month = Number(Mid(rep_date ,4,2))
+var day  = Number(Mid(rep_date ,6,2))
+var big_month = [1,3,5,7,8,10,12]
+var small_month = [4,6,9,11]
+if (year >= 1900) {
+    if (includes(big_month, month) == true) {
+        if ((day > 0) && (day < 32)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (includes(small_month, month) == true) {
+        if ((day > 0) && (day < 31)) {
+            var date = Date(year, (month - 1), (day), 8,0,0,0)
+            var acc = 1
+        }
+        else {
+            var date = Date(year, (month - 1), 1, 8,0,0,0)
+            var acc = 2
+        }
+    }
+    else if (month == 2) {
+        if (year % 4 == 0) {
+            if ((day > 0) && (day < 30)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else{
+                var date = Date(year, (month - 1),1,8,0,0,0)
+                var acc = 2
+            }
+        }
+        else {
+            if ((day > 0) && (day < 29)) {
+                var date = Date(year, (month - 1), day,8,0,0,0)
+                var acc = 1
+            }
+            else {
+                var date = Date(year, (month - 1), 1, 8,0,0,0)
+                var acc = 2
+            }
+        }
+    }
+    else if (month == 0 && day == 0){
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+    else {
+        var date = Date(year, 0, 1,8,0,0,0)
+        var acc = 3
+    }
+}
+else {
+    var date = Null
+    var acc = 0
+}
+return {
+    'result': {
+        ""attributes"": {
+            ""dateretired"": ToLocal(date),
+            ""dateretiredacc"" : acc
+        }
+    }
+}",,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_ Conductor_Cal_03,Based on C_LVCABMATL. materialcoredescription is CODETEXT and selected by user. materialcore is CODECODE and updated by attribute rule.,CALCULATION,Low voltage Conductor,materialcore,True,True,False,True,"var materialCoreDescription = $feature.materialcoredescription
+if(isEmpty(materialCoreDescription) != true){
+    var materialCoreDescriptionDomainName =  Upper(DomainName($feature,""materialcoredescription"",materialCoreDescription))
+    var lvCableMatlFeatures = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.C_LVCABMATL"",[""*""],false)
+    var targetlvCableMatlFeatures = Filter(lvCableMatlFeatures, ""materialcoredescription = @materialCoreDescriptionDomainName"")
+    if(count(targetlvCableMatlFeatures) == 1){
+        return first(targetlvCableMatlFeatures).materialcore
+    }
+}",,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Conductor_Cal_02,Based on C_MVCABMATL. materialcoredescription is CODETEXT and selected by user. materialcore is CODECODE and updated by attribute rule.,CALCULATION,Medium voltage Conductor,materialcore,True,True,False,True,"var materialCoreDescription = $feature.materialcoredescription
+    var mvCableMatlFeatures = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.C_MVCABMATL"",[""*""],false)
+    var targetmvCableMatlFeatures = Filter(mvCableMatlFeatures, ""materialcoredescription = @materialCoreDescription"")
+    if(count(targetmvCableMatlFeatures) == 1){
+        return first(targetmvCableMatlFeatures).materialcore
+    }",,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+TR_Conductor_Cal_011,Based on C_TRCABMATL. materialcoredescription is CODETEXT and selected by user. materialcore is CODECODE and updated by attribute rule.,CALCULATION,Transmission Conductor,materialcore,True,True,False,True,"var materialCoreDescription = $feature.materialcoredescription
+    var trCableMatlFeatures = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.C_TRCABMATL"",[""*""],false)
+    var targettrCableMatlFeatures = Filter(trCableMatlFeatures, ""materialcoredescription = @materialCoreDescription"")
+    if(count(targettrCableMatlFeatures) == 1){
+        return first(targettrCableMatlFeatures).materialcore
+    }",,,False,True,False,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"

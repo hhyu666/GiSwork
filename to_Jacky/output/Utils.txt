@@ -1,0 +1,15 @@
+if ($originalFeature.lifecyclestatus!=$feature.lifecyclestatus||$originalFeature.voltagelimitmaxoperating!=$feature.voltagelimitmaxoperating){
+
+}
+
+if($originalFeature.lifecyclestatus!=$feature.lifecyclestatus){
+
+}
+
+if ($originalFeature.symbolfid!=682) {
+            return 682
+} 
+[http]
+	proxy = 127.0.0.1:7890
+[https]
+	proxy = 127.0.0.1:7890
