@@ -1,0 +1,25 @@
+TR Transformer
+<Null>    	77
+TR Regulator
+<Null>		78
+TR Source Point
+<Null>		79
+TR Circuit Breaker
+<Null>		76
+LV Customer Installation
+<Null>		82
+LV Tap-off
+<Null>		84
+SK Network Hub
+<Null>		47
+PT Line End
+<Null>		86
+PT Depth Marker
+<Null>		87
+Duct Depth Marker
+all not things! asset group is 753!
+Marker - ID Ball
+all not things! asset group is 118!
+LV Sch Line End
+<Null>		510
+
