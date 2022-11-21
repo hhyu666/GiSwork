@@ -74,6 +74,7 @@ def copy_renderer(copyfile, copiedfile):
     # os.rename("%s.bak" % copiedfile, copiedfile)
 
 #目前存在大问题，有的地方name是一模一样的，name不是唯一的，要找到其他唯一的标识
+#现在name不会重复了
 def find_renderer(copyfile, name):
     """
     从copyfile找到要name对应的renderer
