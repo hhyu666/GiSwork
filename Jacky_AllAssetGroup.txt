@@ -1,0 +1,1561 @@
+Code: 0
+Default: True
+Name: Unknown
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 800
+Default: False
+Name: Low voltage 2 winding power transformer
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 801
+Default: False
+Name: Medium voltage 2 winding power transformer
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 802
+Default: False
+Name: Sub transmission 2 winding power transformer
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 803
+Default: False
+Name: Transmission 2 winding power transformer
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 804
+Default: False
+Name: Low voltage 3 winding power transformer
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 805
+Default: False
+Name: Medium voltage 3 winding power transformer
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 806
+Default: False
+Name: Sub transmission 3 winding power transformer
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 807
+Default: False
+Name: Transmission 3 winding power transformer
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 822
+Default: False
+Name: Low voltage Regulator
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 823
+Default: False
+Name: Medium voltage Regulator
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 824
+Default: False
+Name: Sub transmission Regulator
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 825
+Default: False
+Name: Transmission Regulator
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 826
+Default: False
+Name: Low voltage Instrument transformer
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 827
+Default: False
+Name: Medium voltage Instrument transformer
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 828
+Default: False
+Name: Sub transmission Instrument transformer
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 829
+Default: False
+Name: Transmission Instrument transformer
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 830
+Default: False
+Name: Low voltage Fault indicator
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 831
+Default: False
+Name: Medium voltage Fault indicator
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 832
+Default: False
+Name: Sub transmission Fault indicator
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 833
+Default: False
+Name: Transmission Fault indicator
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 838
+Default: False
+Name: Low voltage Fuse
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 839
+Default: False
+Name: Medium voltage Fuse
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 840
+Default: False
+Name: Sub transmission Fuse
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 841
+Default: False
+Name: Transmission Fuse
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 842
+Default: False
+Name: Low voltage Load break switch
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 843
+Default: False
+Name: Medium voltage Load break switch
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 844
+Default: False
+Name: Sub transmission Load break switch
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 845
+Default: False
+Name: Transmission Load break switch
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 850
+Default: False
+Name: Low voltage Disconnector
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 851
+Default: False
+Name: Medium voltage Disconnector
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 852
+Default: False
+Name: Sub transmission Disconnector
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 853
+Default: False
+Name: Transmission Disconnector
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 858
+Default: False
+Name: Low voltage Recloser
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 859
+Default: False
+Name: Medium voltage Recloser
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 860
+Default: False
+Name: Low voltage Circuit breaker
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 861
+Default: False
+Name: Medium voltage Circuit breaker
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 862
+Default: False
+Name: Sub transmission Circuit breaker
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 863
+Default: False
+Name: Transmission Circuit breaker
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 864
+Default: False
+Name: Low voltage Bypass switch
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 865
+Default: False
+Name: Medium voltage Bypass switch
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 808
+Default: False
+Name: Low voltage Transformer end
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 810
+Default: False
+Name: Medium voltage Transformer end
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 812
+Default: False
+Name: Sub transmission Transformer end
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 813
+Default: False
+Name: Transmission Transformer end
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 834
+Default: False
+Name: Low voltage Power converter
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 835
+Default: False
+Name: Medium voltage Power converter
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 836
+Default: False
+Name: Sub transmission Power converter
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 837
+Default: False
+Name: Transmission Power converter
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 809
+Default: False
+Name: Ground switch
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 814
+Default: False
+Name: Low voltage Source point
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 815
+Default: False
+Name: Medium voltage Source point
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 816
+Default: False
+Name: Sub transmission Source point
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 817
+Default: False
+Name: Transmission Source point
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 122
+Default: False
+Name: Low voltage Separable connector
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 123
+Default: False
+Name: Low voltage Switch-disconnector
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 124
+Default: False
+Name: Medium voltage Switch-disconnector
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 125
+Default: False
+Name: Sub transmission Switch-disconnector
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 126
+Default: False
+Name: Transmission Switch-disconnector
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 128
+Default: False
+Name: Low voltage Fuse-switch-disconnector
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 129
+Default: False
+Name: Medium voltage Fuse-switch-disconnector
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 130
+Default: False
+Name: Sub transmission Fuse-switch-disconnector
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 131
+Default: False
+Name: Transmission Fuse-switch-disconnector
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 818
+Default: False
+Name: Low voltage Meter point
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 819
+Default: False
+Name: Medium voltage Meter point
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 820
+Default: False
+Name: Sub transmission Meter point
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 821
+Default: False
+Name: Transmission Meter point
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 854
+Default: False
+Name: Low voltage Fuse-disconnector
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 855
+Default: False
+Name: Medium voltage Fuse-disconnector
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 856
+Default: False
+Name: Low voltage Fuse-switch
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 857
+Default: False
+Name: Medium voltage Fuse-switch
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 871
+Default: False
+Name: Low voltage Overload protective device
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 872
+Default: False
+Name: Sub transmission Recloser
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 873
+Default: False
+Name: Transmission Recloser
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 771
+Default: False
+Name: Medium voltage Circuit breaker primary
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 773
+Default: False
+Name: Low voltage Cutout
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 774
+Default: False
+Name: Low voltage Switchgear
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 775
+Default: False
+Name: Medium voltage Switchgear
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 781
+Default: False
+Name: Transmission Switchgear
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 0
+Default: True
+Name: Unknown
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 950
+Default: False
+Name: Low voltage Attachment
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 951
+Default: False
+Name: Medium voltage Attachment
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 952
+Default: False
+Name: Sub transmission Attachment
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 953
+Default: False
+Name: Transmission Attachment
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 954
+Default: False
+Name: Low voltage Cable joint
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 955
+Default: False
+Name: Medium voltage Cable joint
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 956
+Default: False
+Name: Sub transmission Cable joint
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 957
+Default: False
+Name: Transmission Cable joint
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 962
+Default: False
+Name: Low voltage Line end
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 963
+Default: False
+Name: Medium voltage Line end
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 964
+Default: False
+Name: Sub transmission Line end
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 965
+Default: False
+Name: Transmission Line end
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 970
+Default: False
+Name: Ground node
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 971
+Default: False
+Name: Low Voltage Customer installation
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 972
+Default: False
+Name: Medium Voltage Customer installation
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 973
+Default: False
+Name: Sub transmission Customer installation
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 974
+Default: False
+Name: Transmission Customer installation
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 874
+Default: False
+Name: Crossbonding Cable joint
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 958
+Default: False
+Name: Low voltage Tap-off
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 959
+Default: False
+Name: Medium voltage Tap-off
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 960
+Default: False
+Name: Sub transmission Tap-off
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 961
+Default: False
+Name: Transmission Tap-off
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 975
+Default: False
+Name: Cathodic protection node
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 976
+Default: False
+Name: Lightning protection node
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 977
+Default: False
+Name: Low voltage Busbar tap
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 978
+Default: False
+Name: Low voltage Cabinet busbar
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 979
+Default: False
+Name: Low voltage Exchange service point
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 980
+Default: False
+Name: Low voltage Station busbar
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 981
+Default: False
+Name: Low voltage Streetlight service point
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 982
+Default: False
+Name: Medium voltage Busbar tap
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 983
+Default: False
+Name: Medium voltage Exchange service point
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 984
+Default: False
+Name: Medium voltage Station busbar
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 985
+Default: False
+Name: Sub transmission Busbar tap
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 986
+Default: False
+Name: Sub transmission Exchange service point
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 987
+Default: False
+Name: Transmission Busbar tap
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 988
+Default: False
+Name: Transmission Exchange service point
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 966
+Default: False
+Name: Low voltage Customer service point
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 967
+Default: False
+Name: Medium voltage Customer service point
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 968
+Default: False
+Name: Sub transmission Customer service point
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 969
+Default: False
+Name: Transmission Customer service point
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 751
+Default: False
+Name: Medium voltage Off-page Conductor reference
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 754
+Default: False
+Name: Solkor Cable joint
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 756
+Default: False
+Name: Solkor Line end
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 772
+Default: False
+Name: Solkor Network hub
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 776
+Default: False
+Name: Transmission Survey point
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 777
+Default: False
+Name: Medium voltage Survey point
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 778
+Default: False
+Name: Low voltage Survey point
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 779
+Default: False
+Name: Solkor Survey point
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 782
+Default: False
+Name: Low voltage Cable defect
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 783
+Default: False
+Name: Medium voltage Cable defect
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 784
+Default: False
+Name: Transmission Cable defect
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 0
+Default: True
+Name: Unknown
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 920
+Default: False
+Name: Low voltage Conductor
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 921
+Default: False
+Name: Medium voltage Conductor
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 922
+Default: False
+Name: Sub transmission Conductor
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 923
+Default: False
+Name: Transmission Conductor
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 924
+Default: False
+Name: Low voltage Busbar
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 925
+Default: False
+Name: Medium voltage Busbar
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 926
+Default: False
+Name: Sub transmission Busbar
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 927
+Default: False
+Name: Transmission Busbar
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 928
+Default: False
+Name: Low voltage Connector line
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 929
+Default: False
+Name: Medium voltage Connector line
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 930
+Default: False
+Name: Sub transmission Connector line
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 931
+Default: False
+Name: Transmission Connector line
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 932
+Default: False
+Name: Ground wire
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 933
+Default: False
+Name: Neutral conductor
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 934
+Default: False
+Name: Lightning conductor
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 935
+Default: False
+Name: Cathodic conductor
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 936
+Default: False
+Name: Crossbonding conductor
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 755
+Default: False
+Name: Solkor Line segment
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 0
+Default: True
+Name: Unknown
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 127
+Default: False
+Name: Support equipment
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 902
+Default: False
+Name: Electric substation Transmission
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 903
+Default: False
+Name: Electric substation Sub transmission
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 904
+Default: False
+Name: Electric substation Medium voltage
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 905
+Default: False
+Name: Electric switching substation Transmission
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 906
+Default: False
+Name: Electric switching substation Sub transmission
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 907
+Default: False
+Name: Electric switching substation Medium voltage
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 908
+Default: False
+Name: Electric distribution cabinet Low voltage
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 909
+Default: False
+Name: Electric satellite substation Medium voltage
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 910
+Default: False
+Name: Electric switching location Medium voltage
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 911
+Default: False
+Name: Electric switching location Low voltage
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 912
+Default: False
+Name: Controls assembly Transmission
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 913
+Default: False
+Name: Controls assembly Sub transmission
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 914
+Default: False
+Name: Controls assembly Medium voltage
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 915
+Default: False
+Name: Controls assembly Low voltage
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 916
+Default: False
+Name: Transformer location Transmission
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 917
+Default: False
+Name: Transformer location Sub transmission
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 918
+Default: False
+Name: Transformer location Medium voltage
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 919
+Default: False
+Name: Transformer location Low voltage
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 1000
+Default: False
+Name: Switching bay Low voltage
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 1001
+Default: False
+Name: Metering bay Low voltage
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 1002
+Default: False
+Name: Switching bay Medium voltage
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 1003
+Default: False
+Name: Metering bay Medium voltage
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 1004
+Default: False
+Name: Switching bay Sub transmission
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 1005
+Default: False
+Name: Metering bay Sub transmission
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 1006
+Default: False
+Name: Switching bay Transmission
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 1007
+Default: False
+Name: Metering bay Transmission
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 780
+Default: False
+Name: Electric substation Low voltage
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 0
+Default: True
+Name: Unknown
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 763
+Default: False
+Name: Pilot Cable joint
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 764
+Default: False
+Name: Pilot Cable end
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 766
+Default: False
+Name: Pilot Network hub
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 767
+Default: False
+Name: Pilot Survey point
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 0
+Default: True
+Name: Unknown
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 762
+Default: False
+Name: Pilot Cable segment
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 0
+Default: True
+Name: Unknown
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 102
+Default: False
+Name: Pole
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 103
+Default: False
+Name: Tower
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 104
+Default: False
+Name: Station
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 107
+Default: False
+Name: Cabinet
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 108
+Default: False
+Name: Pedestal
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 110
+Default: False
+Name: Pad
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 111
+Default: False
+Name: Platform
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 113
+Default: False
+Name: Room
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 114
+Default: False
+Name: Building
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 115
+Default: False
+Name: Roof-only cover
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 116
+Default: False
+Name: Hanger
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 117
+Default: False
+Name: Bracket
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 118
+Default: False
+Name: Marker
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 119
+Default: False
+Name: Entrance point
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 120
+Default: False
+Name: Pole support
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 109
+Default: False
+Name: Structure branching point
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 112
+Default: False
+Name: Underground structure
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 106
+Default: False
+Name: Junction box
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 121
+Default: False
+Name: Utility stock
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 753
+Default: False
+Name: Survey point
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 759
+Default: False
+Name: Duct end
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 0
+Default: True
+Name: Unknown
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 170
+Default: False
+Name: Station boundary
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 171
+Default: False
+Name: Cabinet boundary
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 173
+Default: False
+Name: Pad boundary
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 175
+Default: False
+Name: Room boundary
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 176
+Default: False
+Name: Building boundary
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 177
+Default: False
+Name: Roof-only cover boundary
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 178
+Default: False
+Name: Casing boundary
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 180
+Default: False
+Name: Duct boundary
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 181
+Default: False
+Name: Culvert boundary
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 182
+Default: False
+Name: Bridge boundary
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 183
+Default: False
+Name: Foundation boundary
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 172
+Default: False
+Name: Path boundary
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 174
+Default: False
+Name: Underground structure boundary
+Fields:
+SubtypeField: ASSETGROUP
+
+
+Code: 184
+Default: False
+Name: Protection zone boundary
+Fields:
+SubtypeField: ASSETGROUP
+
+
