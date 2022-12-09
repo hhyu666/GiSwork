@@ -1,0 +1,529 @@
+﻿NAME,DESCRIPTION,TYPE,SUBTYPE,FIELD,ISEDITABLE,TRIGGERINSERT,TRIGGERDELETE,TRIGGERUPDATE,SCRIPTEXPRESSION,ERRORNUMBER,ERRORMESSAGE,EXCLUDECLIENTEVALUATION,ISENABLED,BATCH,SEVERITY,TAGS,CATEGORY,CHECKPARAMETERS
+LV_Sch_Line_end_Cal_01,Update the asset type of the LV Cable end according to the standalone table - “HKE_MapLVLineEndMapping”.,CALCULATION,Low voltage Line end,ASSETTYPE,TRUE,TRUE,FALSE,TRUE,"var mappingTable = FeatureSetByName($datastore,""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_MapLVLineEndMapping"",[""*""],false)
+var eqType = $feature.nameproduct
+var targetRow = Filter(mappingTable, ""nameproduct = @eqType"")
+if(count(targetRow)==1){
+    var targetUpdateAssetType = first(targetRow).ASSETTYPE
+    if(targetUpdateAssetType == null){
+        return $feature.ASSETTYPE
+    }
+    return targetUpdateAssetType
+}else{
+    return $feature.ASSETTYPE
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Line_end_Cal_02,Get angle between point and intercept line,CALCULATION,Low voltage Line end,symbolrotation,TRUE,TRUE,FALSE,TRUE,"// Find the first intersecting line from the intersecting class
+var lineClass = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.SchematicLine"", [""objectid""], true)
+var line = First(Intersects(lineClass, $feature))
+// If no feature was found, return the original value
+if (line == null)
+   return $feature.symbolrotation
+// Buffer the point by a small amount to extract the segment
+var search = Extent(Buffer($feature, .01, ""meter""))
+var segment = Clip(line, search)[""paths""][0]
+// Get angle of line using the start and end vertex
+return Angle(segment[0], segment[-1])",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Sch_Customer_service_point_Cal_01,"Update the values of "" Interconnection Status"" and "" Connected SN 1"" based on “Connected SN 1”, “Connected SN 2” and “Connected SN 3”.",CALCULATION,Medium voltage Customer service point,,TRUE,TRUE,FALSE,TRUE,"if($feature.ASSETGROUP != 967){
+  return 
+}
+var connectedCustomer = Trim($feature.connectedCustomer1)
+var connectedCustomer1 = Trim($feature.ConnectedCustomer1)
+var connectedCustomer2 = Trim($feature.connectedCustomer2)
+var connectedCustomer3 = Trim($feature.connectedCustomer3)
+var length1 = 0
+var length2 = 0
+var length3 = 0
+if(!IsEmpty(connectedCustomer1)){
+    length1 = Count(connectedCustomer1)
+}
+if(!IsEmpty(connectedCustomer2)){
+    length2 = Count(connectedCustomer2)
+}
+if(!IsEmpty(connectedCustomer3)){
+    length3 = Count(connectedCustomer3)
+}
+var statusInterconnection
+if(length1 > 0 || length2 > 0 || length3 > 0){
+    statusInterconnection = 400
+} else if(length1 == 0 && length2 == 0 && length3 == 0){
+    statusInterconnection = 500
+}
+var isUpdatedTwoFields
+if(IsEmpty(connectedCustomer)){
+    isUpdatedTwoFields = false
+} else{
+    connectedCustomer = Upper(connectedCustomer)
+    isUpdatedTwoFields = true
+}
+var originalStatusInterconnection = $originalFeature.statusinterconnection
+var dict = {}
+if(isUpdatedTwoFields){
+    var originalConnectedCustomer1 = $originalFeature.connectedcustomer1
+    if(originalStatusInterconnection == statusInterconnection && originalConnectedCustomer1 == connectedCustomer){
+        return 
+    } else if(originalConnectedCustomer1 == connectedCustomer){
+        dict[""statusinterconnection""] = statusInterconnection
+    } else if(originalStatusInterconnection == statusInterconnection){
+        dict[""connectedcustomer1""] = connectedCustomer 
+    } else{
+        dict[""connectedcustomer1""] = connectedCustomer 
+        dict[""statusinterconnection""] = statusInterconnection
+    }  
+} else{
+    if(originalStatusInterconnection == statusInterconnection){
+        return 
+    } else{
+        dict[""statusinterconnection""] = statusInterconnection
+    }
+}
+return {""result"": {""attributes"": dict}}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Sch_Customer_service_point_Cal_02,"Update the values of "" Interconnection Status"" and "" Connected SN 2"" based on “Connected SN 1”, “Connected SN 2” and “Connected SN 3”. ",CALCULATION,Medium voltage Customer service point,,TRUE,TRUE,FALSE,TRUE,"if($feature.ASSETGROUP != 967){
+  return 
+}
+var connectedCustomer = Trim($feature.connectedCustomer2)
+var connectedCustomer1 = Trim($feature.ConnectedCustomer1)
+var connectedCustomer2 = Trim($feature.connectedCustomer2)
+var connectedCustomer3 = Trim($feature.connectedCustomer3)
+var length1 = 0
+var length2 = 0
+var length3 = 0
+if(!IsEmpty(connectedCustomer1)){
+    length1 = Count(connectedCustomer1)
+}
+if(!IsEmpty(connectedCustomer2)){
+    length2 = Count(connectedCustomer2)
+}
+if(!IsEmpty(connectedCustomer3)){
+    length3 = Count(connectedCustomer3)
+}
+var statusInterconnection
+if(length1 > 0 || length2 > 0 || length3 > 0){
+    statusInterconnection = 400
+} else if(length1 == 0 && length2 == 0 && length3 == 0){
+    statusInterconnection = 500
+}
+var isUpdatedTwoFields
+if(IsEmpty(connectedCustomer)){
+    isUpdatedTwoFields = false
+} else{
+    connectedCustomer = Upper(connectedCustomer)
+    isUpdatedTwoFields = true
+}
+var originalStatusInterconnection = $originalFeature.statusinterconnection
+var dict = {}
+if(isUpdatedTwoFields){
+    var originalConnectedCustomer2 = $originalFeature.connectedcustomer2
+    if(originalStatusInterconnection == statusInterconnection && originalConnectedCustomer2 == connectedCustomer){
+        return 
+    } else if(originalConnectedCustomer2 == connectedCustomer){
+        dict[""statusinterconnection""] = statusInterconnection
+    } else if(originalStatusInterconnection == statusInterconnection){
+        dict[""connectedcustomer2""] = connectedCustomer 
+    } else{
+        dict[""connectedcustomer2""] = connectedCustomer 
+        dict[""statusinterconnection""] = statusInterconnection
+    }  
+} else{
+    if(originalStatusInterconnection == statusInterconnection){
+        return 
+    } else{
+        dict[""statusinterconnection""] = statusInterconnection
+    }
+}
+return {""result"": {""attributes"": dict}}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Sch_Customer_service_point_Cal_03,"Update the values of "" Interconnection Status"" and "" Connected SN 3"" based on “Connected SN 1”, “Connected SN 2” and “Connected SN 3”. ",CALCULATION,Medium voltage Customer service point,,TRUE,TRUE,FALSE,TRUE,"if($feature.ASSETGROUP != 967){
+  return 
+}
+var connectedCustomer = Trim($feature.connectedCustomer3)
+var connectedCustomer1 = Trim($feature.ConnectedCustomer1)
+var connectedCustomer2 = Trim($feature.connectedCustomer2)
+var connectedCustomer3 = Trim($feature.connectedCustomer3)
+var length1 = 0
+var length2 = 0
+var length3 = 0
+if(!IsEmpty(connectedCustomer1)){
+    length1 = Count(connectedCustomer1)
+}
+if(!IsEmpty(connectedCustomer2)){
+    length2 = Count(connectedCustomer2)
+}
+if(!IsEmpty(connectedCustomer3)){
+    length3 = Count(connectedCustomer3)
+}
+var statusInterconnection
+if(length1 > 0 || length2 > 0 || length3 > 0){
+    statusInterconnection = 400
+} else if(length1 == 0 && length2 == 0 && length3 == 0){
+    statusInterconnection = 500
+}
+var isUpdatedTwoFields
+if(IsEmpty(connectedCustomer)){
+    isUpdatedTwoFields = false
+} else{
+    connectedCustomer = Upper(connectedCustomer)
+    isUpdatedTwoFields = true
+}
+var originalStatusInterconnection = $originalFeature.statusinterconnection
+var dict = {}
+if(isUpdatedTwoFields){
+    var originalConnectedCustomer3 = $originalFeature.connectedcustomer3
+    if(originalStatusInterconnection == statusInterconnection && originalConnectedCustomer3 == connectedCustomer){
+        return 
+    } else if(originalConnectedCustomer3 == connectedCustomer){
+        dict[""statusinterconnection""] = statusInterconnection
+    } else if(originalStatusInterconnection == statusInterconnection){
+        dict[""connectedcustomer3""] = connectedCustomer 
+    } else{
+        dict[""connectedcustomer3""] = connectedCustomer 
+        dict[""statusinterconnection""] = statusInterconnection
+    }  
+} else{
+    if(originalStatusInterconnection == statusInterconnection){
+        return 
+    } else{
+        dict[""statusinterconnection""] = statusInterconnection
+    }
+}
+return {""result"": {""attributes"": dict}}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Sch_Line_end_Cal_01,Update the asset type of the MV Cable end according to the standalone table - “HKE_MapLVLineEndMapping”. ,CALCULATION,Medium voltage Line end,ASSETTYPE,TRUE,TRUE,FALSE,TRUE,"var mappingTable = FeatureSetByName($datastore,""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_MapMVLineEndMapping"",[""*""],false)
+var eqType = $feature.nameproduct
+var targetRow = Filter(mappingTable, ""nameproduct = @eqType"")
+if(count(targetRow)==1){
+    var targetUpdateAssetType = first(targetRow).ASSETTYPE
+    if(targetUpdateAssetType == null){
+        return $feature.ASSETTYPE
+    }
+    return targetUpdateAssetType
+}else{
+    return $feature.ASSETTYPE
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicJunction_Cal_01,Update the environment to Misc. Graphic Parent.,CALCULATION,,,TRUE,TRUE,FALSE,TRUE,"var miscGraphicsParentTable = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_MiscGraphicsParent"",[""*""],false)
+var featureGlobalID = $feature.GLOBALID
+var Relatedgraphicparents = Filter(miscGraphicsParentTable, ""hkeParentGlobalId = @featureGlobalID"")
+if (count(Relatedgraphicparents) > 0) {
+    var updateObjecetArray = []
+    for (var Relatedgraphicparent in Relatedgraphicparents) {
+        var RelatedgraphicparentGlobalID = Relatedgraphicparent.GLOBALID
+        var RelatedgraphicparentEnv = Relatedgraphicparent.hkeEnvironment
+        var assetGroup = $feature.ASSETGROUP
+        var voltage = $feature.voltagelimitmaxoperating
+        var updateObject = {}
+        var environment = 0
+        if(assetGroup == 751 || assetGroup == 955 || assetGroup == 963 || assetGroup == 967) {  //Medium voltage Off-page Conductor reference (751), Medium voltage Cable joint (955), Medium voltage Line end (963), Medium voltage Customer service point (967)
+            environment = 400 //MV Sch
+        }
+        else if(assetGroup == 954 || assetGroup == 962 || assetGroup == 966 || assetGroup == 977) {  //Low voltage Cable joint (954), Low voltage Line end (962), Low voltage Customer service point (966), Low voltage Busbar tap (977)
+            environment = 600 //LV Sch
+        }
+        else {
+            environment = -300 //Not Loaded
+        }
+        if (RelatedgraphicparentEnv != environment) {
+            updateObject[""GLOBALID""] = RelatedgraphicparentGlobalID
+            updateObject[""attributes""] = { ""hkeEnvironment"": environment }
+            Push(updateObjecetArray, updateObject)
+        }
+    }
+    if (count(updateObjecetArray) > 0) {
+        return {
+            'edit': [{
+                'className': 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_MiscGraphicsParent',
+                'updates': updateObjecetArray
+            }]
+        }
+    }
+}",,,TRUE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicJunction_Cal_02,Calcuate X corrdinate (3 d.p.) and save in Grid X1 Coordinate field.,CALCULATION,,envelopex1,TRUE,TRUE,FALSE,TRUE,Geometry($feature).x,,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicJunction_Cal_03,Calcuate y corrdinate of point feature (3 d.p.) and save in Grid Y1 Coordinate field.,CALCULATION,,envelopey1,TRUE,TRUE,FALSE,TRUE,Geometry($feature).y,,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicJunction_Cal_04,"Update Z to 1000, if the Life Cycle status is not INS or RES. Update Z to 0, if the life cycle status is INS.",CALCULATION,,,TRUE,TRUE,FALSE,TRUE,"var lifeCycleStatus = $feature.lifecyclestatus
+var featureX = Geometry($feature).x
+var featureY = Geometry($feature).y
+var featureZ = Geometry($feature).z
+var featureSR = Geometry($feature).spatialReference
+var z = 0
+if (lifeCycleStatus != 6 && isEmpty(lifeCycleStatus) != true){
+    z = 1000
+}
+if(featureZ != z){
+    return{
+        ""result"":{
+            geometry:Geometry({
+                'x': featureX,
+                'y': featureY,
+                'z': z,
+                'spatialReference': featureSR
+            })
+        }
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicJunction_Cal_06,Update the UNC life cycle status based on the HK Electric life cycle status.,CALCULATION,,statenetworklifecyclenormal,TRUE,TRUE,FALSE,TRUE,"if (DomainName($feature, ""lifecyclestatus"") == ""INS"") {
+  return 256
+} if (DomainName($feature, ""lifecyclestatus"") == ""PPR"" ||  DomainName($feature, ""lifecyclestatus"") == ""PPX""  ) {
+  return 32
+}  if (DomainName($feature, ""lifecyclestatus"") == ""RES"" || DomainName($feature, ""lifecyclestatus"") == ""SP"" ) {
+  return 1
+} if ( DomainName($feature, ""lifecyclestatus"") == ""PPA"" || DomainName($feature, ""lifecyclestatus"") == ""PPM"" ) {
+  return 2
+}else {
+   return 0
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicJunction_Cal_07,Get colour from table.,CALCULATION,,symbolcolor,TRUE,TRUE,FALSE,TRUE,"if ($originalFeature.lifecyclestatus!=$feature.lifecyclestatus){
+    // GetColour (for HV_TER) -- Medium voltage Line end
+    if ($feature.assetgroup == 963) {
+        var colorkey = 14
+        //read color from table
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 22}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+        var sql = 'OBJECTID = ' + colorkey
+        var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+        return result.Colour
+    }
+    // GetColour (for HV_JNT) -- Medium voltage Cable joint
+    if ($feature.assetgroup == 955) {
+        var colorkey = 14
+        //read color from table
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 22}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+        var sql = 'OBJECTID = ' + colorkey
+        var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+        return result.Colour
+    }
+    // GetColour (for LV_TER) -- Low voltage Line end
+    if ($feature.assetgroup == 962) {
+        var colorkey = 14
+        //read color from table
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+        var sql = 'OBJECTID = ' + colorkey
+        var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+        return result.Colour
+    }
+    // GetColour (for LV_JNT) -- Low voltage Cable joint
+    if ($feature.assetgroup == 954) {
+        var colorkey = 14
+        //read color from table
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+        var sql = 'OBJECTID = ' + colorkey
+        var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+        return result.Colour
+    }
+    // GetColour (for off page ref) -- Medium voltage Off-page Conductor reference
+    if ($feature.assetgroup == 751) {
+        var colorkey = 14
+        //read color from table
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 22}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+        var sql = 'OBJECTID = ' + colorkey
+        var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+        return result.Colour
+    }
+    // GetColour (for HV_DIRS) -- Medium voltage Customer service point
+    if ($feature.assetgroup == 967) {
+        var colorkey = 14
+        //read color from table
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 22}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+        var sql = 'OBJECTID = ' + colorkey
+        var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+        return result.Colour
+    }
+    // GetColour (for LV_DIRS) -- Low voltage Customer service point
+    if ($feature.assetgroup == 966) {
+        var colorkey = 14
+        //read color from table
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+        var sql = 'OBJECTID = ' + colorkey
+        var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+        return result.Colour
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicJunction_Cal_08,Return appropriate symbolid for given attribute,CALCULATION,,symbolfid,TRUE,TRUE,FALSE,TRUE,"// SymbolID (for HV_DIRS) -- Medium voltage Customer service point
+if ($feature.assetgroup == 967) {
+    if($originalFeature.statusinterconnection!=$feature.statusinterconnection){
+        var symid = 500
+            if (DomainName($feature,""statusinterconnection"") == ""Yes""){symid = 502}
+            else{symid = 501}
+            return symid
+    }
+   }
+   // SymbolID (for LV_DIRS) -- Low voltage Customer service point
+   if ($feature.assetgroup == 966) {
+    if($originalFeature.supplytype!=$feature.supplytype){
+        var symid = 500
+        if (DomainName($feature,""supplytype"") == ""Single-Core Cable""){symid = 505}
+        else if (DomainName($feature,""supplytype"") == ""Transit Block""){symid = 504}
+        else{symid = 503}
+        return symid
+    }
+   }
+   // SymbolID (For LV_SCH) -- Low voltage Cable joint
+   if ($feature.assetgroup == 954) {
+        if ($originalFeature.symbolfid!=506) {
+            return 506
+        }    
+   }
+   // SymbolID (For HV_JNT) -- Medium voltage Cable joint
+   if ($feature.assetgroup == 955) {
+        if ($originalFeature.symbolfid!=573) {
+            return 573
+        } 
+   }
+   // SymbolID (For off page ref) -- Medium voltage Off-page Conductor reference
+   if ($feature.assetgroup == 751) {
+        if ($originalFeature.symbolfid!=511) {
+            return 511
+        }    
+   }
+   // SymbolID (For HV_TER) -- Medium voltage Line end
+   if ($feature.assetgroup == 963) {
+    if ($originalFeature.symbolfid!=510) {
+        return 510
+    } 
+   }",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicJunction_Cal_09,update display field by asset group,CALCULATION,,displayfieldtext,TRUE,TRUE,FALSE,TRUE,"if ($feature.lifecyclestatus != $originalfeature.lifecyclestatus || $feature.NameAsset != $originalfeature.NameAsset){
+var asset_group = DomainName($feature, ""assetgroup"")
+var output_s_list = []
+var OBJECTID = 'OID' + $feature.OBJECTID
+var lifecyclestatus = '(' + DomainName($feature, ""lifecyclestatus"") + ')'
+var AssetType = DomainName($feature, ""AssetType"")
+var NameAsset = $feature.NameAsset
+ if (Includes(['Medium voltage Cable joint', 'Low voltage Cable joint'], asset_group)) {
+     Push(output_s_list, AssetType)
+ Push(output_s_list, lifecyclestatus)
+ Push(output_s_list, OBJECTID)
+}
+if (Includes(['Medium voltage Customer service point', 'Low voltage Customer service point'], asset_group)) {
+     Push(output_s_list, NameAsset)
+ Push(output_s_list, lifecyclestatus)
+ Push(output_s_list, OBJECTID)
+}
+if (Includes(['Medium voltage Line end', 'Medium voltage Off-page Conductor reference', 'Low voltage Busbar tap', 'Low voltage Line end'], asset_group)) {
+     Push(output_s_list, lifecyclestatus)
+ Push(output_s_list, OBJECTID)
+}
+var output_s = """"
+for (var s in output_s_list){
+    if (s != """") {
+        output_s += output_s_list[s] + "" ""
+    }
+}
+return output_s
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Customer_service_point_Con_01,Verify the value of “Supply Point No.”,CONSTRAINT,Low voltage Customer service point,,TRUE,TRUE,FALSE,TRUE,"var nameAsset = $feature.nameasset
+if(nameAsset == null){
+    return true
+}
+nameAsset = Trim(nameAsset)
+var length = Count(nameAsset) 
+if(length == 0){
+    return true
+} else{
+    nameAsset = Upper(nameAsset)
+    if(Left(nameAsset, 2) != ""SN""){
+        return false
+    }
+}
+if(length == 8){ 
+    var sum = 0
+    for(var i = 3; i <= 7; i++){
+        var numberValue = Number(Mid(nameAsset, i -1, 1), ""#"")
+        if(isNaN(numberValue)){
+            return false
+        }
+        sum = sum + (10 - i ) * numberValue
+    }
+    var result = 11 - (sum % 11)
+    var checkDigit 
+    if(result == 11){
+        checkDigit  = ""0""
+    } else if(result == 10){
+        checkDigit  = ""A""
+    } else{
+        checkDigit  = Text(result, ""#"")
+    }
+    if(Mid(nameAsset, 7, 1) == checkDigit){
+        return true
+    } else{
+        return false
+    }
+} else if(length == 7){
+    return true
+} else{
+    return false
+}",99210,Invalid Name of asset. Please Try Again!,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Sch_Customer_service_point_Con_01,Check if “HEC MV No.” is empty when Life Cycle Status is INS.,CONSTRAINT,Medium voltage Customer service point,,TRUE,TRUE,FALSE,TRUE,"var hecMVNo = Trim($feature.hecmvno)
+if(IsEmpty(hecMVNo)){
+    if($feature.lifecyclestatus == 6){
+        return false
+     }
+}
+return true",99211,No HEC MV No. Input for In Service Equipment!,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Sch_Customer_service_point_Con_02,Verify the value of “Supply Point No.”,CONSTRAINT,Medium voltage Customer service point,,TRUE,TRUE,FALSE,TRUE,"var nameAsset = $feature.nameasset
+if(nameAsset == null){
+    return true
+}
+nameAsset = Trim(nameAsset)
+var length = Count(nameAsset) 
+if(length == 0){
+    return true
+} else{
+    nameAsset = Upper(nameAsset)
+    if(Left(nameAsset, 2) != ""SN""){
+        return false
+    }
+}
+if(length == 8){ 
+    var sum = 0
+    for(var i = 3; i <= 7; i++){
+        var numberValue = Number(Mid(nameAsset, i -1, 1), ""#"")
+        if(isNaN(numberValue)){
+            return false
+        }
+        sum = sum + (10 - i ) * numberValue
+    }
+    var result = 11 - (sum % 11)
+    var checkDigit 
+    if(result == 11){
+        checkDigit  = ""0""
+    } else if(result == 10){
+        checkDigit  = ""A""
+    } else{
+        checkDigit  = Text(result, ""#"")
+    }
+    if(Mid(nameAsset, 7, 1) == checkDigit){
+        return true
+    } else{
+        return false
+    }
+} else if(length == 7){
+    return true
+} else{
+    return false
+}",99210,Invalid Name of asset. Please Try Again!,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Customer_service_point_Val_01,"Check if the ""Life Cycle State"" equals to ""INS"" when ""Supply Point No."" is empty.",VALIDATION,Low voltage Customer service point,,TRUE,FALSE,FALSE,FALSE,"var nameAsset = Trim($feature.nameasset)
+if(IsEmpty(nameAsset)){
+    if($feature.lifecyclestatus == 6){
+        return false
+    }
+}
+return true",99320,No Name of asset Input for In Service Equipment!,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Sch_Offpage_conductor_reference_Val_1,Check orphan in MV Sch Off page (without junction junction association).,VALIDATION,Medium voltage Off-page Conductor reference,,TRUE,FALSE,FALSE,FALSE,"var connectedFeatures = FeatureSetByAssociation($feature,""connected"")
+if(count(connectedFeatures)>0){
+    return true
+}else{
+    return false
+}",99301,Invalid feature(Orphan),FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicJunction_Val_01,Check the MV features’ Operating Voltage (kV) cannot greater than the Rated HV Volt (kV). ,VALIDATION,,,TRUE,FALSE,FALSE,FALSE,"var featureAssetGroupDesc = DomainName($feature, ""ASSETGROUP"", $feature.ASSETGROUP)
+if (Find(""Medium voltage"", featureAssetGroupDesc, 0) != -1) {
+    var opV = $feature.voltagelimitmaxoperating
+    var raV = $feature.voltagelimitmaxrating
+    if (opV > raV) {
+        return false
+    }
+    else {
+        return true
+    }
+} else {
+    return true
+}",99310,The operating voltage is higher than the Rated voltage,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"

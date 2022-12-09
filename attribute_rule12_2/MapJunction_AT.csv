@@ -1,0 +1,1111 @@
+﻿NAME,DESCRIPTION,TYPE,SUBTYPE,FIELD,ISEDITABLE,TRIGGERINSERT,TRIGGERDELETE,TRIGGERUPDATE,SCRIPTEXPRESSION,ERRORNUMBER,ERRORMESSAGE,EXCLUDECLIENTEVALUATION,ISENABLED,BATCH,SEVERITY,TAGS,CATEGORY,CHECKPARAMETERS
+LV_Cable_joint_Cal_01,Update LV Cable Joint's attributes by Stock No.,CALCULATION,Low voltage Cable joint,,TRUE,TRUE,FALSE,TRUE,"var validAssetType = [""Unknown"",""2 way - Straight joint - Low voltage"",""3 way - T and Y joint - Low voltage""]
+var stockTable = FeatureSetByName($dataStore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_LV_JointStockNo"",['*'],false)
+var stockNo = $feature.referenceobjectfidcatalogue
+var originalStockNo = $originalfeature.referenceobjectfidcatalogue
+var validFields = [""nameproductmanufacturer"",""nameproductvariant""]
+var sqlExpression = ""referenceobjectfidcatalogue = @stockNo""
+var updateAttributes = {}
+var assetDomainName = DomainName($feature,""ASSETTYPE"",$feature.ASSETTYPE)
+if(stockNo != originalStockNo && Includes(validAssetType,assetDomainName)){
+    var targetStockRecords = Filter(stockTable, sqlExpression)
+    if(Count(targetStockRecords) != 0 ){
+        var targetStockRecord = first(targetStockRecords)
+        for(var key in targetStockRecord){
+            if(Includes(validFields, key) && targetStockRecord[key] != null && targetStockRecord[key] != 0){
+                updateAttributes[key] = targetStockRecord[key]
+            }
+        }
+    }
+    return{
+        ""result"":{
+            ""attributes"":updateAttributes
+        }
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Cable_joint_Cal_02,Update LV Termination's attributes by Stock No.,CALCULATION,Low voltage Cable joint,,TRUE,TRUE,FALSE,TRUE,"var stockTable = FeatureSetByName($dataStore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_LV_TerminationStockNo"",['*'],false)
+var validAssetType = [""Termination - Low voltage""]
+var stockNo = $feature.referenceobjectfidcatalogue
+var originalStockNo = $originalfeature.referenceobjectfidcatalogue
+var validFields = [""nameproductmanufacturer"",""voltagelimitmaxoperating"",""numberconductortotal""]
+var sqlExpression = ""referenceobjectfidcatalogue = @stockNo""
+var updateAttributes = {}
+var assetDomainName = DomainName($feature,""ASSETTYPE"",$feature.ASSETTYPE)
+if(stockNo != originalStockNo && Includes(validAssetType,assetDomainName)){
+    var targetStockRecords = Filter(stockTable, sqlExpression)
+    if(Count(targetStockRecords) != 0 ){
+        var targetStockRecord = first(targetStockRecords)
+        for(var key in targetStockRecord){
+            if(Includes(validFields, key) && targetStockRecord[key] != null && targetStockRecord[key] != 0){
+                updateAttributes[key] = targetStockRecord[key]
+            }
+        }
+    }
+    return{
+        ""result"":{
+            ""attributes"":updateAttributes
+        }
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Cable_joint_Cal_03,Update Weak Joint Type by Equipment Type Description,CALCULATION,Low voltage Cable joint,weakjointtype,TRUE,TRUE,FALSE,TRUE,"var featureAssetType = $feature.ASSETTYPE
+var featureLifeCycleStatus = $feature.lifecyclestatus
+var featureNameProductVariant = $feature.nameproductvariant
+var featureNameProductManufacturer = $feature.nameproductmanufacturer
+var featureWeakJointType = $feature.weakjointtype
+var vaildNameProductVariant = [""-300"", ""-200"", ""-100"", ""400"", ""500"", ""600"", ""700"", ""800""]
+
+if (featureAssetType != 772 && featureLifeCycleStatus == 6 && includes(vaildNameProductVariant, featureNameProductVariant) == true) {
+    var targetWeakJointType = when(featureNameProductVariant == 1000, ""1"", featureNameProductVariant == 1100, ""2"", featureNameProductVariant == 1300, ""3"", featureNameProductVariant == 1400, ""4"", ""0"")
+    if (featureWeakJointType != targetWeakJointType) {
+        return targetWeakJointType
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Line_end_Cal_01,Update Asset Type by Equipment Type Description,CALCULATION,Low voltage Line end,ASSETTYPE,TRUE,TRUE,FALSE,TRUE,"var mappingTable = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_MapLVLineEndMapping"", [""*""], false)
+var featureAssetType = $feature.ASSETTYPE
+var eqType = $feature.nameproduct
+var targetRow = Filter(mappingTable, ""nameproduct = @eqType"")
+if (count(targetRow) == 1) {
+    var targetUpdateAssetType = first(targetRow).ASSETTYPE
+    if (targetUpdateAssetType == null) {
+        return
+    }
+    if (targetUpdateAssetType != featureAssetType) {
+        return targetUpdateAssetType
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Line_end_Cal_02,Update Rotation of Map Symbol,CALCULATION,Low voltage Line end,symbolrotation,TRUE,TRUE,FALSE,TRUE,"// Find the first intersecting line from the intersecting class
+var lineClass = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.MapLine"", [""objectid""], true)
+var line = First(Intersects(lineClass, $feature))
+// If no feature was found, return the original value
+if (line == null)
+   return $feature.symbolrotation
+// Buffer the point by a small amount to extract the segment
+var search = Extent(Buffer($feature, .01, ""meter""))
+var segment = Clip(line, search)[""paths""][0]
+// Get angle of line using the start and end vertex
+return Angle(segment[0], segment[-1])",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Line_end_Cal_03,Update attributes by Stock No.                                     ,CALCULATION,Low voltage Line end,,TRUE,TRUE,FALSE,TRUE,"var stockTable = FeatureSetByName($dataStore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_LV_CableEndStockNo"",['*'],false)
+var stockNo = $feature.referenceobjectfidcatalogue
+var originalStockNo = $originalfeature.referenceobjectfidcatalogue
+var validFields = [""nameproductmanufacturer""]
+var sqlExpression = ""referenceobjectfidcatalogue = @stockNo""
+var updateAttributes = {}
+if(stockNo != originalStockNo){
+    var targetStockRecords = Filter(stockTable, sqlExpression)
+    if(Count(targetStockRecords) != 0 ){
+        var targetStockRecord = first(targetStockRecords)
+        for(var key in targetStockRecord){
+            if(Includes(validFields, key) && targetStockRecord[key] != null && targetStockRecord[key] != 0){
+                updateAttributes[key] = targetStockRecord[key]
+            }
+        }
+    }
+    return{
+        ""result"":{
+            ""attributes"":updateAttributes
+        }
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Survey_point_Cal_01,Update point's environment,CALCULATION,Low voltage Survey point,environment,TRUE,TRUE,FALSE,TRUE,"var environmentCode = 500 
+if(environmentCode == $originalFeature.environment){
+    return 
+}
+return environmentCode",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MapJunction_Cal_01,Update  Map Junction's Grid X1 Coordinate,CALCULATION,,envelopex1,TRUE,TRUE,FALSE,TRUE,Geometry($feature).x,,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MapJunction_Cal_02,Update Map Junction's Grid Y1 Coordinate,CALCULATION,,envelopey1,TRUE,TRUE,FALSE,TRUE,Geometry($feature).y,,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MapJunction_Cal_03,"Update Shallow Value, Survey Point Type Abv. and Is_Shallow by Survey Point Type",CALCULATION,,,TRUE,TRUE,FALSE,TRUE,"/*776 TR Survey point
+  777 MV Survey point
+  778 LV Survey point
+  779 SK Survey point
+*/
+var validAssetGroup = [776, 777, 778, 779]
+var assetGroup = $feature.ASSETGROUP
+if (includes(validAssetGroup, assetGroup)) {
+    var environment = $feature.environment
+    var nameproductvariant = $feature.nameproductvariant
+    var survetypeTable = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.C_SURVETYPE"",['*'],false)
+    var targetUpdateRows = Filter(survetypeTable, ""nameproductvariant = @nameproductvariant AND ENVIRONMENT = @environment"")
+    if(count(targetUpdateRows)==1){
+        var updateObject = {}
+        var featuredepthValue = $feature.dimdepth
+        var featureIsshallow =  $feature.isshallow
+        var featureNameproduct = $feature.nameproduct
+        var featureShallowValue = $feature.distancesafetyrequirement
+        var targetUpdateRow = First(targetUpdateRows)
+        var targetUpateShallowValue = targetUpdateRow.distancesafetyrequirement
+        var targetUpateNameproduct = targetUpdateRow.nameproduct
+        var targetUpdateIsshallow = """"
+        if(featureShallowValue != targetUpateShallowValue  ){
+            updateObject[""distancesafetyrequirement""] = targetUpateShallowValue
+        }
+        if(featuredepthValue < targetUpateShallowValue){
+            var targetUpdateIsshallow = ""Yes""
+            if(featureIsshallow != targetUpdateIsshallow){
+                updateObject[""isshallow""] = targetUpdateIsshallow
+            }
+        }else{
+            var targetUpdateIsshallow = ""No""
+            if(featureIsshallow!= targetUpdateIsshallow){
+                updateObject[""isshallow""] = targetUpdateIsshallow
+            }
+        }
+        if(featureNameproduct != targetUpateNameproduct){
+            updateObject[""nameproduct""] = targetUpateNameproduct
+        }
+        for(var i in updateObject){}
+        if(IsEmpty(i) != true){
+            return{
+                ""result"":{
+                    'attributes':updateObject
+                }
+            }
+        }
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MapJunction_Cal_04,Update colour_id.,CALCULATION,,symbolcolor,TRUE,TRUE,FALSE,TRUE,"if ($originalFeature.lifecyclestatus!=$feature.lifecyclestatus||$originalFeature.voltagelimitmaxoperating!=$feature.voltagelimitmaxoperating){
+    var colorkey = 14
+        // GetColour (For HV_TER) -- Medium voltage Line end
+        // GetColour (For HV_JNT) -- Medium voltage Cable joint
+        // GetColour  -- Medium Votlage Customer Installation
+        if ($feature.assetgroup == 963 || $feature.assetgroup == 955 || $feature.assetgroup == 972) {
+        //read color from table
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){
+            if ($feature.voltagelimitmaxoperating == 22000){colorkey = 23}
+            else{colorkey = 22}}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+        else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 12}
+        }
+        // GetColour (for HV_DIRS) -- Medium voltage Customer service point
+        if ($feature.assetgroup == 967) {
+        //read color from table
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 22}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+        else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 12}
+        }
+        // GetColour (for LV_JNT) -- Low voltage Cable joint
+        // GetColour (for LV_DIR) -- Low voltage Customer service point
+        // GetColour (for LV_TER) -- Low voltage Line end
+        // GetColour (for LV_TER) -- Low Votlage Customer Installation
+        // GetColour (for LV_TER) -- Low voltage Busbar Tap
+        // GetColour (for LV_TER) -- Low voltage Tap-off
+        if ($feature.assetgroup == 954 || $feature.assetgroup == 966 || $feature.assetgroup == 962 || $feature.assetgroup == 971 || $feature.assetgroup == 977 || $feature.assetgroup == 958) {
+        //read color from table
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+        else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 12}
+        }
+        // GetColour (For SK_TER) -- Solkor Line end
+        // GetColour (For SK_JNT) -- Solkor Cable joint
+        if ($feature.assetgroup == 756 || $feature.assetgroup == 754) {
+        //read color from table
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){
+        colorkey = 23}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 23}
+        else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 23}
+        }
+        if (DomainName($feature, 'assetgroup') == 'Medium voltage Cable joint' || DomainName($feature, 'assetgroup') == 'Medium voltage Tap-off'){
+        //read color from table
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){
+            if ($feature.voltagelimitmaxoperating == 22000){colorkey = 23}
+            else{colorkey = 22}}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+        else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 12}
+        }
+        if (DomainName($feature, ""assetgroup"") == ""Low voltage Cable joint"" || DomainName($feature, ""assetgroup"") == ""Low voltage Tap-off""){
+        //read color from table
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+        else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 12}
+        }
+        // GetColour (For SK_JNT)1 -- Transmission Cable joint
+        // GetColour (For TR_TER) -- Transmission Line end
+        // GetColour -- Tranmission Cable defect
+        if ($feature.assetgroup == 957 || $feature.assetgroup == 965 || $feature.assetgroup == 784) { 
+        //read color from table
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){
+        if ($feature.voltagelimitmaxoperating == 33000 || $feature.voltagelimitmaxoperating == 66000){colorkey = 10}
+        else if ($feature.voltagelimitmaxoperating == 132000){colorkey = 19}
+        else{colorkey = 27}
+        }else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 23}
+        else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 10}
+        }
+        if (DomainName($feature, 'assetgroup') == 'Medium voltage Survey point') {
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 22}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+        else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 12}
+        } 
+        else if (DomainName($feature, 'assetgroup') == 'Low voltage Survey point') {
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+        else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 12}
+        } 
+        else if (DomainName($feature, 'assetgroup') == 'Solkor Survey point') {
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){
+        colorkey = 23}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 23}
+        else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 23}
+        } 
+        else if (DomainName($feature, 'assetgroup') == 'Transmission Survey point') {
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){
+        if ($feature.voltagelimitmaxoperating == 33000 || $feature.voltagelimitmaxoperating == 66000){colorkey = 10}
+        else if ($feature.voltagelimitmaxoperating == 132000){colorkey = 19}
+        else{colorkey = 27}
+        }else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 23}
+        else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 10}
+        }
+        var sql = 'OBJECTID = ' + colorkey
+        var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+        return result.Colour
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MapJunction_Cal_05,Update containment when a Survey point intersects with a appropriate Conductor.,CALCULATION,,,TRUE,TRUE,FALSE,FALSE,"var validAssetGroup = [776,777,778,779]
+var assetGroup = $feature.ASSETGROUP
+if(includes(validAssetGroup,assetGroup)){
+    var assetGroupAssetTypeMapping = {
+        ""776"":{'MapLineAssetGroup':923,'MapLineAssetType':956},
+        ""777"":{'MapLineAssetGroup':921,'MapLineAssetType':901},
+        ""778"":{'MapLineAssetGroup':920,'MapLineAssetType':880},
+        ""779"":{'MapLineAssetGroup':755,'MapLineAssetType':333},
+    }
+    var maplineFeatures = featuresetbyname($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.MapLine"", [""*""],True)
+    var targetMapLineAssetGroup = assetGroupAssetTypeMapping[text(assetGroup)]['MapLineAssetGroup']
+    var targetMapLineAssetType = assetGroupAssetTypeMapping[text(assetGroup)]['MapLineAssetType']
+    var mapConductors = filter(maplineFeatures,""ASSETGROUP = @targetMapLineAssetGroup AND ASSETTYPE = @targetMapLineAssetType"")
+    var crossConductors = intersects($feature, mapConductors)
+    if(count(crossConductors)==1){
+        var crossConductorGlobalID = First(crossConductors).GLOBALID
+        return{
+            ""edit"": [{
+                ""className"": ""^UN_Association"",
+                ""adds"": [{
+                    ""fromClass"": ""MapLine"",
+                    ""fromGlobalId"": crossConductorGlobalID,
+                    ""toClass"": ""MapJunction"",
+                    ""toGlobalId"": $feature.GLOBALID,
+                    ""associationType"": ""containment""
+                }]
+            }]
+        }
+    }
+}",,,TRUE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MapJunction_Cal_06,Update “Supply Status” and “Connected Supply No.”,CALCULATION,,,TRUE,TRUE,TRUE,TRUE,"var validAssetGroup = [971,972]
+var assetGroup = $feature.ASSETGROUP
+if(includes(validAssetGroup,assetGroup)){
+    var containerFeatures = FeatureSetByAssociation($feature,""container"")
+    if(count(containerFeatures)==1){
+        var supplyStatus = """"
+        var structureBoundaryFeatures = FeatureSetByName($datastore,""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.StructureBoundary"",[""*""],false)
+        var containerFeatureGlobalID = First(containerFeatures).GLOBALID
+        var containerStructureBoundaryFeatures = Filter(structureBoundaryFeatures,""GLOBALID = @containerFeatureGlobalID"")
+        if(count(containerStructureBoundaryFeatures)==1){
+            var contentFeatures = FeatureSetByAssociation(First(containerStructureBoundaryFeatures),""content"")
+            if(count(contentFeatures)>0){
+                var mapJunctionFeatures = FeatureSetByName($datastore,""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.MapJunction"",[""*""],false)
+                var contentFeaturesGlobalIDArray = []
+                for(var contentFeature in contentFeatures){
+                    var contentFeatureGlobalID = contentFeature.GLOBALID
+                    /*if($editContext.editType == ""DELETE""){
+                        if($feature.GLOBALID != contentFeatureGlobalID){
+                            Push(contentFeaturesGlobalIDArray,contentFeatureGlobalID)
+                        }
+                    }else{*/
+                        Push(contentFeaturesGlobalIDArray,contentFeatureGlobalID)
+                    //}
+                }
+                var globalIDTurpe = replace(replace(replace(Text(contentFeaturesGlobalIDArray),""["",""(""),""]"","")""),'""',""'"")
+                var whereClause = ""GLOBALID in "" + globalIDTurpe
+                var contentMapJunctionFeatures = Filter(mapJunctionFeatures, whereClause)
+                if(count(contentMapJunctionFeatures) >0){
+                    var numberOfconnectedCustomerPoint = 0
+                    var connectedMapJunctionFeatureNameAssets =""""
+                    for(var contentMapJunctionFeature in contentMapJunctionFeatures){
+                        var connectedFeatures = FeatureSetByAssociation(contentMapJunctionFeature,""connected"")
+                        if(count(connectedFeatures)>0){
+                            var connectedFeaturesGlobalIDArray = []
+                            for(var connectedFeature in connectedFeatures){
+                                 Push(connectedFeaturesGlobalIDArray,connectedFeature.GLOBALID)
+                            }
+                            globalIDTurpe = replace(replace(replace(Text(connectedFeaturesGlobalIDArray),""["",""(""),""]"","")""),'""',""'"")
+                            whereClause = ""GLOBALID in "" + globalIDTurpe + ""AND lifecyclestatus = 6 AND ASSETGROUP IN(966,967)""
+                            var connectedINSMapJunctionFeatures = Filter(mapJunctionFeatures, whereClause)
+                            numberOfconnectedCustomerPoint = numberOfconnectedCustomerPoint + count(connectedINSMapJunctionFeatures)
+                            whereClause = ""GLOBALID in "" + globalIDTurpe + ""AND ASSETGROUP IN(966,967)""
+                            var connectedMapJunctionFeatures = Filter(mapJunctionFeatures, whereClause)
+                            if(count(connectedMapJunctionFeatures)>0){
+                                for(var connectedMapJunctionFeature in  connectedMapJunctionFeatures){
+                                    var connectedMapJunctionFeatureNameAsset = connectedMapJunctionFeature.nameasset
+                                    if(isempty(connectedMapJunctionFeatureNameAsset) != true){
+                                        connectedMapJunctionFeatureNameAssets = connectedMapJunctionFeatureNameAssets + connectedMapJunctionFeatureNameAsset + "";""
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    var containerFeatureSupplyStatus = First(containerStructureBoundaryFeatures).statussupply
+                    var containerFeatureConnectedSupplyNo = First(containerStructureBoundaryFeatures).connectedsupplyno
+                    var updateObject = {}
+                    if(numberOfconnectedCustomerPoint > 0){
+                        supplyStatus = ""400""
+                        if(containerFeatureSupplyStatus!=supplyStatus){
+                            updateObject[""statussupply""] =supplyStatus
+                        }
+                    }else{
+                        supplyStatus = ""500""
+                        if(containerFeatureSupplyStatus!=supplyStatus){
+                            updateObject[""statussupply""] =supplyStatus
+                        }
+                    }
+                    if(isEmpty(connectedMapJunctionFeatureNameAssets)!=true){
+                        connectedMapJunctionFeatureNameAssets = left(connectedMapJunctionFeatureNameAssets, count(connectedMapJunctionFeatureNameAssets)-1)
+                        if(connectedMapJunctionFeatureNameAssets != containerFeatureConnectedSupplyNo){
+                            updateObject[""connectedsupplyno""] = connectedMapJunctionFeatureNameAssets
+                        }
+                    }
+                    if(isEmpty(supplyStatus) != true){
+                        return{
+                            ""edit"" : [{
+                                ""className"": ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.StructureBoundary"",
+                                ""updates"": [{
+                                    ""globalID"" : containerFeatureGlobalID,
+                                    ""attributes"" : updateObject
+                                }]
+                           }]
+                        }
+                    }
+                }
+            }
+        }
+    }
+}",,,TRUE,FALSE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MapJunction_Cal_07,Update symbolid for given attribute.,CALCULATION,,symbolfid,TRUE,TRUE,FALSE,TRUE,"// SymbolID (For LV_TER) -- Low voltage Line end
+if ($feature.assetgroup == 962) {
+    if ($originalFeature.symbolfid!=10) {
+        return 10
+    } 
+}
+   // SymbolID (For HV_TER) -- Medium voltage Line end
+   if ($feature.assetgroup == 963) {
+    if ($originalFeature.symbolfid!=68) {
+        return 68
+    } 
+   }
+   // SymbolID (for HV_DIRS) -- Medium voltage Customer service point
+   if ($feature.assetgroup == 967) {
+    if($originalFeature.statusinterconnection!=$feature.statusinterconnection){
+        var symid = 0
+            if (DomainName($feature,""statusinterconnection"") == ""Yes""){symid = 2}
+            else{symid = 1}
+            return symid
+    }
+   }
+   // SymbolID (for HV_JNT) -- Medium voltage Cable joint
+   if ($feature.assetgroup == 955) {
+    if ($originalFeature.transitionjointtype!=$feature.transitionjointtype||$originalFeature.weakjointtype!=$feature.weakjointtype){
+        var symid=21
+            if ($feature.transitionjointtype == ""1""){
+            if ($feature.weakjointtype == 1){symid =21}
+            else if($feature.weakjointtype ==2){symid =22}
+            else if($feature.weakjointtype ==3){symid =23}
+            else if($feature.weakjointtype ==4){symid =24}
+            else{symid =25}
+            }else{
+            if ($feature.weakjointtype == 1){symid =26}
+            else if($feature.weakjointtype ==2){symid =27}
+            else if($feature.weakjointtype ==3){symid =28}
+            else if($feature.weakjointtype ==4){symid =29}
+            else{symid =30}}
+            return symid
+    }  
+   }
+   // SymbolID (for LV_JNT) -- Low voltage Cable joint
+   if ($feature.assetgroup == 954) {
+    if($originalFeature.weakjointtype!=$feature.weakjointtype){
+        var symid=31
+            if ($feature.weakjointtype == 1){symid =31}
+            else if($feature.weakjointtype ==2){symid =32}
+            else if($feature.weakjointtype ==3){symid =33}
+            else if($feature.weakjointtype ==4){symid =34}
+            else{symid =35}
+            return symid
+    }
+   }
+   // SymbolID (for LV_DIRS) -- Low voltage Customer service point
+   if ($feature.assetgroup == 966) {
+    if($originalFeature.supplytype!=$feature.supplytype){
+        var symid = 0
+            if (DomainName($feature,""supplytype"") == ""Single-Core Cable""){symid = 5}
+            else if (DomainName($feature,""supplytype"") == ""Transit Block""){symid = 4}
+            else{symid = 3}
+            return symid
+    }
+   }
+   // SymbolID (For SK_TER) -- Solkor Line end
+   if ($feature.assetgroup == 756) {
+    if ($originalFeature.symbolfid!=69) {
+        return 69
+    }  
+   }
+   // SymbolID (For SK_JNT) -- Solkor Cable joint
+   if ($feature.assetgroup == 754) {
+    if ($originalFeature.symbolfid!=71) {
+        return 71
+    } 
+   }
+   if (DomainName($feature, 'assetgroup') == 'Medium voltage Survey point') {
+        if ($originalFeature.symbolfid!=43) {
+            return 43
+        } 
+   } else if (DomainName($feature, 'assetgroup') == 'Low voltage Survey point') {
+    if ($originalFeature.symbolfid!=44) {
+        return 44
+    } 
+   } else if (DomainName($feature, 'assetgroup') == 'Solkor Survey point') {
+    if ($originalFeature.symbolfid!=45) {
+        return 45
+    } 
+   } else if (DomainName($feature, 'assetgroup') == 'Transmission Survey point') {
+    if ($originalFeature.symbolfid!=46) {
+        return 46
+    } 
+   } 
+   // SymbolID (For SK_HUB) -- Solkor Network hub
+   if ($feature.assetgroup == 772) {
+    if ($originalFeature.symbolfid!=47) {
+        return 47
+    } 
+   }
+   // SymbolID (For TR_TER) -- Transmission Line end
+   if ($feature.assetgroup == 965) {
+    if ($originalFeature.symbolfid!=70) {
+        return 70
+    } 
+   }
+   // SymbolID (for TR_JNT) - m -- Transmission Cable joint
+   if ($feature.assetgroup == 957) {
+    if($originalFeature.assettype!=$feature.assettype){
+        var symid = 30
+            if ($feature.assettype == 850 || $feature.assettype == 851) {
+            symid = 57
+            }
+            return symid
+    }
+   }
+   // SymbolID -- LV Customer Installation
+   if ($feature.assetgroup == 971) {
+    if ($originalFeature.symbolfid!=82) {
+        return 82
+    } 
+   }
+   // SymbolID -- LV Customer Busbar Tap
+   if ($feature.assetgroup == 977) {
+    if ($originalFeature.symbolfid!=83) {
+        return 83
+    } 
+   }
+   // SymbolID -- LV Tap-off
+   if ($feature.assetgroup == 958) {
+    if ($originalFeature.symbolfid!=84) {
+        return 84
+    } 
+   }
+   // SymbolID -- Transmission Cable Defect
+   if ($feature.assetgroup == 784) {
+    if ($originalFeature.symbolfid!=85) {
+        return 85
+    } 
+   }",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MapJunction_Cal_08,Update the Supply Status of associated Building boundary by Customer service point's lifecycle status,CALCULATION,,,TRUE,TRUE,FALSE,TRUE,"function GetAssoicatedFeatureSet(feature, assocationType,targetLocateFeatureClass,OnlyINS){
+    var associatedFeatures = FeatureSetByAssociation(feature, assocationType)
+    var whereClause = """"
+    if(count(associatedFeatures)>0){
+        var associatedFeaturesGlobalIDArray = []
+        for(var associatedFeature in associatedFeatures){
+                    Push(associatedFeaturesGlobalIDArray,associatedFeature.GLOBALID)
+        }
+        var globalIDTurpe = replace(replace(replace(Text(associatedFeaturesGlobalIDArray),""["",""(""),""]"","")""),'""',""'"")
+        if(OnlyINS == false){
+            whereClause = ""GLOBALID in "" + globalIDTurpe
+        }else{
+            whereClause = ""GLOBALID in "" + globalIDTurpe + ""AND lifecyclestatus = 6""
+        }
+        var associatedFeatureClassFeatures = Filter(targetLocateFeatureClass, whereClause)
+        return associatedFeatureClassFeatures
+    }else{
+        return
+    }
+}
+var validAssetGroup = [966, 967]
+var assetGroup = $feature.ASSETGROUP
+var lifeCycleStatus = $feature.lifecyclestatus
+if(includes(validAssetGroup, assetGroup)){
+    if($originalfeature.lifecyclestatus != lifeCycleStatus){
+        var mapJunctionFeatures = FeatureSetByName($datastore,""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.MapJunction"",[""*""],false)
+        var connectedMapJunctionFeatures = GetAssoicatedFeatureSet($feature,""connected"",mapJunctionFeatures,false)
+        if(isEmpty(connectedMapJunctionFeatures) != true){
+            if(count(connectedMapJunctionFeatures) >0){
+                for(var connectedMapJunctionFeature in connectedMapJunctionFeatures){
+                    var structureBoundaryFeatures = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.StructureBoundary"",[""*""],false)
+                    var containerStructureBoundaryFeatures = GetAssoicatedFeatureSet(connectedMapJunctionFeature,""container"",structureBoundaryFeatures,false)
+                    if(isEmpty(containerStructureBoundaryFeatures) != true){
+                        if(count(containerStructureBoundaryFeatures) == 1){
+                            var containerStructureBoundaryFeature = First(containerStructureBoundaryFeatures)
+                            var containerStructureBoundaryFeatureGlobalId = containerStructureBoundaryFeature.GLOBALID
+                            var containerStructureBoundaryFeatureStatusSupply = containerStructureBoundaryFeature.statussupply
+                            var statusSupply = """"
+                            if(lifeCycleStatus == 6){
+                                statusSupply = ""400""
+                                if(statusSupply != containerStructureBoundaryFeatureStatusSupply){
+                                    return{
+                                        ""edit"" : [{
+                                            ""className"": ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.StructureBoundary"",
+                                            ""updates"": [{
+                                                ""globalID"" : containerStructureBoundaryFeatureGlobalId,
+                                                ""attributes"" : {
+                                                    ""statussupply"" : statusSupply
+                                                }
+                                            }]
+                                       }]
+                                    }
+                                }
+                            }else{
+                                var contentMapJunctionFeatures = GetAssoicatedFeatureSet(containerStructureBoundaryFeature, ""content"",mapJunctionFeatures,false)
+                                var numberOfconnectedCustomerPoint = 0
+                                if(isEmpty(contentMapJunctionFeatures)!=true){
+                                    if(count(contentMapJunctionFeatures)>0){
+                                        for(var contentMapJunctionFeature in contentMapJunctionFeatures){
+                                            connectedMapJunctionFeatures = GetAssoicatedFeatureSet(contentMapJunctionFeature, ""connected"",mapJunctionFeatures,true)
+                                            if(isEmpty(connectedMapJunctionFeatures) != true){
+                                                numberOfconnectedCustomerPoint = numberOfconnectedCustomerPoint + count(connectedMapJunctionFeatures)
+                                            }
+                                        }
+                                        if(numberOfconnectedCustomerPoint > 0){
+                                            statusSupply = ""400""
+                                        }else{
+                                            statusSupply = ""500""
+                                        }
+                                        if(statusSupply != containerStructureBoundaryFeatureStatusSupply){
+                                            return{
+                                                ""edit"" : [{
+                                                    ""className"": ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.StructureBoundary"",
+                                                    ""updates"": [{
+                                                        ""globalID"" : containerStructureBoundaryFeatureGlobalId,
+                                                        ""attributes"" : {
+                                                            ""statussupply"" : statusSupply
+                                                        }
+                                                    }]
+                                               }]
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}",,,TRUE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MapJunction_Cal_09,Assign the environment to the related Misc. Graphic Parent.,CALCULATION,,,TRUE,TRUE,FALSE,TRUE,"var miscGraphicsParentTable = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_MiscGraphicsParent"",[""*""],false)
+var featureGlobalID = $feature.GLOBALID
+var Relatedgraphicparents = Filter(miscGraphicsParentTable, ""hkeParentGlobalId = @featureGlobalID"")
+if (count(Relatedgraphicparents) > 0) {
+    var updateObjecetArray = []
+    for (var Relatedgraphicparent in Relatedgraphicparents) {
+        var RelatedgraphicparentGlobalID = Relatedgraphicparent.GLOBALID
+        var RelatedgraphicparentEnv = Relatedgraphicparent.hkeEnvironment
+        var assetGroup = $feature.ASSETGROUP
+        var voltage = $feature.voltagelimitmaxoperating
+        var updateObject = {}
+        var environment = 0
+        if (assetGroup == 777 || assetGroup == 955 || assetGroup == 963 || assetGroup == 967 || assetGroup == 972) {  //Medium voltage Survey point (777), Medium voltage Cable joint (955), Medium voltage Line end (963), Medium voltage Customer service point (967), Medium Voltage Customer installation (972)
+            if (voltage == 11000) environment = 200 //MV Map 11kV
+            else environment = 300 //MV Map 22kV
+        }
+        else if (assetGroup == 778 || assetGroup == 954 || assetGroup == 958 || assetGroup == 962 || assetGroup == 966 || assetGroup == 971 || assetGroup == 977) {  //Low voltage Survey point (778), Low voltage Cable joint (954), Low voltage Tap-off (958), Low voltage Line end (962), Low voltage Customer service point (966)
+            environment = 500 //LV Map
+        }
+        else if (assetGroup == 754 || assetGroup == 756 || assetGroup == 772 || assetGroup == 779) { //Solkor Cable joint (754), Solkor Line end (756), Solkor Network hub (772), Solkor Survey point (779)
+            environment = 700 //Solkor
+        }
+        else if (assetGroup == 776 || assetGroup == 957 || assetGroup == 965) { //Transmission Survey point (776), Transmission Cable joint (957), Transmission Line end (965)
+            if (voltage == 66000) {
+                environment = 1500 //TR 66kV
+            }
+            else if (voltage == 132000) {
+                environment = 1400 //TR 132kV
+            }
+            else if (voltage == 275000) {
+                environment = 1300 //TR 275kV
+            }
+            else {
+                environment = -300
+            }
+        } else {
+            environment = -300
+        }
+        if (RelatedgraphicparentEnv != environment) {
+            updateObject[""GLOBALID""] = RelatedgraphicparentGlobalID
+            updateObject[""attributes""] = { ""hkeEnvironment"": environment }
+            Push(updateObjecetArray, updateObject)
+        }
+    }
+    if (count(updateObjecetArray) > 0) {
+        return {
+            'edit': [{
+                'className': 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_MiscGraphicsParent',
+                'updates': updateObjecetArray
+            }]
+        }
+    }
+}",,,TRUE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MapJunction_Cal_10,Update Life Cycle Status(UNC),CALCULATION,,statenetworklifecyclenormal,TRUE,TRUE,FALSE,TRUE,"if (DomainName($feature, ""lifecyclestatus"") == ""INS"") {
+  return 256
+} if (DomainName($feature, ""lifecyclestatus"") == ""PPR"" ||  DomainName($feature, ""lifecyclestatus"") == ""PPX""  ) {
+  return 32
+}  if (DomainName($feature, ""lifecyclestatus"") == ""RES"" || DomainName($feature, ""lifecyclestatus"") == ""SP"" ) {
+  return 1
+} if ( DomainName($feature, ""lifecyclestatus"") == ""PPA"" || DomainName($feature, ""lifecyclestatus"") == ""PPM"" ) {
+  return 2
+}else {
+   return 0
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MapJunction_Cal_11,Update Display Field,CALCULATION,,displayfieldtext,TRUE,TRUE,FALSE,TRUE,"if ($feature.lifecyclestatus != $originalfeature.lifecyclestatus || $feature.namecircuitabbreviation != $originalfeature.namecircuitabbreviation || $feature.NameAsset != $originalfeature.NameAsset || $feature.nameproductvariant != $originalfeature.nameproductvariant || $feature.DimDepth != $originalfeature.DimDepth){
+ var asset_group = DomainName($feature, ""assetgroup"")
+ var output_s_list = []
+ var AssetType = DomainName($feature, ""AssetType"")
+ var namecircuitabbreviation = $feature.namecircuitabbreviation
+ var referenceobjectparentid = $feature.referenceobjectparentid
+ var OBJECTID = 'OID' + $feature.OBJECTID
+ var nameproductvariant = $feature.nameproductvariant
+ var lifecyclestatus = '(' + DomainName($feature, ""lifecyclestatus"") + ')'
+ var nametype = DomainName($feature, 'nametype')
+ var DimDepth = $feature.DimDepth
+ var NameAsset = $feature.NameAsset
+  if (Includes(['Low voltage Busbar tap', 'Low Voltage Customer installation'], asset_group)) {
+     Push(output_s_list, referenceobjectparentid)
+  Push(output_s_list, NameAsset)
+  Push(output_s_list, lifecyclestatus)
+  Push(output_s_list, OBJECTID)
+ }
+ if (Includes(['Transmission Cable joint'], asset_group)) {
+     Push(output_s_list, namecircuitabbreviation)
+  Push(output_s_list, NameAsset)
+  Push(output_s_list, lifecyclestatus)
+  Push(output_s_list, OBJECTID)
+ }
+ if (Includes(['Transmission Line end'], asset_group)) {
+     Push(output_s_list, namecircuitabbreviation)
+  Push(output_s_list, lifecyclestatus)
+  Push(output_s_list, OBJECTID)
+ }
+ if (Includes(['Transmission Survey point', 'Medium voltage Survey point', 'Low voltage Survey point', 'Solkor Survey point'], asset_group)) {
+     Push(output_s_list, DimDepth)
+  Push(output_s_list, nameproductvariant)
+  Push(output_s_list, NameAsset)
+  Push(output_s_list, lifecyclestatus)
+  Push(output_s_list, OBJECTID)
+ }
+ if (Includes(['Medium voltage Cable joint', 'Low voltage Cable joint'], asset_group)) {
+     Push(output_s_list, AssetType)
+  Push(output_s_list, lifecyclestatus)
+  Push(output_s_list, OBJECTID)
+ }
+ if (Includes(['Medium voltage Customer service point', 'Medium Voltage Customer installation', 'Low voltage Customer service point', 'Solkor Network hub'], asset_group)) {
+     Push(output_s_list, NameAsset)
+  Push(output_s_list, lifecyclestatus)
+  Push(output_s_list, OBJECTID)
+ }
+ if (Includes(['Medium voltage Line end', 'Low voltage Line end', 'Low voltage Tap-off', 'Solkor Cable joint', 'Solkor Line end'], asset_group)) {
+     Push(output_s_list, lifecyclestatus)
+  Push(output_s_list, OBJECTID)
+ }
+ if (Includes(['Transmission Cable defeat'], asset_group)){
+     Push(output_s_list, nametype)
+  Push(output_s_list, OBJECTID)
+ }
+ var output_s = """"
+ for (var s in output_s_list){
+     if (s != """") {
+         output_s += output_s_list[s] + "" ""
+     }
+ }
+ return output_s
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MapJunction_Cal_12,Update Weak Joint based on Weak Joint Type,CALCULATION,,weakjoint,TRUE,TRUE,FALSE,TRUE,"var featureAssetGroup = $feature.ASSETGROUP
+var featureWeakJointType = $feature.weakjointtype
+var featureWeakJoint = $feature.weakjoint
+var validAssetGroup = [954,955]
+var validWeakJointType = [""1"",""2"",""3"",""4""]
+var weakJointFlagYes = ""400""
+var weakJointFlagNo = ""500""
+if(includes(validAssetGroup,featureAssetGroup)==true){
+    if(includes(validWeakJointType,featureWeakJointType)==true){
+        if(featureWeakJoint != weakJointFlagYes){
+            return weakJointFlagYes
+        }
+    }else{
+        if(featureWeakJoint != weakJointFlagNo){
+            return weakJointFlagNo
+        }
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Cable_joint_Cal_01,Update attributes by Stock No.,CALCULATION,Medium voltage Cable joint,,TRUE,TRUE,FALSE,TRUE,"var validAssetType = [""2 way - Straight joint - Medium voltage""]
+var stockTable = FeatureSetByName($dataStore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_MV_JointStockNo"",['*'],false)
+var stockNo = $feature.referenceobjectfidcatalogue
+var originalStockNo = $originalfeature.referenceobjectfidcatalogue
+var validFields = [""nameproductmanufacturer"",""nameproductvariant"",""voltagelimitmaxoperating"",""voltagelimitmaxrating""]
+var sqlExpression = ""referenceobjectfidcatalogue = @stockNo""
+var updateAttributes = {}
+var assetDomainName = DomainName($feature,""ASSETTYPE"",$feature.ASSETTYPE)
+if(stockNo != originalStockNo && Includes(validAssetType,assetDomainName)){
+    var targetStockRecords = Filter(stockTable, sqlExpression)
+    if(Count(targetStockRecords) != 0 ){
+        var targetStockRecord = first(targetStockRecords)
+        for(var key in targetStockRecord){
+            if(Includes(validFields, key) && targetStockRecord[key] != null && targetStockRecord[key] != 0){
+                updateAttributes[key] = targetStockRecord[key]
+            }
+        }
+    }
+    return{
+        ""result"":{
+            ""attributes"":updateAttributes
+        }
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Cable_joint_Cal_02,Update attributes by Stock No.,CALCULATION,Medium voltage Cable joint,,TRUE,TRUE,FALSE,TRUE,"var stockTable = FeatureSetByName($dataStore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_MV_TerminationStockNo"",['*'],false)
+var validAssetType = [""Termination - Medium voltage""]
+var stockNo = $feature.referenceobjectfidcatalogue
+var originalStockNo = $originalfeature.referenceobjectfidcatalogue
+var validFields = [""nameproductmanufacturer"",""voltagelimitmaxoperating""]
+var sqlExpression = ""referenceobjectfidcatalogue = @stockNo""
+var updateAttributes = {}
+var assetDomainName = DomainName($feature,""ASSETTYPE"",$feature.ASSETTYPE)
+if(stockNo != originalStockNo && Includes(validAssetType,assetDomainName)){
+    var targetStockRecords = Filter(stockTable, sqlExpression)
+    if(Count(targetStockRecords) != 0 ){
+        var targetStockRecord = first(targetStockRecords)
+        for(var key in targetStockRecord){
+            if(Includes(validFields, key) && targetStockRecord[key] != null && targetStockRecord[key] != 0){
+                updateAttributes[key] = targetStockRecord[key]
+            }
+        }
+    }
+    return{
+        ""result"":{
+            ""attributes"":updateAttributes
+        }
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Line_end_Cal_01,Update Asset Type by Equipment Type Description,CALCULATION,Medium voltage Line end,ASSETTYPE,TRUE,TRUE,FALSE,TRUE,"var mappingTable = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_MapMVLineEndMapping"", [""*""], false)
+var eqType = $feature.nameproduct
+var targetRow = Filter(mappingTable, ""nameproduct = @eqType"")
+if (count(targetRow) == 1) {
+    var targetUpdateAssetType = first(targetRow).ASSETTYPE
+    if (targetUpdateAssetType == null) {
+        return
+    }
+    if (targetUpdateAssetType != $feature.ASSETTYPE) {
+        return targetUpdateAssetType
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Line_end_Cal_02,Update MV Line end's attributes by Stock No.,CALCULATION,Medium voltage Line end,,TRUE,TRUE,FALSE,TRUE,"var stockTable = FeatureSetByName($dataStore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_MV_CableEndStockNo"",['*'],false)
+var stockNo = $feature.referenceobjectfidcatalogue
+var originalStockNo = $originalfeature.referenceobjectfidcatalogue
+var validFields = [""nameproductmanufacturer""]
+var sqlExpression = ""referenceobjectfidcatalogue = @stockNo""
+var updateAttributes = {}
+if(stockNo != originalStockNo){
+    var targetStockRecords = Filter(stockTable, sqlExpression)
+    if(Count(targetStockRecords) != 0 ){
+        var targetStockRecord = first(targetStockRecords)
+        for(var key in targetStockRecord){
+            if(Includes(validFields, key) && targetStockRecord[key] != null && targetStockRecord[key] != 0){
+                updateAttributes[key] = targetStockRecord[key]
+            }
+        }
+    }
+    return{
+        ""result"":{
+            ""attributes"":updateAttributes
+        }
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Line_end_Cal_03,Update Symbol Rotation,CALCULATION,Medium voltage Line end,symbolrotation,TRUE,TRUE,FALSE,TRUE,"// Find the first intersecting line from the intersecting class
+var lineClass = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.MapLine"", [""*""], true)
+var line = First(Intersects(lineClass, $feature))
+// If no feature was found, return the original value
+if (line == null)
+   return $feature.symbolrotation
+// Buffer the point by a small amount to extract the segment
+var search = Extent(Buffer($feature, .01, ""meter""))
+var segment = Clip(line, search)[""paths""][0]
+// Get angle of line using the start and end vertex
+return Angle(segment[0], segment[-1])",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SK_Cable_joint_Cal_01,Update attributes by Stock No.,CALCULATION,Solkor Cable joint,,TRUE,TRUE,FALSE,TRUE,"var stockTable = FeatureSetByName($dataStore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_SK_JointStockNo"",['*'],false)
+var stockNo = $feature.referenceobjectfidcatalogue
+var originalStockNo = $originalfeature.referenceobjectfidcatalogue
+var validFields = [""nameproductmanufacturer""]
+var sqlExpression = ""referenceobjectfidcatalogue = @stockNo""
+var updateAttributes = {}
+if(stockNo != originalStockNo){
+    var targetStockRecords = Filter(stockTable, sqlExpression)
+    if(Count(targetStockRecords) != 0 ){
+        var targetStockRecord = first(targetStockRecords)
+        for(var key in targetStockRecord){
+            if(Includes(validFields, key) && targetStockRecord[key] != null && targetStockRecord[key] != 0){
+                updateAttributes[key] = targetStockRecord[key]
+            }
+        }
+    }
+    return{
+        ""result"":{
+            ""attributes"":updateAttributes
+        }
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SK_Line_end_Cal_01,Update attributes by Stock No.                                     ,CALCULATION,Solkor Line end,,TRUE,TRUE,FALSE,TRUE,"var stockTable = FeatureSetByName($dataStore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_SK_CableEndStockNo"",['*'],false)
+var stockNo = $feature.referenceobjectfidcatalogue
+var originalStockNo = $originalfeature.referenceobjectfidcatalogue
+var validFields = [""nameproductmanufacturer""]
+var sqlExpression = ""referenceobjectfidcatalogue = @stockNo""
+var updateAttributes = {}
+if(stockNo != originalStockNo){
+    var targetStockRecords = Filter(stockTable, sqlExpression)
+    if(Count(targetStockRecords) != 0 ){
+        var targetStockRecord = first(targetStockRecords)
+        for(var key in targetStockRecord){
+            if(Includes(validFields, key) && targetStockRecord[key] != null && targetStockRecord[key] != 0){
+                updateAttributes[key] = targetStockRecord[key]
+            }
+        }
+    }
+    return{
+        ""result"":{
+            ""attributes"":updateAttributes
+        }
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SK_Line_end_Cal_02,Update Symbol Rotation,CALCULATION,Solkor Line end,symbolrotation,TRUE,TRUE,FALSE,TRUE,"// Find the first intersecting line from the intersecting class
+var lineClass = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.MapLine"", [""objectid""], true)
+var line = First(Intersects(lineClass, $feature))
+// If no feature was found, return the original value
+if (line == null)
+   return $feature.symbolrotation
+// Buffer the point by a small amount to extract the segment
+var search = Extent(Buffer($feature, .01, ""meter""))
+var segment = Clip(line, search)[""paths""][0]
+// Get angle of line using the start and end vertex
+return Angle(segment[0], segment[-1])",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SK_Network_hub_Cal_01,"Update Name of location, details by Owner Substation Name.",CALCULATION,Solkor Network hub,namelocationdetails,TRUE,TRUE,FALSE,TRUE,"var nameasset = trim($feature.nameasset)
+var substationMappingTable = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.C_SUBNAME"",[""*""],false)
+var mappedRecords = Filter(substationMappingTable, ""nameassetsubstation = @nameasset"")
+if(count(mappedRecords)==1){
+    targetNameLocationDetailsSubstation = first(mappedRecords).namelocationdetailssubstation
+    
+    if(targetNameLocationDetailsSubstation != $feature.namelocationdetails){
+        return targetNameLocationDetailsSubstation
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SK_Survey_point_Cal_01,Updates Environment.,CALCULATION,Solkor Survey point,environment,TRUE,TRUE,FALSE,TRUE,"var environmentCode = 700
+if(environmentCode == $originalFeature.environment){
+    return 
+}
+return environmentCode",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+TR_Line_end_Cal_01,Update Symbol rotation between point and intercept line.,CALCULATION,Transmission Line end,symbolrotation,TRUE,TRUE,FALSE,TRUE,"//Modify the attribute rule
+// Find the first intersecting line from the intersecting class
+var lineClass = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.MapLine"", [""objectid""], true)
+var line = First(Intersects(lineClass, $feature))
+// If no feature was found, return the original value
+if (line == null)
+   return $feature.symbolrotation
+// Buffer the point by a small amount to extract the segment
+var search = Extent(Buffer($feature, .01, ""meter""))
+var segment = Clip(line, search)[""paths""][0]
+// Get angle of line using the start and end vertex
+return Angle(segment[0], segment[-1])",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+TR_Line_end_Cal_02,Update Asset Type by Equipment Type Description,CALCULATION,Transmission Line end,ASSETTYPE,TRUE,TRUE,FALSE,TRUE,"var mappingTable = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_MapTRLineEndMapping"", [""*""], false)
+var eqType = $feature.nameproduct
+var targetRow = Filter(mappingTable, ""nameproduct = @eqType"")
+if (count(targetRow) == 1) {
+    var targetUpdateAssetType = first(targetRow).ASSETTYPE
+    if (targetUpdateAssetType == null) {
+        return
+    }
+    if (targetUpdateAssetType != $feature.ASSETTYPE) {
+        return targetUpdateAssetType
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Customer_service_point_Con_1,Validate the Supply Point No,CONSTRAINT,Low voltage Customer service point,,TRUE,TRUE,FALSE,TRUE,"var nameAsset = $feature.nameasset
+if(nameAsset == null){
+    return true
+}
+nameAsset = Trim(nameAsset)
+var length = Count(nameAsset) 
+if(length == 0){
+    return true
+} else{
+    nameAsset = Upper(nameAsset)
+    if(Left(nameAsset, 2) != ""SN""){
+        return false
+    }
+}
+if(length == 8){ 
+    var sum = 0
+    for(var i = 3; i <= 7; i++){
+        var numberValue = Number(Mid(nameAsset, i -1, 1), ""#"")
+        if(isNaN(numberValue)){
+            return false
+        }
+        sum = sum + (10 - i ) * numberValue
+    }
+    var result = 11 - (sum % 11)
+    var checkDigit 
+    if(result == 11){
+        checkDigit  = ""0""
+    } else if(result == 10){
+        checkDigit  = ""A""
+    } else{
+        checkDigit  = Text(result, ""#"")
+    }
+    if(Mid(nameAsset, 7, 1) == checkDigit){
+        return true
+    } else{
+        return false
+    }
+} else if(length == 7){
+    return true
+} else{
+    return false
+}",99210,Invalid Name of asset. Please Try Again!,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Customer_service_point_Con_1,Validate the Supply Point No,CONSTRAINT,Medium voltage Customer service point,,TRUE,TRUE,FALSE,TRUE,"var nameAsset = $feature.nameasset
+if(nameAsset == null){
+    return true
+}
+nameAsset = Trim(nameAsset)
+var length = Count(nameAsset) 
+if(length == 0){
+    return true
+} else{
+    nameAsset = Upper(nameAsset)
+    if(Left(nameAsset, 2) != ""SN""){
+        return false
+    }
+}
+if(length == 8){ 
+    var sum = 0
+    for(var i = 3; i <= 7; i++){
+        var numberValue = Number(Mid(nameAsset, i -1, 1), ""#"")
+        if(isNaN(numberValue)){
+            return false
+        }
+        sum = sum + (10 - i ) * numberValue
+    }
+    var result = 11 - (sum % 11)
+    var checkDigit 
+    if(result == 11){
+        checkDigit  = ""0""
+    } else if(result == 10){
+        checkDigit  = ""A""
+    } else{
+        checkDigit  = Text(result, ""#"")
+    }
+    if(Mid(nameAsset, 7, 1) == checkDigit){
+        return true
+    } else{
+        return false
+    }
+} else if(length == 7){
+    return true
+} else{
+    return false
+}",99210,Invalid Name of asset. Please Try Again!,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Customer_service_point_Con_2,Check if “HEC MV No.” is empty when Life Cycle Status is INS.,CONSTRAINT,Medium voltage Customer service point,,TRUE,TRUE,FALSE,TRUE,"var hecMVNo = Trim($feature.hecmvno)
+if(IsEmpty(hecMVNo)){
+    if($feature.lifecyclestatus == 6){
+        return false
+     }
+}
+return true",99211,No HEC MV No. Input for In Service Equipment!,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Customer_service_point_Val_01,"Validate the features which life cFind the feature(s) if the ""Life Cycle State"" equals to ""INS"" and ""Supply Point No."" is empty.",VALIDATION,Low voltage Customer service point,,TRUE,FALSE,FALSE,FALSE,"var nameAsset = Trim($feature.nameasset)
+if(IsEmpty(nameAsset)){
+    if($feature.lifecyclestatus == 6){
+        return false
+    }
+}
+return true",99320,No Name of asset Input for In Service Equipment!,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MapJunction_Val_01,Check the Survey point and Cable defect must be contained by only one Conductor.,VALIDATION,,,TRUE,FALSE,FALSE,FALSE,"var validAssetGroup = [776,777,778,779,782,783,784]
+if(includes(validAssetGroup, $feature.ASSETGROUP)){
+var containers = FeatureSetByAssociation($feature, ""container"")
+if(count(containers)==1){
+    return true
+}else{
+    return false
+}
+}else{
+    return true
+}",99302,Invalid Association,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MapJunction_Val_02,Check the INS SN Point without the junction connectivity to the customer installation point.,VALIDATION,,,TRUE,FALSE,FALSE,FALSE,"var validAssetGroup = [966,967]
+if(includes(validAssetGroup,$feature.ASSETGROUP) && $feature.lifecyclestatus == 6){
+    var connectedFeatures = FeatureSetByAssociation($feature,""connected"")
+    if(Count(connectedFeatures)>0){
+        var mapJunctionFeatures = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.MapJunction"",[""*""],false)
+        var connectedFeaturesGlobalIDArray = []
+        var i = 0
+        for(var connectedFeature in connectedFeatures){
+            connectedFeaturesGlobalIDArray[i++] = connectedFeature.GLOBALID
+        }
+        var contentFeaturesGlobalIDtupe = replace(replace(replace(Text(connectedFeaturesGlobalIDArray), ""["", ""(""), ""]"", "")""), '""', ""'"")
+        var whereClause = ""GLOBALID in "" + contentFeaturesGlobalIDtupe + ""AND ASSETGROUP IN(971,972)""
+        var containerCustomerInstallationFeatures = Filter(mapJunctionFeatures, whereClause)
+        if(Count(containerCustomerInstallationFeatures)>0){
+            return true
+        }else{
+            return false
+        }
+    }
+    else{
+        return true
+    }
+}
+else{
+    return true
+}",99309,Invalid SN (without any SN subrecord),FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MapJunction_Val_03,Check the MV features’ Operating Voltage (kV) cannot greater than the Rated HV Volt (kV).,VALIDATION,,,TRUE,FALSE,FALSE,FALSE,"var featureAssetGroupDesc = DomainName($feature, ""ASSETGROUP"", $feature.ASSETGROUP)
+if (Find(""Medium voltage"", featureAssetGroupDesc, 0) != -1) {
+    var opV = $feature.voltagelimitmaxoperating
+    var raV = $feature.voltagelimitmaxrating
+    if (opV > raV) {
+        return false
+    }
+    else {
+        return true
+    }
+} else {
+    return true
+}",99310,The operating voltage is higher than the Rated voltage,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MapJunction_Val_04,"Check if there are LV Customer installation, MV Customer installation, MV Customer service point, LV Customer service point and SK Hub without containment.",VALIDATION,,,TRUE,FALSE,FALSE,FALSE,"/*Low voltage Customer installation 971
+Medium voltage Customer installation 972
+Medium voltage Customer service point 967
+Low voltage Customer service point 966
+Solkor Hub 772
+*/
+var validAssetGroup = [971,972,967,966,772]
+if(includes(validAssetGroup, $feature.ASSETGROUP)){
+    var containerFeatures = FeatureSetByAssociation($feature,""container"")
+    if(count(containerFeatures) >0){
+        return true
+    }
+    else{
+        return false
+    }
+}else{
+    return true
+}",99301,Invalid feature(Orphan),FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Customer_service_point_Val_01,"Find the feature(s) if the ""Life Cycle State"" equals to ""INS"" and ""Supply Point No."" is empty.",VALIDATION,Medium voltage Customer service point,,TRUE,FALSE,FALSE,FALSE,"var nameAsset = Trim($feature.nameasset)
+if(IsEmpty(nameAsset)){
+    if($feature.lifecyclestatus == 6){
+        return false
+    }
+}
+return true",99320,No Name of asset Input for In Service Equipment!,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"

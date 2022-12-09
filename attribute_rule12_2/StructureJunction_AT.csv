@@ -1,0 +1,151 @@
+﻿NAME,DESCRIPTION,TYPE,SUBTYPE,FIELD,ISEDITABLE,TRIGGERINSERT,TRIGGERDELETE,TRIGGERUPDATE,SCRIPTEXPRESSION,ERRORNUMBER,ERRORMESSAGE,EXCLUDECLIENTEVALUATION,ISENABLED,BATCH,SEVERITY,TAGS,CATEGORY,CHECKPARAMETERS
+StructureJunction_Cal_01,Calcuate X corrdinate (3 d.p.) and save in Grid X1 Coordinate field,CALCULATION,,envelopex1,TRUE,TRUE,FALSE,TRUE,Geometry($feature).x,,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+StructureJunction_Cal_02,Calcuate y corrdinate of point feature (3 d.p.) and save in Grid Y1 Coordinate field,CALCULATION,,envelopey1,TRUE,TRUE,FALSE,TRUE,Geometry($feature).y,,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+StructureJunction_Cal_03,Get colour from table,CALCULATION,,symbolcolor,TRUE,TRUE,FALSE,TRUE,"// GetColour (LV_POL) -- Pole
+if ($feature.assetgroup == 102) {
+    if ($originalFeature.lifecyclestatus != $feature.lifecyclestatus) {
+        var colorkey = 14
+        //read color from table
+        if (DomainName($feature, 'lifecyclestatus') == ""INS"") { colorkey = 24 }
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX"") { colorkey = 28 }
+        else if (DomainName($feature, 'lifecyclestatus') == ""RES"") { colorkey = 12 }
+        var sql = 'OBJECTID = ' + colorkey
+        var result = First(Filter(FeatureSetByName($datastore, 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour', ['*'], false), sql))
+        return result.Colour
+    }
+}
+// GetColour (ID_BALL) -- Marker
+if ($feature.assetgroup == 118) {
+    var colorkey = 14
+    var attach = FeatureSetByAssociation($feature, 'attached')
+    if (Count(attach) > 0) {
+        var attach_o = First(attach)
+        var fs_list = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.MapJunction"")
+        var target_gid = attach_o['globalid']
+        var fs = Filter(fs_list, ""globalid = @target_gid"");
+        if (Count(fs) > 0) {
+            fs = First(fs)
+            var attach_ag = DomainName(fs, 'assetgroup')
+            if (attach_ag == 'Medium voltage Line end' || attach_ag == 'Low voltage Line end') {
+                return fs.symbolcolor
+            }
+        }
+    }
+    var sql = 'OBJECTID = ' + colorkey
+    var result = First(Filter(FeatureSetByName($datastore, 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour', ['*'], false), sql))
+    if ($originalFeature.symbolcolor != result.Colour) {
+        return result.Colour
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+StructureJunction_Cal_04,Return appropriate symbolid for given attribute,CALCULATION,,symbolfid,TRUE,TRUE,FALSE,TRUE,"// SymbolID (LV_POL) -- Pole
+if ($feature.assetgroup == 102) {
+    // if ($originalFeature.nameproductvariant != $feature.nameproductvariant) {
+        var symid = 0
+        if ($feature.nameproductvariant == ""Aerial Bundled Cable Pole"" || $feature.nameproductvariant == ""Aerial Bundeld Cable Pole"") { symid = 38 }
+        else if ($feature.nameproductvariant == ""Path Lighting Pole"" || $feature.nameproductvariant == ""Path Lightning Pole"") { symid = 39 }
+        else if ($feature.nameproductvariant == ""Central Metering Pole"") { symid = 40 }
+        else if ($feature.nameproductvariant == ""Aerial Bundled Central Metering Pole"") { symid = 41 }
+        else { symid = 42 }
+        return symid
+    // }
+}
+// SymbolID -- Duct End
+if ($feature.assetgroup == 759) {
+    if ($originalFeature.symbolfid != 88) {
+        return 88
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+StructureJunction_Cal_05,update display field by asset group,CALCULATION,,displayfieldtext,TRUE,TRUE,FALSE,TRUE,"var asset_group = DomainName($feature, ""assetgroup"")
+var output_s_list = []
+if ($feature.lifecyclestatus != $originalfeature.lifecyclestatus || $feature.endtype != $originalfeature.endtype || $feature.NameAsset != $originalfeature.NameAsset){
+var referenceobjectparentid = $feature.referenceobjectparentid
+var OBJECTID = 'OID' + $feature.OBJECTID
+var endtype = $feature.endtype
+var lifecyclestatus = '(' + DomainName($feature, ""lifecyclestatus"") + ')'
+var NameAsset = $feature.NameAsset
+ if (Includes(['Survey point', 'Marker'], asset_group)) {
+        Push(output_s_list, referenceobjectparentid)
+    Push(output_s_list, NameAsset)
+    Push(output_s_list, lifecyclestatus)
+    Push(output_s_list, OBJECTID)
+}
+if (Includes(['Pole'], asset_group)) {
+        Push(output_s_list, NameAsset)
+    Push(output_s_list, lifecyclestatus)
+    Push(output_s_list, OBJECTID)
+}
+if (Includes(['Duct end'], asset_group)) {
+        Push(output_s_list, endtype)
+    Push(output_s_list, lifecyclestatus)
+    Push(output_s_list, OBJECTID)
+}
+var output_s = """"
+for (var s in output_s_list){
+    if (s != """") {
+        output_s += output_s_list[s] + "" ""
+    }
+}
+return output_s
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Survey_point_Cal_01,"Based on table C_SURVEYTYPE and feature’s "" Survey Point Type "" value will update “Survey Point Shallow Value”, “Survey Point Type Abv.” and “Is_Shallow”.",CALCULATION,Survey point,,TRUE,TRUE,FALSE,TRUE,"var assetGroup = $feature.ASSETGROUP
+var environment = $feature.environment
+var nameproductvariant = $feature.surveypointtype
+var survetypeTable = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.C_SURVETYPE"", ['*'], false)
+var targetUpdateRows = Filter(survetypeTable, ""nameproductvariant = @nameproductvariant AND ENVIRONMENT = @environment"")
+if (count(targetUpdateRows) == 1) {
+    var updateObject = {}
+    var featuredepthValue = $feature.dimdepth
+    var featureIsshallow = $feature.isshallow
+    var featureNameproduct = $feature.nameproduct
+    var featureShallowValue = $feature.distancesafetyrequirement
+    var targetUpdateRow = First(targetUpdateRows)
+    var targetUpateShallowValue = targetUpdateRow.distancesafetyrequirement
+    var targetUpateNameproduct = targetUpdateRow.nameproduct
+    var targetUpdateIsshallow = """"
+    if (featureShallowValue != targetUpateShallowValue) {
+        updateObject[""distancesafetyrequirement""] = targetUpateShallowValue
+    }
+    if (featuredepthValue < targetUpateShallowValue) {
+        var targetUpdateIsshallow = ""Yes""
+        if (featureIsshallow != targetUpdateIsshallow) {
+            updateObject[""isshallow""] = targetUpdateIsshallow
+        }
+    } else {
+        var targetUpdateIsshallow = ""No""
+        if (featureIsshallow != targetUpdateIsshallow) {
+            updateObject[""isshallow""] = targetUpdateIsshallow
+        }
+    }
+    if (featureNameproduct != targetUpateNameproduct) {
+        updateObject[""nameproduct""] = targetUpateNameproduct
+    }
+    for (var i in updateObject) { }
+    if (IsEmpty(i) != true) {
+        return {
+            ""result"": {
+                'attributes': updateObject
+            }
+        }
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Duct_end_Con_01,Constrain that a duct end must be placed on a duct boundary outline.,CONSTRAINT,Duct end,,TRUE,TRUE,FALSE,TRUE,"var ductBoundaryAssetGroup = 180
+var structureBoundaryFeatures = FeatureSetByName($datastore,""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.StructureBoundary"",[""*""],true)
+var ductBoundaryFeatures = Filter(structureBoundaryFeatures, ""ASSETGROUP = @ductBoundaryAssetGroup"")
+var touchedDuctEnd = touches(ductBoundaryFeatures, Geometry($feature))
+if(count(touchedDuctEnd)>0){
+    return true
+}else{
+    return false
+}",99202,The Duct end must place on the duct boundary outline,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Marker_Val_01,Check if the Marker feature without attachment with other features.,VALIDATION,Marker,,TRUE,FALSE,FALSE,FALSE,"var attachFeatures = FeatureSetByAssociation($feature,""attached"")
+if(count(attachFeatures)>0){
+    return true
+}else{
+    return false
+}",99301,Invalid feature(Orphan),FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Survey_point_Val_01,Check if the Survey point feature without contained by other features.,VALIDATION,Survey point,,TRUE,FALSE,FALSE,FALSE,"var containerFeatures = FeatureSetByAssociation($feature,""container"")
+if(count(containerFeatures)>0){
+    return true
+}else{
+    return false
+}",99301,Invalid feature(Orphan),FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"

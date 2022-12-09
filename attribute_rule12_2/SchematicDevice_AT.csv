@@ -1,0 +1,893 @@
+﻿NAME,DESCRIPTION,TYPE,SUBTYPE,FIELD,ISEDITABLE,TRIGGERINSERT,TRIGGERDELETE,TRIGGERUPDATE,SCRIPTEXPRESSION,ERRORNUMBER,ERRORMESSAGE,EXCLUDECLIENTEVALUATION,ISENABLED,BATCH,SEVERITY,TAGS,CATEGORY,CHECKPARAMETERS
+LV_Sch_Cutout_ Cal_01,Update Cutout Angle,CALCULATION,Low voltage Cutout,symbolrotation,TRUE,TRUE,FALSE,TRUE,"// Cutout fuse - Low voltage
+var angle = 0
+var x = Geometry($feature).x
+var y = Geometry($feature).y
+var o_s = """"
+if (Includes([352,353,355,356,357, 354], $feature.ASSETTYPE)) {
+    // find same nameasset
+    var nameasset = $feature.nameasset;
+    var sql = ""nameasset = @nameasset"";
+    var result = (Filter(FeatureSetByName($datastore,""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.SchematicDevice"",[""*""],false),sql));
+    for (var i in result) {
+         o_s += Text(Geometry(i))
+         var cx = Geometry(i)
+         if ( Abs(y - cx.y) > 0.1) {
+            if ((y - cx.y) < 0){
+                if ($feature.ASSETTYPE == 354) {
+                    return 180
+                }
+            } else {
+                if ($feature.ASSETTYPE != 354){
+                    return 180
+                }
+            }
+         } 
+    }
+}
+return 0",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Disconnector_Cal_01,Update Isolator Capacity and Isolator Manufacturer based on the standalone table - “C_LVPANRABV”. ,CALCULATION,Low voltage Disconnector,,TRUE,TRUE,FALSE,TRUE,"var nameProductVariant = DomainName($feature,""nameproductvariant"",$feature.nameproductvariant)
+var existCurrentLimitMaxRating = $feature.currentlimitmaxrating
+var existNameProductManufacturer = $feature.nameproductmanufacturer
+var lvPanRaBvFeatures = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.C_LVPANRABV"", [""*""], false)
+var rows = Filter(lvPanRaBvFeatures, ""nameproductvariant = @nameProductVariant"")
+if (count(rows) == 1) {
+    var updateObject = {}
+    var row = first(rows)
+    var nameProductManufacturer = row.nameproductmanufacturer
+    var currentLimitMaxRating = row.currentlimitmaxrating
+    if (nameProductManufacturer != existNameProductManufacturer) {
+        updateObject[""nameproductmanufacturer""] = nameProductManufacturer
+    }
+    if (currentLimitMaxRating != existCurrentLimitMaxRating) {
+        updateObject[""currentlimitmaxrating""] = currentLimitMaxRating
+    }
+    for (var i in updateObject) { }
+    if (isEmpty(i) != true) {
+        return {
+            ""result"": {
+                ""attributes"": updateObject
+            }
+        }
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Switchgear_Cal_01,"Update the value of ""Equipment Rating (A)"" to ""Link"" when the ""Isolator Capacity Abv."" is ""Copper Link"".",CALCULATION,Low voltage Switchgear,currentlimitmaxrating,TRUE,TRUE,FALSE,TRUE,"if($feature.nameproductvariant == null){
+  return
+}
+if(DomainName($feature,""nameproductvariant"") == ""Copper link""){
+  if($originalFeature.currentlimitmaxrating != -50){
+      return -50
+  }
+}
+return",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Transformer_end_Cal_01,Calculates the value of “Forecasted Load HV (A)” and “Forecasted Load LV (A)” based on “Forecasted Load (kVA)” as well as “Operating voltage (V)”. ,CALCULATION,Low voltage Transformer end,,TRUE,TRUE,FALSE,TRUE,"if($feature.ASSETGROUP != 808){
+  return 
+}
+var powerFlowForCasted = $feature.powerflowforecasted
+if(powerFlowForCasted == null || $feature.voltageprimary == null){
+   return
+}
+var voltage = DomainName($feature, ""voltageprimary"")
+var originalCurrentForecastedPrimary = $originalFeature.currentforecastedprimary
+var originalCurrentForecastedSecondary = $originalFeature.currentforecastedsecondary
+var ROOT3 = 1.732050807
+var currentForecastedPrimary
+var currentForecastedSecondary
+if(voltage == ""22""){
+  currentForecastedPrimary  = Round(powerFlowForCasted / (22 * ROOT3), 0)
+} else{
+    currentForecastedPrimary = Round(powerFlowForCasted / (11 * ROOT3), 0)
+}
+currentForecastedSecondary = Round((powerFlowForCasted * 1000) / (380 * ROOT3), 0)
+var dict = {}
+if(originalCurrentForecastedPrimary == currentForecastedPrimary && originalCurrentForecastedSecondary == currentForecastedSecondary ){
+    return
+} else if(originalCurrentForecastedPrimary == currentForecastedPrimary){
+    dict[""currentforecastedsecondary""] = currentForecastedSecondary
+} else if(originalCurrentForecastedSecondary == currentForecastedSecondary){
+    dict[""currentforecastedprimary""] = currentForecastedPrimary 
+} else{
+    dict[""currentforecastedprimary""] = currentForecastedPrimary 
+    dict[""currentforecastedsecondary""] = currentForecastedSecondary
+}
+return {
+    ""result"": {
+        ""attributes"": dict
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Transformer_end_Cal_02,Update the field value of “Load Statistics Info.”. ,CALCULATION,Low voltage Transformer end,referenceloadstat,TRUE,TRUE,FALSE,TRUE,"var referenceObjectParentID = $feature.referenceobjectparentid
+if(referenceObjectParentID == ""0"" || $feature.lifecyclestatus != 6){
+    if($originalFeature.referenceloadstat == """"){
+        return 
+    }
+    return """"
+}
+var nameAsset = $feature.nameasset
+if(IsEmpty(referenceObjectParentID) || IsEmpty(nameAsset)){
+    if($originalFeature.referenceloadstat == """"){
+        return 
+    }
+    return """"
+}
+var referenceLoadStat = First(Filter(FeatureSetByName($datastore, ""HKE_System_Config"", ['*'], true), ""configKey = 'TxReferenceLoadStatURL'"")).configValue + ""?SSCODE=""  + ""?SSCODE="" + referenceObjectParentID + ""&TXNO="" + nameAsset
+if($originalFeature.referenceloadstat == referenceLoadStat){
+    return 
+}
+return referenceLoadStat",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Sch_2_winding_power_transformer_Cal_01,Calculates the value of “Forecasted Load HV (A)” and “Forecasted Load LV (A)” based on “Forecasted Load (kVA)” as well as “Operating voltage (V)”.,CALCULATION,Medium voltage 2 winding power transformer,,TRUE,TRUE,FALSE,TRUE,"if($feature.ASSETGROUP != 801){
+  return 
+}
+var powerFlowForCasted = $feature.powerflowforecasted
+if(powerFlowForCasted == null || $feature.voltagelimitmaxoperating == null){
+   return
+}
+var voltage = DomainName($feature, ""voltagelimitmaxoperating"")
+var originalCurrentForecastedPrimary = $originalFeature.currentforecastedprimary
+var originalCurrentForecastedSecondary = $originalFeature.currentforecastedsecondary
+var ROOT3 = 1.732050807
+var currentForecastedPrimary
+var currentForecastedSecondary
+if(voltage == ""22""){
+  currentForecastedPrimary  = Round(powerFlowForCasted / (22 * ROOT3), 0)
+} else{
+    currentForecastedPrimary = Round(powerFlowForCasted / (11 * ROOT3), 0)
+}
+currentForecastedSecondary = Round((powerFlowForCasted * 1000) / (380 * ROOT3), 0)
+var dict = {}
+if(originalCurrentForecastedPrimary == currentForecastedPrimary && originalCurrentForecastedSecondary == currentForecastedSecondary ){
+    return
+} else if(originalCurrentForecastedPrimary == currentForecastedPrimary){
+    dict[""currentforecastedsecondary""] = currentForecastedSecondary
+} else if(originalCurrentForecastedSecondary == currentForecastedSecondary){
+    dict[""currentforecastedprimary""] = currentForecastedPrimary 
+} else{
+    dict[""currentforecastedprimary""] = currentForecastedPrimary 
+    dict[""currentforecastedsecondary""] = currentForecastedSecondary
+}
+return {
+    ""result"": {
+        ""attributes"": dict
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Sch_2_winding_power_transformer_Cal_02,Update the field value of “Load Statistics Info.”.    ,CALCULATION,Medium voltage 2 winding power transformer,referenceloadstat,TRUE,TRUE,FALSE,TRUE,"var referenceObjectParentID = $feature.referenceobjectparentid
+if(referenceObjectParentID == ""0"" || $feature.lifecyclestatus != 6){
+    if($originalFeature.referenceloadstat == """"){
+        return 
+    }
+    return """"
+}
+var nameAsset =  $feature.nameasset
+if(IsEmpty(referenceObjectParentID) || IsEmpty(nameAsset)){
+   if($originalFeature.referenceloadstat == """"){
+        return 
+    }
+    return """"
+}
+var referenceLoadStat = First(Filter(FeatureSetByName($datastore, ""HKE_System_Config"", ['*'], true), ""configKey = 'TxReferenceLoadStatURL'"")).configValue +  + ""?SSCODE="" + referenceObjectParentID + ""&TXNO="" + nameAsset
+if($originalFeature.referenceloadstat == referenceLoadStat){
+    return 
+}
+return referenceLoadStat",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Sch_2_winding_power_transformer_Cal_03,Get angle between point and intercept line,CALCULATION,Medium voltage 2 winding power transformer,symbolrotation,TRUE,TRUE,FALSE,TRUE,"// Find the first intersecting line from the intersecting class
+var lineClass = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.SchematicLine"", [""objectid""], true)
+var line = First(Intersects(lineClass, $feature))
+// If no feature was found, return the original value
+if (line == null)
+   return $feature.symbolrotation
+// Buffer the point by a small amount to extract the segment
+var search = Extent(Buffer($feature, .01, ""meter""))
+var segment = Clip(line, search)[""paths""][0]
+// Get angle of line using the start and end vertex
+return Angle(segment[0], segment[-1])",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Sch_Circuit_breaker_primary_Cal_01,Update Owner Substation Name based on the standalone table -  “C_SUBNAME”. ,CALCULATION,Medium voltage Circuit breaker primary,namelocationdetails,TRUE,TRUE,FALSE,TRUE,"var referenceObjectParentid = $feature.referenceobjectparentid
+    var subNameTable = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.C_SUBNAME"",[""*""],false)
+    var targetSubNameRows = Filter(subNameTable,""nameasset = @referenceObjectParentid"")
+    if(count(targetSubNameRows) == 1){
+        var updateNameLocation = first(targetSubNameRows).namelocationdetailssubstation
+        return updateNameLocation
+    }",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicDevice_Cal_01,Assign the environment to the Misc. Graphic features ,CALCULATION,,,TRUE,TRUE,FALSE,TRUE,"var miscGraphicsParentTable = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_MiscGraphicsParent"",[""*""],false)
+var featureGlobalID = $feature.GLOBALID
+var Relatedgraphicparents = Filter(miscGraphicsParentTable, ""hkeParentGlobalId = @featureGlobalID"")
+if (count(Relatedgraphicparents) > 0) {
+    var updateObjecetArray = []
+    for (var Relatedgraphicparent in Relatedgraphicparents) {
+        var RelatedgraphicparentGlobalID = Relatedgraphicparent.GLOBALID
+        var RelatedgraphicparentEnv = Relatedgraphicparent.hkeEnvironment
+        var assetGroup = $feature.ASSETGROUP
+        var voltage = $feature.voltagelimitmaxoperating
+        var updateObject = {}
+        var environment = 0
+        if(assetGroup == 771 || assetGroup == 775 || assetGroup == 801 || assetGroup == 819) {  //Medium voltage Circuit breaker primary (771), Medium voltage Switchgear (775), Medium voltage 2 winding power transformer (801), Medium voltage Meter point (819)
+            environment = 400 //MV Sch
+        } 
+        else if(assetGroup == 773 || assetGroup == 774 || assetGroup == 808 || assetGroup == 850) {  //Low voltage Cutout (773), Low voltage Switchgear (774), Low voltage Transformer end (808), Low voltage Disconnector (850)
+            environment = 600 //LV Sch
+        } 
+        else {
+            environment = -300 //Not Loaded
+        }
+        if (RelatedgraphicparentEnv != environment) {
+            updateObject[""GLOBALID""] = RelatedgraphicparentGlobalID
+            updateObject[""attributes""] = { ""hkeEnvironment"": environment }
+            Push(updateObjecetArray, updateObject)
+        }
+    }
+    if (count(updateObjecetArray) > 0) {
+        return {
+            'edit': [{
+                'className': 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_MiscGraphicsParent',
+                'updates': updateObjecetArray
+            }]
+        }
+    }
+}",,,TRUE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicDevice_Cal_02,Calcuate y corrdinate of point feature (3 d.p.) and save in Grid Y1 Coordinate field,CALCULATION,,envelopey1,TRUE,TRUE,FALSE,TRUE,Geometry($feature).y,,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicDevice_Cal_03,Calcuate x corrdinate of point feature (3 d.p.) and save in Grid X1 Coordinate field,CALCULATION,,envelopex1,TRUE,TRUE,FALSE,TRUE,Geometry($feature).x,,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicDevice_Cal_04,"Update Z to 1000, if the Life Cycle status is not INS or RES. Update Z to 0, if the life cycle status is INS. ",CALCULATION,,,TRUE,TRUE,FALSE,TRUE,"var lifeCycleStatus = $feature.lifecyclestatus
+var featureX = Geometry($feature).x
+var featureY = Geometry($feature).y
+var featureZ = Geometry($feature).z
+var featureSR = Geometry($feature).spatialReference
+var z = 0
+if (lifeCycleStatus != 6 || lifeCycleStatus != 11){
+    z = 1000
+}
+if(featureZ != z){
+    return{
+        ""result"":{
+            geometry:Geometry({
+                'x': featureX,
+                'y': featureY,
+                'z': z,
+                'spatialReference': featureSR
+            })
+        }
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicDevice_Cal_05,Update the UNC life cycle status based on the HK Electric life cycle status.   ,CALCULATION,,statenetworklifecyclenormal,TRUE,TRUE,FALSE,TRUE,"if (DomainName($feature, ""lifecyclestatus"") == ""INS"") {
+  return 256
+} if (DomainName($feature, ""lifecyclestatus"") == ""PPR"" ||  DomainName($feature, ""lifecyclestatus"") == ""PPX""  ) {
+  return 32
+}  if (DomainName($feature, ""lifecyclestatus"") == ""RES"" || DomainName($feature, ""lifecyclestatus"") == ""SP"" ) {
+  return 1
+} if ( DomainName($feature, ""lifecyclestatus"") == ""PPA"" || DomainName($feature, ""lifecyclestatus"") == ""PPM"" ) {
+  return 2
+}else {
+   return 0
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicDevice_Cal_06,Get colour from table,CALCULATION,,symbolcolor,TRUE,TRUE,FALSE,TRUE,"if ($originalFeature.lifecyclestatus!=$feature.lifecyclestatus){
+    // GetColour (HV_SWG) -- Medium voltage Switchgear
+    if ($feature.assetgroup == 775) {
+        var colorkey = 14
+        //read color from table
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 22}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+        var sql = 'OBJECTID = ' + colorkey
+        var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+        return result.Colour
+    }
+    // GetColour (HV_BKR) -- Medium voltage Circuit breaker primary
+    if ($feature.assetgroup == 771) {
+        var colorkey = 14
+        //read color from table
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 22}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+        var sql = 'OBJECTID = ' + colorkey
+        var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+        return result.Colour
+    }
+    // GetColour (HV_TRF) -- Medium voltage 2 winding power transformer
+    if ($feature.assetgroup == 801) {
+        var colorkey = 14
+        //read color from table
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 22}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+        var sql = 'OBJECTID = ' + colorkey
+        var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+        return result.Colour
+    }
+    // GetColour (LV_TRF) -- Low voltage Transformer end
+    if ($feature.assetgroup == 808) {
+        var colorkey = 14
+        //read color from table
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+        var sql = 'OBJECTID = ' + colorkey
+        var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+        return result.Colour
+    }
+    // GetColour (HV_SWG)1 -- Medium voltage Meter point
+    if ($feature.assetgroup == 819) {
+        var colorkey = 14
+        //read color from table
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 22}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+        var sql = 'OBJECTID = ' + colorkey
+        var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+        return result.Colour
+    }
+    // GetColour (LV_SWG) -- Low voltage Switchgear
+    if ($feature.assetgroup == 774) {
+        var colorkey = 14
+        //read color from table
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+        var sql = 'OBJECTID = ' + colorkey
+        var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+        return result.Colour
+    }
+    // GetColour (LV_ISO) -- Low voltage Disconnector
+    if ($feature.assetgroup == 850) {
+        var colorkey = 14
+        //read color from table
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+        var sql = 'OBJECTID = ' + colorkey
+        var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+        return result.Colour
+    }
+    // GetColour (LV_IO) -- Low voltage Cutout
+    if ($feature.assetgroup == 773) {
+        var colorkey = 14
+        //read color from table
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+        var sql = 'OBJECTID = ' + colorkey
+        var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+        return result.Colour
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicDevice_Cal_07,Return appropriate symbolid for given attribute,CALCULATION,,symbolfid,TRUE,TRUE,FALSE,TRUE,"// SymbolID (for HV_TRF) -- Medium voltage 2 winding power transformer
+if ($feature.assetgroup == 801) {
+    if ($originalFeature.nameproductvariant != $feature.nameproductvariant) {
+        var symid = 513
+        if (DomainName($feature, ""nameproductvariant"") == ""Rectifier"") {
+            symid = 512
+        }
+        else {
+            symid = 513
+        }
+        return symid
+    }
+}
+// SymbolID (for HV_SWG) -- Medium voltage Switchgear
+if ($feature.assetgroup == 775) {
+    if ($originalFeature.nameproductvariant != $feature.nameproductvariant) {
+        var symid = 508
+        if (DomainName($feature, ""nameproductvariant"") == ""GVS - Gas Vacuum Switch"" || DomainName($feature, ""nameproductvariant"") == ""Breaker"" || DomainName($feature, ""nameproductvariant"") == ""Bus Breaker"") {
+            symid = 507
+        }
+        else if (DomainName($feature, 'nameproductvariant') == ""AVF - Air Vacuum Feeder"") {
+            symid = 509
+        } else {
+            symid = 508
+        }
+        return symid
+    }
+}
+// SymbolID (For HV_BKR) -- Medium voltage Circuit breaker primary
+if ($feature.assetgroup == 771) {
+    if ($originalFeature.symbolfid != 514) {
+        return 514
+    }
+}
+// SymbolID (for HV_SWG_4) -- Medium voltage Meter point
+if ($feature.assetgroup == 819) {
+    if ($originalFeature.symbolrotation != $feature.symbolrotation || $originalFeature.nameproductvariant != $feature.nameproductvariant) {
+        var symid = 515
+        var deg = round($feature.symbolrotation * 180 / 3.1415926)
+        if (DomainName($feature, 'nameproductvariant') == ""AMP - Air Metering Panel"" || DomainName($feature, 'nameproductvariant') == ""GMP - Gas Metering Panel"") {
+            if (deg == 90 || deg == -90) { symid = 516 }
+            else if (deg == 0 || deg == 180) { symid = 515 }
+        } else {
+            if (deg == 90 || deg == -90) { symid = 518 }
+            else if (deg == 0 || deg == 180) { symid = 517 }
+            else { symid = 17 }
+        }
+        return symid
+    }
+}
+// SymbolID (for LV_SWG) -- Low voltage Switchgear
+if ($feature.assetgroup == 774) {
+    if ($originalFeature.statusswitchingnormal != $feature.statusswitchingnormal) {
+        var symid = 0
+        if (DomainName($feature, ""statusswitchingnormal"") == ""Closed"") { symid = 574 }
+        else { symid = 573 }
+        return symid
+    }
+}
+// SymbolID (for LV_ISO) -- Low voltage Disconnector
+if ($feature.assetgroup == 850) {
+    if ($originalFeature.statusswitchingnormal != $feature.statusswitchingnormal) {
+        if ($feature.statusswitchingnormal == 2) {
+            return 575
+        }
+        return 572
+    }
+}
+// SymbolID (for LV_TRF) -- Low voltage Transformer end
+if ($feature.assetgroup == 808) {
+    if ($originalFeature.symbolfid != 519) {
+        return 519
+    }
+}
+// SymbolID (for LV_IO) -M -- Low voltage Cutout
+if ($feature.assetgroup == 773) {
+    if ($originalFeature.statusswitchingnormal != $feature.statusswitchingnormal || $originalFeature.ASSETTYPE != $feature.ASSETTYPE) {
+        // Cutout fuse - Low voltage
+        var symid = 558
+        if ($feature.ASSETTYPE == 354) {
+            if (DomainName($feature, 'statusswitchingnormal') == 'Open') {
+                return 550
+            } else if (DomainName($feature, 'statusswitchingnormal') == 'Closed') {
+                return 551
+            }
+        } else if (Includes([352, 353, 355, 356, 357], $feature.ASSETTYPE)) {
+            if (DomainName($feature, ""statusswitchingnormal"") == ""Closed"") { symid = 558 }
+            else { symid = 559 }
+        }
+        return symid
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicDevice_Cal_08,update display field by asset group,CALCULATION,,displayfieldtext,TRUE,TRUE,FALSE,TRUE,"if ($feature.lifecyclestatus != $originalfeature.lifecyclestatus || $feature.meterpanelnumber != $originalfeature.meterpanelnumber || $feature.NameAsset != $originalfeature.NameAsset){
+var asset_group = DomainName($feature, ""assetgroup"")
+var output_s_list = []
+var referenceobjectparentid = $feature.referenceobjectparentid
+var OBJECTID = 'OID' + $feature.OBJECTID
+var lifecyclestatus = '(' + DomainName($feature, ""lifecyclestatus"") + ')'
+var meterpanelnumber = $feature.meterpanelnumber
+var NameAsset = $feature.NameAsset
+ if (Includes(['Medium voltage 2 winding power transformer', 'Medium voltage Circuit breaker primary', 'Medium voltage Switchgear', 'Low voltage Disconnector', 'Low voltage Switchgear', 'Low voltage Transformer end'], asset_group)) {
+    	Push(output_s_list, referenceobjectparentid)
+	Push(output_s_list, NameAsset)
+	Push(output_s_list, lifecyclestatus)
+	Push(output_s_list, OBJECTID)
+}
+if (Includes(['Low voltage Cutout'], asset_group)) {
+    	Push(output_s_list, NameAsset)
+	Push(output_s_list, lifecyclestatus)
+	Push(output_s_list, OBJECTID)
+}
+if (Includes(['Medium voltage Meter point'], asset_group)) {
+    	Push(output_s_list, referenceobjectparentid)
+	Push(output_s_list, meterpanelnumber)
+	Push(output_s_list, lifecyclestatus)
+	Push(output_s_list, OBJECTID)
+}
+var output_s = """"
+for (var s in output_s_list){
+    if (s != """") {
+        output_s += output_s + "" ""
+    }
+}
+return output_s
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Cutout_ Con_01,Verify the field value of “Supply Point No.”. ,CONSTRAINT,Low voltage Cutout,,TRUE,TRUE,FALSE,TRUE,"var nameAsset = $feature.nameasset
+if(nameAsset == null){
+    return true
+}
+nameAsset = Trim(nameAsset)
+var length = Count(nameAsset) 
+if(length == 0){
+    return true
+} else{
+    nameAsset = Upper(nameAsset)
+    if(Left(nameAsset, 2) != ""SN""){
+        return false
+    }
+}
+if(length == 8){ 
+    var sum = 0
+    for(var i = 3; i <= 7; i++){
+        var numberValue = Number(Mid(nameAsset, i -1, 1), ""#"")
+        if(isNaN(numberValue)){
+            return false
+        }
+        sum = sum + (10 - i ) * numberValue
+    }
+    var result = 11 - (sum % 11)
+    var checkDigit 
+    if(result == 11){
+        checkDigit  = ""0""
+    } else if(result == 10){
+        checkDigit  = ""A""
+    } else{
+        checkDigit  = Text(result, ""#"")
+    }
+    if(Mid(nameAsset, 7, 1) == checkDigit){
+        return true
+    } else{
+        return false
+    }
+} else if(length == 7){
+    return true
+} else{
+    return false
+}",99210,Invalid Name of asset. Please Try Again!,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Disconnector_Con_01,"If the isolator type is Isolator panel, the isolator no. should be greater than 0. If the isolator type is Panel Isolator, the isolator no. should be 0.",CONSTRAINT,Low voltage Disconnector,,TRUE,TRUE,FALSE,TRUE,"var nameProduct = $feature.nameproduct
+var nameAsset = $feature.nameasset
+if(isEmpty(nameAsset)!= true){
+    var nameAssetInt = number(nameAsset)
+    if(IsNan(nameAssetInt) == false){
+        if(nameProduct ==""500""){
+            if(nameAssetInt > 0){
+                return true
+            }else{
+                return false
+            }
+        }else if(nameProduct == ""400""){
+            if(nameAssetInt == 0){
+                return true
+            }else{
+                return false
+            }
+        }else{
+            return true
+        }
+    }else{
+        return false
+    }
+}else{
+    return false
+}",99206,Invalid Isolator no.,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Cutout_Val_01,"Check if the ""Life Cycle State"" equals to ""INS"" when ""Supply Point No."" is empty ",VALIDATION,Low voltage Cutout,,TRUE,FALSE,FALSE,FALSE,"var nameAsset = Trim($feature.nameasset)
+if(IsEmpty(nameAsset)){
+    if($feature.lifecyclestatus == 6){
+        return false
+    }
+}
+return true",99320,No Supply Point No. Input for In Service Equipment!,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Cutout_Val_02,Check if the LV Cutout features without the containment. ,VALIDATION,,,TRUE,FALSE,FALSE,FALSE,"//Check if the feature in Low Voltage Cutout Node without containment.
+var containerFeatures = FeatureSetByAssociation($feature,""container"")
+if(count(containerFeatures)>0){
+    return true
+}else{
+    return false
+}",99301,Invalid feature(Orphan),FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Disconnector_Val_01,Check Duplicated Isolator panel No.,VALIDATION,,,TRUE,FALSE,FALSE,FALSE,"var nameProduct = $feature.nameproduct
+var assetType = $feature.ASSETTYPE
+var nameAsset = $feature.nameasset
+var lifeCycleStatus = $feature.lifecyclestatus
+var referenceObjectParentid = $feature.referenceobjectparentid
+if(nameProduct == ""500"" && lifeCycleStatus == 6){
+    var schematicDeviceFeatures = FeatureSetByName($datastore,""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.SchematicDevice"",[""*""],false)
+    var sameIsolatorNoFeatures = Filter(schematicDeviceFeatures, ""ASSETTYPE = @assetType AND nameproduct = @nameProduct AND lifecyclestatus = @lifeCycleStatus AND nameasset = @nameAsset AND referenceobjectparentid = @referenceObjectParentid "")
+    if(count(sameIsolatorNoFeatures) > 1){
+        return false
+    }
+    else{
+        return true
+    }
+}else{
+    return true
+}",99307,Duplicated Isolator,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Transformer_end_Val_01,Check if “Equipment Type Description” is not equal to “Not Loaded” ,VALIDATION,Low voltage Transformer end,,TRUE,FALSE,FALSE,FALSE,"if(IsEmpty($feature.nameproductvariant)){
+  return true
+}
+if(DomainName($feature, ""nameproductvariant"") == ""Not Loaded""){
+    return false
+} 
+return true",99321,Name of product variant must not be NOT LOADED,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Transformer_end_Val_02,Check if “HEC No.” is not equal to “0” when “Equipment Type Description” equals to “Single Phase”. ,VALIDATION,Low voltage Transformer end,,TRUE,FALSE,FALSE,FALSE,"var referenceObjectFidProcure = $feature.referenceobjectfidprocure
+if(IsEmpty($feature.nameproductvariant) || IsEmpty(referenceObjectFidProcure)){
+    return true
+}
+if(DomainName($feature, ""nameproductvariant"")== ""Single Phase"" && referenceObjectFidProcure != ""0""){
+    return false
+}
+return true",99322,Available only in Three Phase Equipment!,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Transformer_end_Val_03,Check if “HEC No. (L3/B)” is not equal to “0” when “Equipment Type Description” equals to “Single Phase”. ,VALIDATION,Low voltage Transformer end,,TRUE,FALSE,FALSE,FALSE,"var referenceObjectFidProcureL3 = Text($feature.referenceobjectfidprocurel3, ""#"")
+if(IsEmpty($feature.nameproductvariant) ||  IsEmpty(referenceObjectFidProcureL3)){
+   return true
+}
+if(DomainName($feature, ""nameproductvariant"") != ""Single Phase"" && referenceObjectFidProcureL3 != ""0""){
+    return false
+}
+return true",99323,Available only in Single Phase Equipment!,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Transformer_end_Val_04,Check if “HEC No. (L2/Y)” is not equal to “0” when “Equipment Type Description” equals to “Single Phase”.,VALIDATION,Low voltage Transformer end,,TRUE,FALSE,FALSE,FALSE,"var referenceObjectFidProcureL2 = Text($feature.referenceobjectfidprocurel2, ""#"")
+if(IsEmpty($feature.nameproductvariant) || IsEmpty(referenceObjectFidProcureL2 )){
+  return true
+}
+if(DomainName($feature, ""nameproductvariant"") != ""Single Phase"" && referenceObjectFidProcureL2 != ""0""){
+    return false
+}
+return true",99323,Available only in Single Phase Equipment!,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Transformer_end_Val_05,Check if “HEC No. (L1/R)” is not equal to “0” when “Equipment Type Description” equals to “Single Phase”. ,VALIDATION,Low voltage Transformer end,,TRUE,FALSE,FALSE,FALSE,"var referenceObjectFidProcureL1 = Text($feature.referenceobjectfidprocurel1, ""#"")
+if(IsEmpty($feature.nameproductvariant) || IsEmpty(referenceObjectFidProcureL1)){
+   return true
+}
+if(DomainName($feature, ""nameproductvariant"") != ""Single Phase"" && referenceObjectFidProcureL1 != ""0""){
+    return false
+}
+return true",99323,Available only in Single Phase Equipment!,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Transformer_end_Val_06,Verify the value of “Year of manufacturing”,VALIDATION,Low voltage Transformer end,,TRUE,FALSE,FALSE,FALSE,"var yearManufacturing =$feature.yearmanufacturing
+if(IsEmpty(yearManufacturing)){
+  return true
+}
+var yearManufacturingText = Trim(Text(yearManufacturing, ""#""))
+if(yearManufacturingText == ""0""){
+    return true
+}
+if(Count(yearManufacturingText) < 4 ){
+    return false
+}
+if(yearManufacturing < 1900){
+    return false
+}
+if(yearManufacturing > Year(Date())){
+    return false
+}
+return true",99324,Invalid Year value!,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Transformer_end_Val_07,Check if “Year of manufacturing” is not equal to “0” when “Equipment Type Description” equals to “Single Phase” ,VALIDATION,Low voltage Transformer end,,TRUE,FALSE,FALSE,FALSE,"var yearManufacturing = $feature.yearmanufacturing
+if(IsEmpty(yearManufacturing) || IsEmpty($feature.nameproductvariant)){
+   return true
+}
+if(DomainName($feature, ""nameproductvariant"") == ""Single Phase"" && yearManufacturing != 0){
+    return false
+}
+return true",99322,Available only in Three Phase Equipment!,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Transformer_end_Val_08,Verify the value of “Year of Manufacturing (L3/B)”. ,VALIDATION,Low voltage Transformer end,,TRUE,FALSE,FALSE,FALSE,"var yearManufacturingL3 = $feature.yearmanufacturingl3
+if(IsEmpty(yearManufacturingL3 )){
+    return true
+}
+var yearManufacturingL3Text = Trim(Text(yearManufacturingL3, ""#""))
+if(yearManufacturingL3Text == ""0""){
+    return true
+}
+if(Count(yearManufacturingL3Text) < 4 ){
+    return false
+}
+if(yearManufacturingL3 < 1900){
+    return false
+}
+if(yearManufacturingL3 > Year(Date())){
+    return false
+}
+return true",99324,Invalid Year value!,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Transformer_end_Val_09,Check if “Year of Manufacturing (L3/B)” is not equal to “0” when “Equipment Type Description” is not “Single Phase”.   ,VALIDATION,Low voltage Transformer end,,TRUE,FALSE,FALSE,FALSE,"var yearManufacturingL3= $feature.yearmanufacturingl3
+if(IsEmpty($feature.nameproductvariant) || IsEmpty(yearManufacturingL3 ) ){
+   return true
+}
+if(DomainName($feature, ""nameproductvariant"") != ""Single Phase"" && yearManufacturingL3 != 0){
+    return false
+}
+return true",99323,Available only in Single Phase Equipment!,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Transformer_end_Val_10,Verify the value of “Year of Manufacturing (L1/R)”. ,VALIDATION,Low voltage Transformer end,,TRUE,FALSE,FALSE,FALSE,"var yearManufacturingL1 = $feature.yearmanufacturingl1
+if(IsEmpty(yearManufacturingL1)){
+  return true
+}
+var yearManufacturingL1Text = Trim(Text(yearManufacturingL1, ""#""))
+if(yearManufacturingL1Text == ""0""){
+    return true
+}
+if(Count(yearManufacturingL1Text) < 4 ){
+    return false
+}
+if(yearManufacturingL1 < 1900){
+    return false
+}
+if(yearManufacturingL1 > Year(Date())){
+    return false
+}
+return true",99324,Invalid Year value!,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Transformer_end_Val_11,Check if “Year of Manufacturing (L1/R)” is not equal to “0” when “Equipment Type Description” is not “Single Phase” ,VALIDATION,Low voltage Transformer end,,TRUE,FALSE,FALSE,FALSE,"var yearManufacturingL1 = $feature.yearmanufacturingl1 
+if(IsEmpty($feature.nameproductvariant) || IsEmpty(yearManufacturingL1)){
+  return true
+}
+if(DomainName($feature, ""nameproductvariant"") != ""Single Phase"" && yearManufacturingL1 != 0){
+    return false
+}
+return true",99323,Available only in Single Phase Equipment!,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Transformer_end_Val_12,Verify the value of “Year of Manufacturing (L2/Y)”. ,VALIDATION,Low voltage Transformer end,,TRUE,FALSE,FALSE,FALSE,"var yearManufacturingL2 = $feature.yearmanufacturingl2
+if(IsEmpty(yearManufacturingL2)){
+   return true
+}
+var yearManufacturingL2Text = Trim(Text(yearManufacturingL2, ""#""))
+if(yearManufacturingL2Text == ""0""){
+    return true
+}
+if(Count(yearManufacturingL2Text) < 4 ){
+    return false
+}
+if(yearManufacturingL2 < 1900){
+    return false
+}
+if(yearManufacturingL2 > Year(Date())){
+    return false
+}
+return true",99324,Invalid Year value!,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Transformer_end_Val_13,Check if “Year of Manufacturing (L2/Y)” is not equal to “0” when “Equipment Type Description” is not “Single Phase”. ,VALIDATION,Low voltage Transformer end,,TRUE,FALSE,FALSE,FALSE,"var yearManufacturingL2 = $feature.yearmanufacturingl2
+if(IsEmpty(yearManufacturingL2) || IsEmpty($feature.nameproductvariant)){
+   return true
+}
+if(DomainName($feature, ""nameproductvariant"") != ""Single Phase"" && yearManufacturingL2 != 0){
+    return false
+}
+return true",99323,Available only in Single Phase Equipment!,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Transformer_end_Val_14,Check if “Year of Manufacturing” or “HEC No.” is not equal to 0 when the “Equipment Type Description” equals to “Single Phase” ,VALIDATION,Low voltage Transformer end,,TRUE,FALSE,FALSE,FALSE,"if(IsEmpty($feature.nameproductvariant)){
+    return true
+}
+if(DomainName($feature, ""nameproductvariant"") == ""Single Phase""){
+    if(IsEmpty($feature.yearManufacturing) || IsEmpty($feature.referenceobjectfidprocure)){
+        return true
+    }
+    if($feature.yearManufacturing != 0 || $feature.referenceobjectfidprocure != ""0""){
+        return false
+    }
+} 
+return true",99325,Equipment Type Description SINGLE PHASE do not agree with Reference object foreign ID in procurement system /Year of Manufacturing.,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Sch_2_winding_power_transformer_Val_01,Check if “Equipment Type Description” is not equal to “Not Loaded”.,VALIDATION,Medium voltage 2 winding power transformer,,TRUE,FALSE,FALSE,FALSE,"if(IsEmpty($feature.nameproductvariant)){
+  return true
+}
+if(DomainName($feature, ""nameproductvariant"") == ""Not Loaded""){
+    return false
+  } 
+return true",99321,Name of product variant must not be NOT LOADED,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Sch_2_winding_power_transformer_Val_02,Check if “HEC No.” is not equal to “0” when “Equipment Type Description” equals to “Single Phase”. ,VALIDATION,Medium voltage 2 winding power transformer,,TRUE,FALSE,FALSE,FALSE,"if(IsEmpty($feature.nameproductvariant)  || IsEmpty($feature.referenceobjectfidprocure)){
+   return true
+}
+if(DomainName($feature, ""nameproductvariant"") == ""Single Phase"" &&  $feature.referenceobjectfidprocure != ""0""){
+    return false
+}
+return true",99322,Available only in Three Phase Equipment!,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Sch_2_winding_power_transformer_Val_03,Check if “HEC No. (L3/B)” is not equal to “0” when “Equipment Type Description” equals to “Single Phase”. ,VALIDATION,Medium voltage 2 winding power transformer,,TRUE,FALSE,FALSE,FALSE,"var referenceObjectFidProcureL3 = Text($feature.referenceobjectfidprocurel3, ""#"")
+if(IsEmpty($feature.nameproductvariant) ||  IsEmpty(referenceObjectFidProcureL3)){
+   return true
+}
+if(DomainName($feature, ""nameproductvariant"") != ""Single Phase"" && referenceObjectFidProcureL3 != ""0""){
+    return false
+}
+return true",99323,Available only in Single Phase Equipment!,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Sch_2_winding_power_transformer_Val_04,Check if “HEC No. (L2/Y)” is not equal to “0” when “Equipment Type Description” equals to “Single Phase”.,VALIDATION,Medium voltage 2 winding power transformer,,TRUE,FALSE,FALSE,FALSE,"var referenceObjectFidProcureL2 = Text($feature.referenceobjectfidprocurel2, ""#"")
+if(IsEmpty($feature.nameproductvariant) || IsEmpty(referenceObjectFidProcureL2 )){
+  return true
+}
+if(DomainName($feature, ""nameproductvariant"") != ""Single Phase"" && referenceObjectFidProcureL2 != ""0""){
+    return false
+}
+return true",99323,Available only in Single Phase Equipment!,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Sch_2_winding_power_transformer_Val_05,Check if “HEC No. (L1/R)” is not equal to “0” when “Equipment Type Description” equals to “Single Phase”. ,VALIDATION,Medium voltage 2 winding power transformer,,TRUE,FALSE,FALSE,FALSE,"var referenceObjectFidProcureL1 = Text($feature.referenceobjectfidprocurel1, ""#"")
+if(IsEmpty($feature.nameproductvariant) || IsEmpty(referenceObjectFidProcureL1)){
+   return true
+}
+if(DomainName($feature, ""nameproductvariant"") != ""Single Phase"" && referenceObjectFidProcureL1 != ""0""){
+    return false
+}
+return true",99323,Available only in Single Phase Equipment!,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Sch_2_winding_power_transformer_Val_06,Verify the value of “Year of manufacturing”,VALIDATION,Medium voltage 2 winding power transformer,,TRUE,FALSE,FALSE,FALSE,"var yearManufacturing =$feature.yearmanufacturing
+if(IsEmpty(yearManufacturing)){
+  return true
+}
+var yearManufacturingText = Trim(Text(yearManufacturing, ""#""))
+if(yearManufacturingText == ""0""){
+    return true
+}
+if(Count(yearManufacturingText) < 4 ){
+    return false
+}
+if(yearManufacturing < 1900){
+    return false
+}
+if(yearManufacturing > Year(Date())){
+    return false
+}
+return true",99324,Invalid Year value!,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Sch_2_winding_power_transformer_Val_07,Check if “Year of manufacturing” is not equal to “0” when “Equipment Type Description” equals to “Single Phase”.,VALIDATION,Medium voltage 2 winding power transformer,,TRUE,FALSE,FALSE,FALSE,"var yearManufacturing = $feature.yearmanufacturing
+if(IsEmpty($feature.nameproductvariant) || IsEmpty(yearManufacturing)){
+   return true
+}
+if(DomainName($feature, ""nameproductvariant"") == ""Single Phase"" && yearManufacturing != 0){
+    return false
+}
+return true",99322,Available only in Three Phase Equipment!,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Sch_2_winding_power_transformer_Val_08,Verify the value of “Year of Manufacturing (L3/B)”. ,VALIDATION,Medium voltage 2 winding power transformer,,TRUE,FALSE,FALSE,FALSE,"var yearManufacturingL3 = $feature.yearmanufacturingl3
+if(IsEmpty(yearManufacturingL3 )){
+    return true
+}
+var yearManufacturingL3Text = Trim(Text(yearManufacturingL3, ""#""))
+if(yearManufacturingL3Text == ""0""){
+    return true
+}
+if(Count(yearManufacturingL3Text) < 4 ){
+    return false
+}
+if(yearManufacturingL3 < 1900){
+    return false
+}
+if(yearManufacturingL3 > Year(Date())){
+    return false
+}
+return true",99324,Invalid Year value!,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Sch_2_winding_power_transformer_Val_09,Check if “Year of Manufacturing (L3/B)” is not equal to “0” when “Equipment Type Description” is not “Single Phase”.,VALIDATION,Medium voltage 2 winding power transformer,,TRUE,FALSE,FALSE,FALSE,"var yearManufacturingL3= $feature.yearmanufacturingl3
+if(IsEmpty($feature.nameproductvariant) || IsEmpty(yearManufacturingL3 ) ){
+   return true
+}
+if(DomainName($feature, ""nameproductvariant"") != ""Single Phase"" && yearManufacturingL3 != 0){
+    return false
+}
+return true",99323,Available only in Single Phase Equipment!,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Sch_2_winding_power_transformer_Val_10,Check if “Year of Manufacturing (L1/R)” is not equal,VALIDATION,Medium voltage 2 winding power transformer,,TRUE,FALSE,FALSE,FALSE,"var yearManufacturingL1 = $feature.yearmanufacturingl1
+if(IsEmpty(yearManufacturingL1)){
+  return true
+}
+var yearManufacturingL1Text = Trim(Text(yearManufacturingL1, ""#""))
+if(yearManufacturingL1Text == ""0""){
+    return true
+}
+if(Count(yearManufacturingL1Text) < 4 ){
+    return false
+}
+if(yearManufacturingL1 < 1900){
+    return false
+}
+if(yearManufacturingL1 > Year(Date())){
+    return false
+}
+return true",99324,Invalid Year value!,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Sch_2_winding_power_transformer_Val_11,Check if “Year of Manufacturing (L1/R)” is not equal to “0” when “Equipment Type Description” is not “Single Phase”   ,VALIDATION,Medium voltage 2 winding power transformer,,TRUE,FALSE,FALSE,FALSE,"var yearManufacturingL1 = $feature.yearmanufacturingl1 
+if(IsEmpty($feature.nameproductvariant) || IsEmpty(yearManufacturingL1)){
+  return true
+}
+if(DomainName($feature, ""nameproductvariant"") != ""Single Phase"" && yearManufacturingL1 != 0){
+    return false
+}
+return true",99323,Available only in Single Phase Equipment!,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Sch_2_winding_power_transformer_Val_12,Verify the value of “Year of Manufacturing (L2/Y)”. ,VALIDATION,Medium voltage 2 winding power transformer,,TRUE,FALSE,FALSE,FALSE,"var yearManufacturingL2 = $feature.yearmanufacturingl2
+if(IsEmpty(yearManufacturingL2)){
+   return true
+}
+var yearManufacturingL2Text = Trim(Text(yearManufacturingL2, ""#""))
+if(yearManufacturingL2Text == ""0""){
+    return true
+}
+if(Count(yearManufacturingL2Text) < 4 ){
+    return false
+}
+if(yearManufacturingL2 < 1900){
+    return false
+}
+if(yearManufacturingL2 > Year(Date())){
+    return false
+}
+return true",99324,Invalid Year value!,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Sch_2_winding_power_transformer_Val_13,Check if “Year of Manufacturing (L2/Y)” is not equal to “0” when “Equipment Type Description” is not “Single Phase”. ,VALIDATION,Medium voltage 2 winding power transformer,,TRUE,FALSE,FALSE,FALSE,"var yearManufacturingL2 = $feature.yearmanufacturingl2
+if(IsEmpty(yearManufacturingL2) || IsEmpty($feature.nameproductvariant)){
+   return true
+}
+if(DomainName($feature, ""nameproductvariant"") != ""Single Phase"" && yearManufacturingL2 != 0){
+    return false
+}
+return true",99323,Available only in Single Phase Equipment!,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Sch_2_winding_power_transformer_Val_14,Check if “Year of Manufacturing” or “HEC No.” is not equal to 0 when the “Equipment Type Description” equals to “Single Phase” ,VALIDATION,Medium voltage 2 winding power transformer,,TRUE,FALSE,FALSE,FALSE,"if(IsEmpty($feature.nameproductvariant)){
+    return true
+}
+if(DomainName($feature, ""nameproductvariant"") == ""Single Phase""){
+    if(IsEmpty($feature.yearManufacturing) || IsEmpty($feature.referenceobjectfidprocure)){
+        return true
+    }
+    if($feature.yearManufacturing != 0 || $feature.referenceobjectfidprocure != ""0""){
+        return false
+    }
+} 
+return true",99325,Equipment Type Description SINGLE PHASE do not agree with Reference object foreign ID in procurement system /Year of Manufacturing.,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Sch_Circuit_breaker_primary_Val_01,Check if “Owner Substation Abv.” is not equal to “Not Loaded” ,VALIDATION,Medium voltage Circuit breaker primary,,TRUE,FALSE,FALSE,FALSE,"if(IsEmpty($feature.referenceobjectparentid)){
+  return true
+}
+if(DomainName($feature, ""referenceobjectparentid"")== ""Not Loaded""){
+  return false
+}
+return true",99328,ParentID for referencing object cannot be Not Loaded,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicDevice_Val_01,Check the MV features’ Operating Voltage (kV) cannot greater than the Rated HV Volt (kV)   ,VALIDATION,,,TRUE,FALSE,FALSE,FALSE,"var featureAssetGroupDesc = DomainName($feature, ""ASSETGROUP"", $feature.ASSETGROUP)
+if (Find(""Medium voltage"", featureAssetGroupDesc, 0) != -1) {
+    var opV = $feature.voltagelimitmaxoperating
+    var raV = $feature.voltagelimitmaxrating
+    if (opV > raV) {
+        return false
+    }
+    else {
+        return true
+    }
+} else {
+    return true
+}",99310,The operating voltage is higher than the Rated voltage,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"

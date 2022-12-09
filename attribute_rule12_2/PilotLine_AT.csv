@@ -1,0 +1,255 @@
+﻿NAME,DESCRIPTION,TYPE,SUBTYPE,FIELD,ISEDITABLE,TRIGGERINSERT,TRIGGERDELETE,TRIGGERUPDATE,SCRIPTEXPRESSION,ERRORNUMBER,ERRORMESSAGE,EXCLUDECLIENTEVALUATION,ISENABLED,BATCH,SEVERITY,TAGS,CATEGORY,CHECKPARAMETERS
+PilotLine_Cal_01,Assign Life cycle status to the contained survey points.,CALCULATION,,,TRUE,TRUE,FALSE,TRUE,"function GetAssoicatedFeatureSet(feature, assocationType, targetLocateFeatureClass, validSurveyPointAssetGroup) {
+    var associatedFeatures = FeatureSetByAssociation(feature, assocationType)
+    if (count(associatedFeatures) > 0) {
+        var associatedFeaturesGlobalIDArray = []
+        for (var associatedFeature in associatedFeatures) {
+            Push(associatedFeaturesGlobalIDArray, associatedFeature.GLOBALID)
+        }
+        var globalIDTurpe = replace(replace(replace(Text(associatedFeaturesGlobalIDArray), ""["", ""(""), ""]"", "")""), '""', ""'"")
+        var surveyPointAssetGroupTurpe = replace(replace(replace(Text(validSurveyPointAssetGroup), ""["", ""(""), ""]"", "")""), '""', ""'"")
+        var whereClause = ""GLOBALID in "" + globalIDTurpe + ""AND ASSETGROUP ="" + surveyPointAssetGroupTurpe
+        var associatedFeatureClassFeatures = Filter(targetLocateFeatureClass, whereClause)
+        return associatedFeatureClassFeatures
+    } else {
+        return
+    }
+}
+var validSurveyPointAssetGroup = 767
+var assetGroup = $feature.ASSETGROUP
+var lifeCycleStatus = $feature.lifecyclestatus
+var updateObjectArray = []
+var mapJunctionFeatures = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.MapJunction"", [""*""], false)
+var contentSurveyPointFeatures = GetAssoicatedFeatureSet($feature, ""content"", mapJunctionFeatures, validSurveyPointAssetGroup)
+if (isEmpty(contentSurveyPointFeatures) != true) {
+    if (count(contentSurveyPointFeatures) > 0) {
+        for (var contentSurveyPointFeature in contentSurveyPointFeatures) {
+            var updateObject = {}
+            var contentSurveyPointFeatureGlobalID = contentSurveyPointFeature.GLOBALID
+            var contentSurveyPointFeatureLifeCycleStatus = contentSurveyPointFeature.lifecyclestatus
+            if (contentSurveyPointFeatureLifeCycleStatus != lifeCycleStatus) {
+                updateObject[""GLOBALID""] = contentSurveyPointFeatureGlobalID
+                updateObject[""attributes""] = { ""lifecyclestatus"": lifeCycleStatus }
+                Push(updateObjectArray, updateObject)
+            }
+        }
+        if (count(updateObjectArray) > 0) {
+            return {
+                'edit': [{
+                    'className': ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.MapJunction"",
+                    'updates': updateObjectArray
+                }]
+            }
+        }
+    }
+}",,,TRUE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+PilotLine_Cal_02,Assign the environment to the Misc. Graphic features ,CALCULATION,,,TRUE,TRUE,FALSE,TRUE,"var miscGraphicsParentTable = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_MiscGraphicsParent"",[""*""],false)
+var featureGlobalID = $feature.GLOBALID
+var Relatedgraphicparents = Filter(miscGraphicsParentTable, ""hkeParentGlobalId = @featureGlobalID"")
+if (count(Relatedgraphicparents) > 0) {
+    var updateObjecetArray = []
+    for (var Relatedgraphicparent in Relatedgraphicparents) {
+        var RelatedgraphicparentGlobalID = Relatedgraphicparent.GLOBALID
+        var RelatedgraphicparentEnv = Relatedgraphicparent.hkeEnvironment
+        var assetGroup = $feature.ASSETGROUP
+        var validPilotLineAssetGroup = 762
+        var updateObject = {}
+        var environment = 0
+        if(assetGroup == validPilotLineAssetGroup){
+            environment = 900
+        }else{
+            environment = -300
+        }
+        if (RelatedgraphicparentEnv != environment) {
+            updateObject[""GLOBALID""] = RelatedgraphicparentGlobalID
+            updateObject[""attributes""] = { ""hkeEnvironment"": environment }
+            Push(updateObjecetArray, updateObject)
+        }
+    }
+    if (count(updateObjecetArray) > 0) {
+        return {
+            'edit': [{
+                'className': 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_MiscGraphicsParent',
+                'updates': updateObjecetArray
+            }]
+        }
+    }
+}",,,TRUE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+PilotLine_Cal_03,Update Grid X1 (StartPoint),CALCULATION,,envelopex1,FALSE,TRUE,FALSE,TRUE,Geometry($feature).paths[0][0].x,,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+PilotLine_Cal_04,Update Grid X2 (EndPoint),CALCULATION,,envelopex2,FALSE,TRUE,FALSE,TRUE,Geometry($feature).paths[0][-1].x,,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+PilotLine_Cal_05,Update Grid Y1 (StartPoint),CALCULATION,,envelopey2,FALSE,TRUE,FALSE,TRUE,Geometry($feature).paths[0][-1].y,,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+PilotLine_Cal_06,Update Grid Y2 (EndPoint),CALCULATION,,envelopey1,FALSE,TRUE,FALSE,TRUE,Geometry($feature).paths[0][0].y,,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+PilotLine_Cal_07,Update UNC Life Cycle Status,CALCULATION,,statenetworklifecyclenormal,TRUE,TRUE,FALSE,TRUE,"if (DomainName($feature, ""lifecyclestatus"") == ""INS"") {
+  return 256
+} if (DomainName($feature, ""lifecyclestatus"") == ""PPR"" ||  DomainName($feature, ""lifecyclestatus"") == ""PPX""  ) {
+  return 32
+}  if (DomainName($feature, ""lifecyclestatus"") == ""RES"" || DomainName($feature, ""lifecyclestatus"") == ""SP"" ) {
+  return 1
+} if ( DomainName($feature, ""lifecyclestatus"") == ""PPA"" || DomainName($feature, ""lifecyclestatus"") == ""PPM"" ) {
+  return 2
+}else {
+   return 0
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+PilotLine_Cal_08,Update colourId,CALCULATION,,symbolcolor,TRUE,TRUE,FALSE,TRUE,"// GetColour (PT_SEC) -- Pilot Cable segment
+if ($feature.assetgroup == 762) {
+    var colorkey = 26
+    var sql = 'OBJECTID = ' + colorkey
+    var result = First(Filter(FeatureSetByName($datastore, 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour', ['*'], false), sql))
+    if ($originalFeature.symbolfid != result.Colour) {
+        return result.Colour
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+PilotLine_Cal_09,Return appropriate symbolid for given attribute,CALCULATION,,symbolfid,TRUE,TRUE,FALSE,TRUE,"// SymbolID (PT_SEC) -- Pilot Cable segment
+if ($feature.assetgroup == 762) {
+    if ($originalFeature.lifecyclestatus != $feature.lifecyclestatus) {
+        var symid = 1
+        //read color from table
+        if (DomainName($feature, 'nametype') == ""Submarine Cable"") {
+            if (DomainName($feature, 'lifecyclestatus') == ""INS"") { symid = 655 }
+            else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX"") { symid = 656 }
+            else if (DomainName($feature, 'lifecyclestatus') == ""RES"") { symid = 657 }
+        } else {
+            if (DomainName($feature, 'nametype') == ""Unknown Route"") {
+                if (DomainName($feature, 'wateringress') == 'Yes') {
+                    if (DomainName($feature, 'lifecyclestatus') == ""INS"") { symid = 661 }
+                    else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX"") { symid = 662 }
+                    else if (DomainName($feature, 'lifecyclestatus') == ""RES"") { symid = 663 }
+                } else {
+                    if (DomainName($feature, 'lifecyclestatus') == ""INS"") { symid = 679 }
+                    else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX"") { symid = 680 }
+                    else if (DomainName($feature, 'lifecyclestatus') == ""RES"") { symid = 681 }
+                }
+            } else {
+                if (DomainName($feature, 'wateringress') == 'Yes') {
+                    if (DomainName($feature, 'lifecyclestatus') == ""INS"") { symid = 667 }
+                    else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX"") { symid = 668 }
+                    else if (DomainName($feature, 'lifecyclestatus') == ""RES"") { symid = 669 }
+                } else {
+                    if (DomainName($feature, 'lifecyclestatus') == ""INS"") { symid = 670 }
+                    else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX"") { symid = 671 }
+                    else if (DomainName($feature, 'lifecyclestatus') == ""RES"") { symid = 672 }
+                }
+            }
+        }
+        return symid
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+PilotLine_Cal_10,Update Display Field,CALCULATION,,displayfieldtext,TRUE,TRUE,FALSE,TRUE,"var asset_group = DomainName($feature, ""assetgroup"")
+var output_s_list = []
+var OBJECTID = 'OID' + $feature.OBJECTID
+var lifecyclestatus = '(' + DomainName($feature, ""lifecyclestatus"") + ')'
+var cableprefix = $feature.cableprefix
+var NameAsset = $feature.NameAsset
+ if (Includes(['Pilot Cable segment'], asset_group)) {
+     Push(output_s_list, cableprefix)
+ Push(output_s_list, NameAsset)
+ Push(output_s_list, lifecyclestatus)
+ Push(output_s_list, OBJECTID)
+}
+var output_s = []
+for (var s in output_s_list){
+    if (s != """") {
+        output_s += output_s_list[s] + "" ""
+    }
+}
+return output_s",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+PT_Cable_segment_Cal_01,Update the network route feature and association according to the updating of the PT Cable segment's cable number and life cycle status.,CALCULATION,Pilot Cable segment,,TRUE,TRUE,TRUE,TRUE,"// this function would update its association(container) automatically when the user change nameasset 
+var target_asset_type = ['Pilot Cable segment']
+var target_asset_type_dict = '{""Pilot Cable segment"": ""Pilot Network route""}'
+var target_lifecyclestatus = ['INS']
+//var target_lifecyclestatus = ['INS']
+var target_asset_type_dict = Dictionary(target_asset_type_dict)
+function checkIfAssociated(current_asset_name) {
+    // -1 : no found existed associated item
+    // other: we have to delete the existed one
+    var ass_container = FeatureSetByAssociation($feature, 'container');
+    if (Count(ass_container) > 0) {
+        // Once we found, we have to find the full set of the target feature
+        var asset = first(ass_container)
+        return asset.oid
+    }
+    return -1
+}
+function checkIfAssetNumExists(x){
+    var asset_list = FeatureSetByName($datastore, 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.PilotEdgeObject')
+    asset_list = Filter(asset_list, ""nameasset = @x"")
+    if (Count(asset_list) > 0) {
+        var asset = first(asset_list)
+        return asset.GlobalID
+    } return -1
+}
+// start processing
+var res_asset_type = DomainName($feature,""ASSETTYPE"",$feature.ASSETTYPE)
+var res_lifecyclestatus = DomainName($feature, ""lifecyclestatus"", $feature.lifecyclestatus)
+// check if the asset type in the target asset type
+// if (($feature.nameasset != $originalfeature.nameasset || $feature.lifecyclestatus != $originalfeature.lifecyclestatus) && !IsEmpty($feature.nameasset) && Includes(target_asset_type, res_asset_type) && Includes(target_lifecyclestatus, res_lifecyclestatus)){
+if (($editContext.editType == ""INSERT"" || $feature.nameasset != $originalfeature.nameasset || $feature.lifecyclestatus != $originalfeature.lifecyclestatus) && Includes(target_asset_type, res_asset_type)){
+    // check if there is a association have to remove
+    var check_if_associated = checkIfAssociated($feature.nameasset)
+    var output_json = []
+    var output_count = 0
+    // Note : if the lifecycle not equal to INS or nameasset is Empty, we not going to build new association
+    if (Includes(target_lifecyclestatus, res_lifecyclestatus) && !IsEmpty($feature.nameasset)) {
+        // check if we need to create a new
+        // If its cable number is found in the feature class - network rocontainerute:
+        var check_result = checkIfAssetNumExists($feature.nameasset)
+        // if found the asset type is already exists in MapEdgeObject
+        if (check_result != -1) {
+            output_json[output_count] = {
+                        'className': 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.PilotEdgeObject',
+                        'updates': [{
+                            ""GlobalID"": check_result,
+                            ""associationType"": 'container'
+                        }]
+                    }
+            output_count ++
+        } else {
+        // if not found, then add the new one to it
+            var asset_list = FeatureSetByName($datastore, 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.PilotEdgeObject')
+            output_json[output_count] = {
+                'className': 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.PilotEdgeObject',
+                'adds': [{
+                    'attributes': {
+                        'AssetGroup': DomainCode(asset_list, ""ASSETGROUP"", target_asset_type_dict[res_asset_type]),
+                        'nameasset': $feature.nameasset
+                    },
+                    ""associationType"": 'container'
+                    }]
+                }
+            output_count ++
+        }
+    }
+    // delete if it already has association
+    if (check_if_associated != -1) {
+        // should do something to update the return data
+        output_json[output_count] = {
+                ""className"": ""^UN_Association"",
+                ""deletes"": [{
+                    ""objectID"": check_if_associated
+                }]
+            }
+    }
+    return {
+            'edit': output_json
+    }
+}",,,TRUE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+PT_Cable_segment_Cal_02,Update PT Front Page link,CALCULATION,Pilot Cable segment,referencereport,TRUE,TRUE,FALSE,TRUE,"var nameAsset = $feature.nameasset
+if($feature.lifecyclestatus != 6 || nameasset == ""0""){
+    if($originalFeature.referencereport != """"){
+        return """"
+    }
+    return
+} 
+if(IsEmpty(nameAsset)){
+    if($originalFeature.referencereport != """"){
+        return """"
+    }
+    return
+}
+var items = Filter(FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_System_Config"", ['*'], true), ""configKey LIKE 'ReportLoader'"")
+var item = First(items)
+var link = item.configValue + ""?ReportType=FrontPage_PT&Filename=ptfp_"" + nameAsset + "".pdf""
+if($originalFeature.referencereport != link){
+    return link
+}
+return",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"

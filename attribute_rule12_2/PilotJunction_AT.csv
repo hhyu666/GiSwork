@@ -1,0 +1,281 @@
+﻿NAME,DESCRIPTION,TYPE,SUBTYPE,FIELD,ISEDITABLE,TRIGGERINSERT,TRIGGERDELETE,TRIGGERUPDATE,SCRIPTEXPRESSION,ERRORNUMBER,ERRORMESSAGE,EXCLUDECLIENTEVALUATION,ISENABLED,BATCH,SEVERITY,TAGS,CATEGORY,CHECKPARAMETERS
+PilotJunction_Cal_01,Update Grid X1 Coordinate,CALCULATION,,envelopex1,TRUE,TRUE,FALSE,TRUE,Geometry($feature).x,,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+PilotJunction_Cal_02,Update Grid Y1 Coordinate,CALCULATION,,envelopey1,TRUE,TRUE,FALSE,TRUE,Geometry($feature).y,,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+PilotJunction_Cal_03,Update the environment to Misc. Graphic Parent.,CALCULATION,,,TRUE,TRUE,FALSE,TRUE,"var miscGraphicsParentTable = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_MiscGraphicsParent"",[""*""],false)
+var featureGlobalID = $feature.GLOBALID
+var Relatedgraphicparents = Filter(miscGraphicsParentTable, ""hkeParentGlobalId = @featureGlobalID"")
+if (count(Relatedgraphicparents) > 0) {
+    var updateObjecetArray = []
+    var pilotAssetGroup = [763,764,766,767]
+    for (var Relatedgraphicparent in Relatedgraphicparents) {
+        var RelatedgraphicparentGlobalID = Relatedgraphicparent.GLOBALID
+        var RelatedgraphicparentEnv = Relatedgraphicparent.hkeEnvironment
+        var assetGroup = $feature.ASSETGROUP
+        var updateObject = {}
+        var environment = 0
+        if(includes(pilotAssetGroup,assetGroup) == true){
+            environment = 900
+        }else{
+            environment = -300
+        }
+        if (RelatedgraphicparentEnv != environment) {
+            updateObject[""GLOBALID""] = RelatedgraphicparentGlobalID
+            updateObject[""attributes""] = { ""hkeEnvironment"": environment }
+            Push(updateObjecetArray, updateObject)
+        }
+    }
+    if (count(updateObjecetArray) > 0) {
+        return {
+            'edit': [{
+                'className': 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_MiscGraphicsParent',
+                'updates': updateObjecetArray
+            }]
+        }
+    }
+}",,,TRUE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+PilotJunction_Cal_04,Update UNC Life Cycle Status,CALCULATION,,statenetworklifecyclenormal,TRUE,TRUE,FALSE,TRUE,"if (DomainName($feature, ""lifecyclestatus"") == ""INS"") {
+  return 256
+} if (DomainName($feature, ""lifecyclestatus"") == ""PPR"" ||  DomainName($feature, ""lifecyclestatus"") == ""PPX""  ) {
+  return 32
+}  if (DomainName($feature, ""lifecyclestatus"") == ""RES"" || DomainName($feature, ""lifecyclestatus"") == ""SP"" ) {
+  return 1
+} if ( DomainName($feature, ""lifecyclestatus"") == ""PPA"" || DomainName($feature, ""lifecyclestatus"") == ""PPM"" ) {
+  return 2
+}else {
+   return 0
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+PilotJunction_Cal_06,Get colour from table.,CALCULATION,,symbolcolor,TRUE,TRUE,FALSE,TRUE,"// SymbolID (for HV Sch Cable) -- Medium voltage Conductor
+if ($feature.assetgroup == 921) {
+    if($originalFeature.lifecyclestatus!=$feature.lifecyclestatus){
+        var symid = 1
+            //read color from table
+            if (DomainName($feature,""circuittype"") == ""Interconnector""){
+                if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 683}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 684}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 685}
+            }else{
+                if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 686}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 687}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 688}
+            }
+            return symid
+    }
+   }
+   // SymbolID (for LV Sch Cable) -- Low voltage Conductor
+   if ($feature.assetgroup == 920) {
+    if($originalFeature.lifecyclestatus!=$feature.lifecyclestatus){
+        var symid = 7
+            if ($feature.ASSETTYPE == 0){ //UNKNOWN
+                if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 689}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 690}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 691}
+            }else if ($feature.ASSETTYPE == 880){ //UNDERGROUND
+                if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 692}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 693}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 694}
+            }else if ($feature.ASSETTYPE == 881){ //OVERHEAD
+                if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 695}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 696}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 697}
+            }else if ($feature.ASSETTYPE == 886){ // SUBMARINE
+                if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 698}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 699}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 700}
+            }else if ($feature.namefeaturetype == 573){ // Interconnector
+                if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 683}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 684}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 685}
+            }else{
+                if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 701}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 702}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 703}
+            }
+            return symid
+    }
+   }
+   // SymbolID (for HV busbar) -- Medium voltage Busbar
+   if ($feature.assetgroup == 925) {
+    if ($originalFeature.symbolfid!=682) {
+        return 682
+    } 
+   }
+   // SymbolID (for LV busbar) -- Low voltage Busbar
+   if ($feature.assetgroup == 924) {
+    if ($originalFeature.symbolfid!=682) {
+        return 682
+    } 
+   }
+   // SymbolID (for LV Sch Cable/Connector) -- Low voltage Connector line
+   if ($feature.assetgroup == 928) {
+    if($originalFeature.lifecyclestatus!=$feature.lifecyclestatus){
+        var symid = 7
+            if ($feature.ASSETTYPE == 0){ //UNKNOWN
+                if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 689}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 690}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 691}
+            }else if ($feature.ASSETTYPE == 880){ //UNDERGROUND
+                if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 692}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 693}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 694}
+            }else if ($feature.ASSETTYPE == 881){ //OVERHEAD
+                if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 695}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 696}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 697}
+            }else if ($feature.ASSETTYPE == 886){ // SUBMARINE
+                if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 698}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 699}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 700}
+            }else{
+                if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 701}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 702}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 703}
+            }
+            return symid
+    }
+   }",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+PilotJunction_Cal_07,Return appropriate symbolid for given attribute.,CALCULATION,,symbolfid,TRUE,TRUE,FALSE,TRUE,"// SymbolID (for PT_HUB) -- Pilot Network hub
+if ($feature.assetgroup == 766) {
+    if ($originalFeature.symbolfid != 48) {
+        return 48
+    }
+}
+// SymbolID (for PT_JNT) -- Pilot Cable joint
+if ($feature.assetgroup == 763) {
+    if ($originalFeature.symbolfid != 60) {
+        return 60
+    }
+}
+// SymbolID -- Pilot Line End
+if ($feature.assetgroup == 764) {
+    if ($originalFeature.symbolfid != 86) {
+        return 86
+    }
+}
+// SymbolID -- Pilot Depth Marker
+if ($feature.assetgroup == 767) {
+    if ($originalFeature.symbolfid != 87) {
+        return 87
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+PilotJunction_Cal_08,update display field by asset group.,CALCULATION,,displayfieldtext,TRUE,TRUE,FALSE,TRUE,"var asset_group = DomainName($feature, ""assetgroup"")
+var output_s_list = []
+var AssetType = DomainName($feature, ""AssetType"")
+var OBJECTID = 'OID' + $feature.OBJECTID
+var DimDepth = $feature.DimDepth
+var lifecyclestatus = '(' + DomainName($feature, ""lifecyclestatus"") + ')'
+var nameproductvariant = $feature.nameproductvariant
+var NameAsset = $feature.NameAsset
+ if (Includes(['Pilot Survey point'], asset_group)) {
+     Push(output_s_list, DimDepth)
+ Push(output_s_list, nameproductvariant)
+ Push(output_s_list, NameAsset)
+ Push(output_s_list, lifecyclestatus)
+ Push(output_s_list, OBJECTID)
+}
+if (Includes(['Pilot Cable joint'], asset_group)) {
+     Push(output_s_list, AssetType)
+ Push(output_s_list, lifecyclestatus)
+ Push(output_s_list, OBJECTID)
+}
+if (Includes(['Pilot Network hub'], asset_group)) {
+     Push(output_s_list, NameAsset)
+ Push(output_s_list, lifecyclestatus)
+ Push(output_s_list, OBJECTID)
+}
+if (Includes(['Pilot Cable end'], asset_group)) {
+     Push(output_s_list, nameproductvariant)
+ Push(output_s_list, lifecyclestatus)
+ Push(output_s_list, OBJECTID)
+}
+var output_s = []
+for (var s in output_s_list){
+    if (s != """") {
+        output_s += output_s_list[s] + "" ""
+    }
+}
+return output_s",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+PT_Cable_end_Cal_05,Calculate the rotation of the cable end symbol.,CALCULATION,Pilot Cable end,symbolrotation,TRUE,TRUE,FALSE,TRUE,"// Find the first intersecting line from the intersecting class
+var lineClass = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.MapLine"", [""objectid""], true)
+var line = First(Intersects(lineClass, $feature))
+// If no feature was found, return the original value
+if (line == null)
+   return $feature.symbolrotation
+// Buffer the point by a small amount to extract the segment
+var search = Extent(Buffer($feature, .01, ""meter""))
+var segment = Clip(line, search)[""paths""][0]
+// Get angle of line using the start and end vertex
+return Angle(segment[0], segment[-1])",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+PT_Network_hub_Cal_01,Update HK Electric system fields to null.,CALCULATION,Pilot Network hub,,TRUE,TRUE,FALSE,TRUE,"var featureLifeCycleStatus = $feature.lifecyclestatus
+var featureFibreConnected = $feature.fibreconnected
+var featureStrategicConnected = $feature.strategicconnected
+
+if($feature.ASSETGROUP == 766){
+    return
+}
+
+if($originalFeature.lifecyclestatus != featureLifeCycleStatus){
+    if(featureLifeCycleStatus != 6){
+        return{""result"":{
+            ""attributes"":{
+                ""fibreconnected"":null,
+                ""strategicconnected"":null
+            }
+        }}
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+PT_Network_hub_Cal_02,Update substation name based on standalone table - “C_SUBNAME”.,CALCULATION,Pilot Network hub,namelocation,TRUE,TRUE,FALSE,TRUE,"var nameasset = trim($feature.nameasset)
+var substationMappingTable = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.C_SUBNAME"",[""*""],false)
+var mappedRecords = Filter(substationMappingTable, ""nameassetsubstation = @nameasset"")
+if(count(mappedRecords)==1){
+    var targetNameLocation = first(mappedRecords).namelocationdetailssubstation
+    if($feature.namelocation != targetNameLocation){
+        return targetNameLocation
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+PT_Survey_point_Cal_01,"Based on table C_SURVEYTYPE and the feature’s "" Survey Point Type "" value will update “Survey Point Type Abv.” and “Is_Shallow”.",CALCULATION,Pilot Survey point,,TRUE,TRUE,FALSE,TRUE,"var environment = $feature.environment
+    var nameproductvariant = $feature.surveypointtype
+    var survetypeTable = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.C_SURVETYPE"",['*'],false)
+    var targetUpdateRows = Filter(survetypeTable, ""nameproductvariant = @nameproductvariant AND ENVIRONMENT = @environment"")
+    if(count(targetUpdateRows)==1){
+        var updateObject = {}
+        var featuredepthValue = $feature.dimdepth
+        var featureIsshallow =  $feature.isshallow
+        var featureNameproduct = $feature.nameproduct
+        var targetUpdateRow = First(targetUpdateRows)
+        var targetUpateNameproduct = targetUpdateRow.nameproduct
+        var targetUpateShallowValue = targetUpdateRow.distancesafetyrequirement
+        var targetUpdateIsshallow = """"
+        if(featuredepthValue < targetUpateShallowValue){
+            var targetUpdateIsshallow = ""Yes""
+            if(featureIsshallow != targetUpdateIsshallow){
+                updateObject[""isshallow""] = targetUpdateIsshallow
+            }
+        }else{
+            var targetUpdateIsshallow = ""No""
+            if(featureIsshallow!= targetUpdateIsshallow){
+                updateObject[""isshallow""] = targetUpdateIsshallow
+            }
+        }
+        if(featureNameproduct != targetUpateNameproduct){
+            updateObject[""nameproduct""] = targetUpateNameproduct
+        }
+        for(var i in updateObject){}
+        if(IsEmpty(i) != true){
+            return{
+                ""result"":{
+                    'attributes':updateObject
+                }
+            }
+        }
+    }",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+PT_Survey_point_Cal_02,Update Environment by Asset Group,CALCULATION,Pilot Survey point,environment,TRUE,TRUE,FALSE,TRUE,"var environmentCode = 900
+if(environmentCode == $originalFeature.environment){
+    return 
+}
+return environmentCode",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+PT_Survey_point_Val_01,Check if the PT Survey point without container.,VALIDATION,Pilot Survey point,,TRUE,FALSE,FALSE,FALSE,"var containerFeatures = FeatureSetByAssociation($feature, ""container"")
+if(count(containerFeatures)>0){
+    return true
+}else{
+    return false
+}",99301,Invalid feature(Orphan),FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"

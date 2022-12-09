@@ -1,0 +1,417 @@
+﻿NAME,DESCRIPTION,TYPE,SUBTYPE,FIELD,ISEDITABLE,TRIGGERINSERT,TRIGGERDELETE,TRIGGERUPDATE,SCRIPTEXPRESSION,ERRORNUMBER,ERRORMESSAGE,EXCLUDECLIENTEVALUATION,ISENABLED,BATCH,SEVERITY,TAGS,CATEGORY,CHECKPARAMETERS
+Building_boundary_Cal_01,Generate the LV Customer Installation Point at the centroid of the Building Boundary (Structure Boundary) and build the containment association with it after user create the address outline,CALCULATION,Building boundary,,TRUE,TRUE,FALSE,FALSE,"var structureBoundaryCentroidPoint = Centroid(Geometry($feature))
+var structureBoundaryCentroidX = structureBoundaryCentroidPoint.x
+var structureBoundaryCentroidY = structureBoundaryCentroidPoint.y
+var structureBoundarySpatialReference = structureBoundaryCentroidPoint.spatialReference
+    return { 
+        ""edit"": [{
+            ""className"": ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.MapJunction"",
+            ""adds"": [{
+                ""tag"": ""jo1"", 
+                ""attributes"": {
+                    ""ASSETGROUP"": 971,
+                    ""ASSETTYPE"": 1020
+                },'geometry': Geometry({
+                    'x': structureBoundaryCentroidX,
+                    'y': structureBoundaryCentroidY,
+                    'z':0,
+                    'spatialReference':structureBoundarySpatialReference
+                })
+            }]
+        }, {
+            ""className"": ""^UN_Association"",
+            ""adds"": [{
+                ""fromClass"": ""StructureBoundary"",
+                ""fromGlobalId"": $feature.GLOBALID,
+                ""toClass"": ""MapJunction"",
+                ""toGlobalId"": ""jo1.globalID"",
+                ""associationType"": ""containment""
+            }]
+        }]
+    }",,,TRUE,FALSE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Building_boundary_Cal_02,Calculate the x axis of the feature’s centroid point and update to “Envelope x centroid coordinate”.,CALCULATION,Building boundary,envelopexcentroid,TRUE,TRUE,FALSE,TRUE,centroid(Geometry($feature)).x,,,FALSE,FALSE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Building_boundary_Cal_03,Calculate the y axis of the feature’s centroid point and update to “Envelope y centroid coordinate”.,CALCULATION,Building boundary,envelopeycentroid,TRUE,TRUE,FALSE,TRUE,centroid(Geometry($feature)).y,,,FALSE,FALSE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+StructureBoundary_Cal_01,"Assign the environment to the Misc. Graphic features. 
+
+ ",CALCULATION,,,TRUE,TRUE,FALSE,TRUE,"var miscGraphicsParentTable = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_MiscGraphicsParent"",[""*""],false)
+var featureGlobalID = $feature.GLOBALID
+var Relatedgraphicparents = Filter(miscGraphicsParentTable, ""hkeParentGlobalId = @featureGlobalID"")
+if (count(Relatedgraphicparents) > 0) {
+    var updateObjecetArray = []
+    for (var Relatedgraphicparent in Relatedgraphicparents) {
+        var RelatedgraphicparentGlobalID = Relatedgraphicparent.GLOBALID
+        var RelatedgraphicparentEnv = Relatedgraphicparent.hkeEnvironment
+        var assetGroup = $feature.ASSETGROUP
+        var updateObject = {}
+        var environment = 0
+        if(assetGroup == 171) {  //Medium voltage Conductor (921), Medium voltage Busbar (925), Medium voltage Connector line (929)
+           environment = 500 
+        }
+        else if(assetGroup == 176) {  //Low voltage Conductor (920), Low voltage Busbar (924), Low voltage Connector line (928)
+           environment = 800
+        } 
+        else if(assetGroup == 180 || assetGroup == 174){
+            environment = 1200
+        }
+        else{
+            environment = -300
+        }
+        if (RelatedgraphicparentEnv != environment) {
+            updateObject[""GLOBALID""] = RelatedgraphicparentGlobalID
+            updateObject[""attributes""] = { ""hkeEnvironment"": environment }
+            Push(updateObjecetArray, updateObject)
+        }
+    }
+    if (count(updateObjecetArray) > 0) {
+        return {
+            'edit': [{
+                'className': 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_MiscGraphicsParent',
+                'updates': updateObjecetArray
+            }]
+        }
+    }
+}",,,TRUE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+StructureBoundary_Cal_02,Assign the Duct boundary and Underground structure boundary’s “Life Cycle Status” and “Feature Type” to the contained Survey point feature(s).,CALCULATION,,,TRUE,TRUE,FALSE,TRUE,"var validAssetGroup = [180, 174]
+if (includes(validAssetGroup, $feature.ASSETGROUP) == true) {
+    var contentFeatures = FeatureSetByAssociation($feature, ""content"")
+    var lifeCycleStatus = $feature.lifecyclestatus
+    var nameFeatureType = $feature.namefeaturetype
+    var depthAssetGroup = 753
+    if (count(contentFeatures) > 0) {
+        var structureJunctionFeatures = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.StructureJunction"", [""*""], false)
+        var contentFeaturesGlobalIDArray = []
+        for (var contentFeature in contentFeatures) {
+            Push(contentFeaturesGlobalIDArray, contentFeature.GLOBALID)
+        }
+        var globalIDTurpe = replace(replace(replace(Text(contentFeaturesGlobalIDArray), ""["", ""(""), ""]"", "")""), '""', ""'"")
+        var whereClause = ""GLOBALID in "" + globalIDTurpe + ""AND ASSETGROUP = @depthAssetGroup""
+        var contentDepthFeatures = Filter(structureJunctionFeatures, whereClause)
+        if (count(contentDepthFeatures) > 0) {
+            var updateObjectArray = []
+            for (var contentDepthFeature in contentDepthFeatures) {
+                var contentDepthFeatureLifeCycleStatus = contentDepthFeature.lifecyclestatus
+                var contentDepthFeatureNameFeatureType = contentDepthFeature.namefeaturetype
+                var contentDepthFeatureGlobalID = contentDepthFeature.GLOBALID
+                var updateObject
+                var attributesObject = {}
+                if (contentDepthFeatureLifeCycleStatus != lifeCycleStatus) {
+                    attributesObject[""lifecyclestatus""] = lifeCycleStatus
+                }
+                if (contentDepthFeatureNameFeatureType != nameFeatureType) {
+                    attributesObject[""namefeaturetype""] = nameFeatureType
+                }
+                for (var key in attributesObject) { }
+                if (isEmpty(key) != true) {
+                    updateObject[""GLOBALID""] = contentDepthFeatureGlobalID
+                    updateObject[""attributes""] = attributesObject
+                    push(updateObjectArray, updateObject)
+                }
+            }
+            if (count(updateObjectArray) > 0) {
+                return {
+                    'edit': [{
+                        'className': 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.StructureJunction',
+                        'updates': updateObjectArray
+                    }]
+                }
+            }
+        }
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+StructureBoundary_Cal_03,Calculate envelope max X coordinate and save in this field,CALCULATION,,envelopex2,TRUE,TRUE,FALSE,TRUE,extent(Geometry($feature)).xmax,,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+StructureBoundary_Cal_04,Calculate envelope max Y coordinate and save in this field,CALCULATION,,envelopey2,TRUE,TRUE,FALSE,TRUE,extent(Geometry($feature)).ymax,,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+StructureBoundary_Cal_05,Calculate envelope min X coordinate and save in this field,CALCULATION,,envelopex1,TRUE,TRUE,FALSE,TRUE,extent(Geometry($feature)).xmin,,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+StructureBoundary_Cal_06,Calculate envelope min Y coordinate and save in this field,CALCULATION,,envelopey1,TRUE,TRUE,FALSE,TRUE,extent(Geometry($feature)).ymin,,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+StructureBoundary_Cal_08,Get colour from table,CALCULATION,,symbolcolor,TRUE,TRUE,FALSE,TRUE,"// GetColour (For LV_DPM) -- Cabinet boundary
+if ($feature.assetgroup == 171) {
+    if ($originalFeature.lifecyclestatus != $feature.lifecyclestatus) {
+        var colorkey = 14
+        //read color from table
+        if (DomainName($feature, 'lifecyclestatus') == ""INS"") { colorkey = 24 }
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX"") { colorkey = 28 }
+        else if (DomainName($feature, 'lifecyclestatus') == ""RES"") { colorkey = 24 }
+        var sql = 'OBJECTID = ' + colorkey
+        var result = First(Filter(FeatureSetByName($datastore, 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour', ['*'], false), sql))
+        return result.Colour
+    }
+}
+// GetColour (For DT_SEG) -- Duct boundary
+if ($feature.assetgroup == 180) {
+    if ($originalFeature.lifecyclestatus != $feature.lifecyclestatus) {
+        var colorkey = 14
+        //read color from table
+        if (DomainName($feature, 'lifecyclestatus') == ""INS"") { colorkey = 13 }
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX"") { colorkey = 28 }
+        var sql = 'OBJECTID = ' + colorkey
+        var result = First(Filter(FeatureSetByName($datastore, 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour', ['*'], false), sql))
+        return result.Colour
+    }
+}
+// GetColour (For DT_PIT) -- Underground structure boundary
+if ($feature.assetgroup == 174) {
+    if ($originalFeature.lifecyclestatus != $feature.lifecyclestatus || $originalFeature.assettype != $feature.assettype) {
+        var colorkey = 14
+        //read color from table
+        if (DomainName($feature, 'lifecyclestatus') == ""INS"") { colorkey = 13 }
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX"") { colorkey = 28 }
+        if ($feature.assettype == 190) {
+            colorkey = 27
+        }
+        var sql = 'OBJECTID = ' + colorkey
+        var result = First(Filter(FeatureSetByName($datastore, 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour', ['*'], false), sql))
+        return result.Colour
+    }
+}
+// GetColour (For ADM_ADR) -- Building boundary
+if ($feature.assetgroup == 176) {
+    if ($originalFeature.lifecyclestatus != $feature.lifecyclestatus) {
+        var colorkey = 2
+        //read color from table
+        if (DomainName($feature, 'lifecyclestatus') == ""INS"") { colorkey = 2 }
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX"") { colorkey = 28 }
+        else if (DomainName($feature, 'lifecyclestatus') == ""RES"") { colorkey = 12 }
+        var sql = 'OBJECTID = ' + colorkey
+        var result = First(Filter(FeatureSetByName($datastore, 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour', ['*'], false), sql))
+        return result.Colour
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+StructureBoundary_Cal_09,Return appropriate symbolid for given attribute,CALCULATION,,symbolfid,TRUE,TRUE,FALSE,TRUE,"// SymbolID (for LV_DPM) -- Cabinet boundary
+if ($feature.assetgroup == 171) {
+    if ($originalFeature.lifecyclestatus != $feature.lifecyclestatus) {
+        var symid = 1
+        if (DomainName($feature, 'lifecyclestatus') == ""INS"") { symid = 670 }
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX"") { symid = 671 }
+        else if (DomainName($feature, 'lifecyclestatus') == ""RES"") { symid = 672 }
+        return symid
+    }
+}
+// SymbolID (for DT_SEG) -- Duct boundary
+if ($feature.assetgroup == 180) {
+    if ($originalFeature.symbolfid != 707) {
+        return 707
+    }
+}
+// SymbolID (for DT_PIT) -- Underground structure boundary
+if ($feature.assetgroup == 174) {
+    if ($originalFeature.symbolfid != 670) {
+        return 670
+    }
+}
+// SymbolID (for ADM_ADR) -- Building boundary
+if ($feature.assetgroup == 176) {
+    if ($originalFeature.lifecyclestatus != $feature.lifecyclestatus) {
+        var symid = 1
+        if (DomainName($feature, 'lifecyclestatus') == ""INS"") { symid = 670 }
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX"") { symid = 671 }
+        else if (DomainName($feature, 'lifecyclestatus') == ""RES"") { symid = 672 }
+        return symid
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+StructureBoundary_Cal_10,update display field by asset group,CALCULATION,,displayfieldtext,TRUE,TRUE,FALSE,TRUE,"if ($feature.lifecyclestatus != $originalfeature.lifecyclestatus || $feature.NameAsset != $originalfeature.NameAsset){
+var asset_group = DomainName($feature, ""assetgroup"")
+var output_s_list = []
+var OBJECTID = 'OID' + $feature.OBJECTID
+var lifecyclestatus = '(' + DomainName($feature, ""lifecyclestatus"") + ')'
+var NameAsset = $feature.NameAsset
+ if (Includes(['Building boundary', 'Cabinet boundary', 'Underground structure boundary'], asset_group)) {
+        Push(output_s_list, NameAsset)
+    Push(output_s_list, lifecyclestatus)
+    Push(output_s_list, OBJECTID)
+}
+if (Includes(['Duct boundary'], asset_group)) {
+        Push(output_s_list, lifecyclestatus)
+    Push(output_s_list, OBJECTID)
+}
+var output_s = """"
+for (var s in output_s_list){
+    if (s != """") {
+        output_s += output_s_list[s] + "" ""
+    }
+}
+return output_s
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Underground_structure_boundary_Cal_01,"After the Underground structure boundary is created, a Manhole junction object is generated and build the containment with the Underground structure boundary.",CALCULATION,Underground structure boundary,,TRUE,TRUE,FALSE,FALSE,"var featureAssetGroup = $feature.ASSETGROUP
+
+if(featureAssetGroup == 174){
+    return { 
+        ""edit"": [{
+            ""className"": ""StructureJunctionObject"",
+            ""adds"": [{
+                ""tag"": ""jo1"", 
+                ""attributes"": {
+                    ""ASSETGROUP"": 760,
+                    ""ASSETTYPE"": 338
+                }
+            }]
+        }, {
+            ""className"": ""^UN_Association"",
+            ""adds"": [{
+                ""fromClass"": ""StructureBoundary"",
+                ""fromGlobalId"": $feature.GLOBALID,
+                ""toClass"": ""StructureJunctionObject"",
+                ""toGlobalId"": ""jo1.globalID"",
+                ""associationType"": ""containment""
+            }]
+        }]
+    }
+}",,,FALSE,FALSE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Underground_structure_boundary_Cal_02,Update the attribute - “Cover Code” according to the standalone table - “C_PITCOVER”.,CALCULATION,Underground structure boundary,materialcode,TRUE,TRUE,FALSE,TRUE,"var environment = $feature.environment
+var featureMaterialCode = $feature.materialcode
+var trPitEnvironment = ""1000""
+if (environment == trPitEnvironment) {
+    var material = $feature.material
+    var mappingTableRows = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.C_PITCOVER"", [""*""], false)
+    var targetRows = Filter(mappingTableRows, ""material = @material"")
+    if (count(targetRows) == 1) {
+        var targetMaterialCode = first(targetRows).materialcode
+        if (targetMaterialCode != featureMaterialCode) {
+            return first(targetRows).materialcode
+        }
+    }
+}",,,FALSE,FALSE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Underground_structure_boundary_Cal_03,"Generate new "" Pit No."" for Underground structure boundary when the value of ""Pit No."" is 0 or duplicate.",CALCULATION,Underground structure boundary,nameasset,TRUE,TRUE,FALSE,TRUE,"function findMax(numbers) {
+    var maxNum = -Infinity;
+    for (var index in numbers) {
+      if(numbers[index] > maxNum){
+        maxNum = numbers[index]
+      }
+    }
+    return maxNum;
+}
+function generateNewPitNum(assetGroup){
+    var tbl = FeatureSetByName($datastore, 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.StructureBoundary')
+    var sql = ""ASSETGROUP = "" + assetGroup + "" AND nameasset <> '0'""
+    var rows = Filter(tbl, sql)
+    var cnt = Count(rows) 
+        if(cnt > 0) {
+            var pitNums = []
+            for(var row in rows){
+                var pitNum = Number(row.nameasset, ""#"")
+                if(IsNan(pitNum)){
+                    continue
+                }
+                Push(pitNums, pitNum)
+            }
+            var newPitNum = findMax(pitNums) + 1
+            return Text(newPitNum + 1, ""#"")
+        }
+    return ""1""
+}
+function IsUniqlePitNum(assetGroup, pitNum){
+    var tbl = FeatureSetByName($datastore, 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.StructureBoundary')
+    pitNum = Number(pitNum, ""#"")
+    var sql = ""ASSETGROUP = "" + assetGroup + "" AND nameasset = '"" + pitNum + ""'""
+    var rows = Filter(tbl, sql)
+    if(Count(rows) > 1) {
+        return false
+    }
+    return true
+}
+var nameAsset = $feature.nameasset
+var assetGroup = 174
+if(IsEmpty(nameAsset) || nameAsset == ""0""){
+    return generateNewPitNum(assetGroup)
+} 
+if(IsUniqlePitNum(assetGroup, nameAsset) == false){
+    return generateNewPitNum(assetGroup)   
+}
+return",,,FALSE,FALSE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Building_boundary_Val_01,Check that a Building boundary can contain at most 1 Low voltage Customer installation and 1 Medium voltage Customer installation.,VALIDATION,Building boundary,,TRUE,FALSE,FALSE,FALSE,"var contentFeatures = FeatureSetByassociation($feature, ""content"")
+var lvCustomerInstallAssetGroup = 971
+var mvCustomerInstallAssetGroup = 972
+if (count(contentFeatures) > 0) {
+    var mapJunctionFeatures = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.MapJunction"", [""*""], false)
+    var associatedFeaturesGlobalIDArray = []
+    for (var contentFeature in contentFeatures) {
+        Push(associatedFeaturesGlobalIDArray, contentFeature.GLOBALID)
+    }
+    var globalIDTurpe = replace(replace(replace(Text(associatedFeaturesGlobalIDArray), ""["", ""(""), ""]"", "")""), '""', ""'"")
+    var assetGroupTurpe = replace(replace(replace(Text([lvCustomerInstallAssetGroup, mvCustomerInstallAssetGroup]), ""["", ""(""), ""]"", "")""), '""', ""'"")
+    var whereClause = ""GLOBALID in "" + globalIDTurpe + ""AND ASSETGROUP IN"" + assetGroupTurpe
+    var mapCustomerInstallFeatures = Filter(mapJunctionFeatures, whereClause)
+    var numberContentLVCustomerInstallFeatures = 0
+    var numberContentMVCustomerInstallFeatures = 0
+    if (count(mapCustomerInstallFeatures) > 0) {
+        for (var mapCustomerInstallFeature in mapCustomerInstallFeatures) {
+            var assetGroup = mapCustomerInstallFeature.ASSETGROUP
+            if (lvCustomerInstallAssetGroup == assetGroup) {
+                numberContentLVCustomerInstallFeatures = numberContentLVCustomerInstallFeatures + 1
+            }
+            else if (mvCustomerInstallAssetGroup == assetGroup) {
+                numberContentMVCustomerInstallFeatures = numberContentMVCustomerInstallFeatures + 1
+            }
+        }
+        var lvCustomerBoolValue = true
+        var mvCustomerBoolValue = true
+        if (numberContentLVCustomerInstallFeatures <= 1){
+            lvCustomerBoolValue = true
+        }else {
+            lvCustomerBoolValue = false
+        }
+        if( numberContentMVCustomerInstallFeatures <= 1){
+            mvCustomerBoolValue = true
+        }
+        else{
+            mvCustomerBoolValue = false
+        }
+        if(lvCustomerBoolValue == true && mvCustomerBoolValue==true){
+            return true
+        }else{
+            return false
+        }
+    }else{
+        return true
+    }
+} else {
+    return true
+}",99305,Invalid association (it should contain two duct ends),FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Duct_boundary_Val_01,Check a Duct boundary must contain two Duct ends.,VALIDATION,Duct boundary,,TRUE,FALSE,FALSE,FALSE,"function GetAssoicatedFeatureSet(contentFeatures, targetLocateFeatureClass, AssetGroup) {
+    var associatedFeaturesGlobalIDArray = []
+    for (var associatedFeature in contentFeatures) {
+        Push(associatedFeaturesGlobalIDArray, associatedFeature.GLOBALID)
+    }
+    var globalIDTurpe = replace(replace(replace(Text(associatedFeaturesGlobalIDArray), ""["", ""(""), ""]"", "")""), '""', ""'"")
+    var whereClause = ""GLOBALID in "" + globalIDTurpe + ""AND ASSETGROUP = "" + AssetGroup
+    var associatedFeatureClassFeatures = Filter(targetLocateFeatureClass, whereClause)
+    return associatedFeatureClassFeatures
+}
+var contentFeatures = FeatureSetByassociation($feature,""content"")
+if(count(contentFeatures) >0){
+    var structureJunctionFeatures = FeatureSetByName($datastore,""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.StructureJunction"",[""*""],false)
+    var ductEndAssetGroup = 759
+    var contentedDuctEndFeatures = GetAssoicatedFeatureSet(contentFeatures, structureJunctionFeatures, ductEndAssetGroup)
+    if(count(contentedDuctEndFeatures)==2){
+        return true
+    }else{
+        return false
+    }
+}else{
+    return false
+}",99305,Invalid association (it should contain two duct ends),FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Duct_boundary_Val_02,Verify the value of “No. of Spare Ducts”.,VALIDATION,Duct boundary,,TRUE,FALSE,FALSE,FALSE,"var numberContainerAvailable = $feature.numbercontaineravailable
+if(!IsEmpty(numberContainerAvailable)){
+    if(numberContainerAvailable < 0){
+        return false
+    } else{
+        var numberContainerCapacity = $feature.numbercontainercapacity
+        if(IsEmpty(numberContainerCapacity)){
+            return true
+        }
+        if(numberContainerAvailable  > numberContainerCapacity){
+            return false
+        }
+    }
+}
+return true",99327,Number of available container/assembly slots must be >= 0 and <= Number of installation slots in container/Assembly,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+StructureBoundary_Val_01,Check if the Duct boundary and Cabinet boundary without contained any features.,VALIDATION,,,TRUE,FALSE,FALSE,FALSE,"var validAssetGroup = [171,180]
+var assetGroup = $feature.ASSETGROUP
+if(includes(validAssetGroup,assetGroup) == true){
+    var contentFeatures = FeatureSetByAssociation($feature,""content"")
+    if(count(contentFeatures)>0){
+        return true
+    }else{
+        return false
+    }
+}else{
+    return true
+}",99301,Invalid feature(Orphan),FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"

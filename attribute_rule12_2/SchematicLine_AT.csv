@@ -1,0 +1,429 @@
+﻿NAME,DESCRIPTION,TYPE,SUBTYPE,FIELD,ISEDITABLE,TRIGGERINSERT,TRIGGERDELETE,TRIGGERUPDATE,SCRIPTEXPRESSION,ERRORNUMBER,ERRORMESSAGE,EXCLUDECLIENTEVALUATION,ISENABLED,BATCH,SEVERITY,TAGS,CATEGORY,CHECKPARAMETERS
+LV_Sch_Busbar_Cal_01,Update the field value of “Load Statistics Info.”.,CALCULATION,Low voltage Busbar,referenceloadstat,TRUE,TRUE,FALSE,TRUE,"var referenceObjectParentID = $feature.referenceobjectparentid
+if(referenceObjectParentID == ""0"" || $feature.lifecyclestatus != 6){
+    if($originalFeature.referenceloadstat == """"){
+        return 
+    }
+    return """"
+}
+var nameAsset = $feature.nameasset
+if(IsEmpty(nameAsset) || IsEmpty(referenceObjectParentID)){
+  if($originalFeature.referenceloadstat == """"){
+        return 
+    }
+    return """"
+}
+var referenceLoadStat = First(Filter(FeatureSetByName($datastore, ""HKE_System_Config"", ['*'], true), ""configKey = 'PlReferenceLoadStatURL'"")).configValue + ""?SSCODE=""+ referenceObjectParentID + ""&PLNO="" + nameAsset
+if($originalFeature.referenceloadstat == referenceLoadStat){
+    return 
+}
+return referenceLoadStat",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Conductor_Cal_01,Update the “Recommended Circuit Rating” and “Section Material Code” based on standalone table C_LVCIRRATE_57. ,CALCULATION,Low voltage Conductor,,TRUE,TRUE,FALSE,TRUE,"var nameProductVariant = $feature.nameproductvariant
+var lvCirRateRows = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.C_LVCIRRATE"", [""*""], false)
+var targetRows = Filter(lvCirRateRows, ""nameproductvariant = @nameProductVariant"")
+if (count(targetRows) == 1) {
+    var updateObject = {}
+    var row = first(targetRows)
+    var currentApproved = row.currentapproved
+    var materialCore = row.materialcore
+    var existCurrentApproved = $feature.currentapproved
+    var existMaterialCore = $feature.materialcore
+    if (existCurrentApproved != currentApproved) {
+        updateObject[""currentApproved""] = currentApproved
+    }
+    if (existMaterialCore != materialCore) {
+        updateObject[""materialCore""] = materialCore
+    }
+    for (var i in updateObject) { }
+    if (isEmpty(i) != true) {
+        return {
+            'result': {
+                'attributes': updateObject
+            }
+        }
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Conductor_Cal_02,Update the field value of “LV Front Page”. ,CALCULATION,Low voltage Conductor,referencereport,TRUE,TRUE,FALSE,TRUE,"var nameAsset = Trim($feature.nameasset)
+if($feature.lifecyclestatus != 6  || IsEmpty(nameasset)){
+    if($originalFeature.referencereport  != """"){
+        return """"
+    }
+    return 
+} 
+var items = Filter(FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_System_Config"", ['*'], true), ""configKey LIKE 'ReportLoader'"")
+var item = First(items)
+var link = item.configValue + ""?ReportType=FrontPage_LV&Filename=lvfp_"" + nameAsset + "".pdf""
+if($originalFeature.referencereport  != link){
+        return link 
+}
+return",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Conductor_Cal_03,Update the field value of “Load Statistics Info.”.,CALCULATION,Low voltage Conductor,referenceloadstat,TRUE,TRUE,FALSE,TRUE,"var referenceObjectParentID = $feature.referenceobjectparentid
+var subNetworkName = $feature.SUBNETWORKNAME
+if(Number(referenceObjectParentID, ""#"") == 0 || $feature.lifecyclestatus != 6){
+    if($originalFeature.referenceloadstat != """"){
+        return """"
+    }
+    return 
+}
+var index = Find(""::"" , subNetworkName, 0)
+if(index == -1){
+    if($originalFeature.referenceloadstat != """"){
+        return """"
+    }
+    return 
+}
+var eqNumber = Left(subNetworkName, 4)
+var link = First(Filter(FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_System_Config"", ['*'], true), ""configKey = 'LvReferenceLoadStatURL'"")).configValue + ""?SSCODE="" + referenceObjectParentID + ""&LVIO="" + eqNumber
+if($originalFeature.referenceloadstat != link){
+   return link
+}
+return",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Connector_line_Cal_01,Update the field value of “LV Front Page”. ,CALCULATION,Low voltage Connector line,referencereport,TRUE,TRUE,FALSE,TRUE,"var nameAsset = Trim($feature.nameasset)
+if($feature.lifecyclestatus  != 6 || IsEmpty(nameasset)){
+    if($originalFeature.referencereport != """"){
+        return """"
+    }
+    return 
+} 
+var items = Filter(FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_System_Config"", ['*'], true), ""configKey LIKE 'ReportLoader'"")
+var item = First(items)
+var link = item.configValue + ""?ReportType=FrontPage_LV&Filename=lvfp_"" + nameAsset + "".pdf""
+if($originalFeature.referencereport != link){
+   return link 
+}
+return",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+LV_Sch_Connector_line_Cal_02,Update the field value of “Load Statistics Info.”.,CALCULATION,Low voltage Connector line,referenceloadstat,TRUE,TRUE,FALSE,TRUE,"var referenceObjectParentID = $feature.referenceobjectparentid
+var subNetworkName = $feature.SUBNETWORKNAME
+if(Number(referenceObjectParentID, ""#"") == 0 || $feature.lifecyclestatus != 6){
+    if($originalFeature.referenceloadstat != """"){
+        return """"
+    }
+    return 
+}
+var index = Find(""::"" , subNetworkName, 0)
+if(index != -1){
+    if($originalFeature.referenceloadstat != """"){
+        return """"
+    }
+    return 
+}
+var eqNumber = Left(subNetworkName, 4)
+var link = First(Filter(FeatureSetByName($datastore, ""HKE_System_Config"", ['*'], true), ""configKey = 'LvReferenceLoadStatURL'"")).configValue + ""?SSCODE="" + referenceObjectParentID + ""&LVIO="" + eqNumber
+if($originalFeature.referenceloadstat != link){
+   return link
+}
+return",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Sch_Conductor_Cal_01,Update MV Sch Cable Stock Information,CALCULATION,,,TRUE,TRUE,FALSE,TRUE,"var stockTable = FeatureSetByName($dataStore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_MV_CableSectionStockNo"",validFields,false)
+var stockNo = $feature.referenceobjectfidcatalogue
+var originalStockNo = $originalfeature.referenceobjectfidcatalogue
+var validFields = [""materialcore"",""voltagelimitmaxoperating"",""voltagelimitmaxrating""]
+var sqlExpression = ""referenceobjectfidcatalogue = @stockNo""
+var updateAttributes = {}
+if(stockNo != originalStockNo){
+    var targetStockRecords = Filter(stockTable, sqlExpression)
+    if(Count(targetStockRecords) != 0 ){
+        var targetStockRecord = first(targetStockRecords)
+        for(var key in targetStockRecord){
+            if(key != ""OBJECTID"" && Includes(validFields, key) && targetStockRecord[key] != null && targetStockRecord[key] != 0){
+                updateAttributes[key] = targetStockRecord[key]
+            }
+        }
+    }
+    return{
+        ""result"":{
+            ""attributes"":updateAttributes
+        }
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicLine_Cal_01,Assign the environment to the Misc. Graphic features,CALCULATION,,,TRUE,TRUE,FALSE,TRUE,"var miscGraphicsParentTable = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_MiscGraphicsParent"",[""*""],false)
+var featureGlobalID = $feature.GLOBALID
+var Relatedgraphicparents = Filter(miscGraphicsParentTable, ""hkeParentGlobalId = @featureGlobalID"")
+if (count(Relatedgraphicparents) > 0) {
+    var updateObjecetArray = []
+    for (var Relatedgraphicparent in Relatedgraphicparents) {
+        var RelatedgraphicparentGlobalID = Relatedgraphicparent.GLOBALID
+        var RelatedgraphicparentEnv = Relatedgraphicparent.hkeEnvironment
+        var assetGroup = $feature.ASSETGROUP
+        var voltage = $feature.voltagelimitmaxoperating
+        var updateObject = {}
+        var environment = 0
+        if(assetGroup == 921 || assetGroup == 925 || assetGroup == 929) {  //Medium voltage Conductor (921), Medium voltage Busbar (925), Medium voltage Connector line (929)
+           environment = 400 
+        }
+        else if(assetGroup == 920 || assetGroup == 924 || assetGroup == 928) {  //Low voltage Conductor (920), Low voltage Busbar (924), Low voltage Connector line (928)
+           environment = 600
+        } 
+        else {
+            var environment = -300
+        }
+        if (RelatedgraphicparentEnv != environment) {
+            updateObject[""GLOBALID""] = RelatedgraphicparentGlobalID
+            updateObject[""attributes""] = { ""hkeEnvironment"": environment }
+            Push(updateObjecetArray, updateObject)
+        }
+    }
+    if (count(updateObjecetArray) > 0) {
+        return {
+            'edit': [{
+                'className': 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_MiscGraphicsParent',
+                'updates': updateObjecetArray
+            }]
+        }
+    }
+}",,,TRUE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicLine_Cal_02,Copy X coordinate of the start vertex (part 1) of the line feature to this field,CALCULATION,,envelopex1,FALSE,TRUE,FALSE,TRUE,Geometry($feature).paths[0][0].x,,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicLine_Cal_03,Copy X coordinate of the end vertex (part 1) of the line feature to this field,CALCULATION,,envelopex2,FALSE,TRUE,FALSE,TRUE,Geometry($feature).paths[0][-1].x,,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicLine_Cal_04,Copy Y coordinate of the end vertex (part 1) of the line feature to this field,CALCULATION,,envelopey2,FALSE,TRUE,FALSE,TRUE,Geometry($feature).paths[0][-1].y,,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicLine_Cal_05,Copy Y coordinate of the start vertex (part 1) of the line feature to this field,CALCULATION,,envelopey1,FALSE,TRUE,FALSE,TRUE,Geometry($feature).paths[0][0].y,,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicLine_Cal_06,"Update Z to 1000, if the Life Cycle status is not INS or RES. Update Z to 0, if the life cycle status is INS. ",CALCULATION,,,TRUE,TRUE,FALSE,TRUE,"var lifeCycleStatus = $feature.lifecyclestatus
+var featureX = Geometry($feature).x
+var featureY = Geometry($feature).y
+var featureZ = Geometry($feature).z
+var featureSR = Geometry($feature).spatialReference
+var z = 0
+if (lifeCycleStatus != 6 || lifeCycleStatus != 11){
+    z = 1000
+}
+if(featureZ != z){
+    return{
+        ""result"":{
+            geometry:Geometry({
+                'x': featureX,
+                'y': featureY,
+                'z': z,
+                'spatialReference': featureSR
+            })
+        }
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicLine_Cal_07,Update the UNC life cycle status based on the HK Electric life cycle status.,CALCULATION,,statenetworklifecyclenormal,TRUE,TRUE,FALSE,TRUE,"if (DomainName($feature, ""lifecyclestatus"") == ""INS"") {
+  return 256
+} if (DomainName($feature, ""lifecyclestatus"") == ""PPR"" ||  DomainName($feature, ""lifecyclestatus"") == ""PPX""  ) {
+  return 32
+}  if (DomainName($feature, ""lifecyclestatus"") == ""RES"" || DomainName($feature, ""lifecyclestatus"") == ""SP"" ) {
+  return 1
+} if ( DomainName($feature, ""lifecyclestatus"") == ""PPA"" || DomainName($feature, ""lifecyclestatus"") == ""PPM"" ) {
+  return 2
+}else {
+   return 0
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicLine_Cal_08,Get colour from table,CALCULATION,,symbolcolor,TRUE,TRUE,FALSE,TRUE,"if($originalFeature.lifecyclestatus!=$feature.lifecyclestatus){
+    // GetColour (for HV Sch Busbar) -- Medium voltage Busbar
+    if ($feature.assetgroup == 925) {
+        var colorkey = 14
+        //read color from table
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 22}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+        var sql = 'OBJECTID = ' + colorkey
+        var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+        return result.Colour
+    }
+    // GetColour (for HV Sch Cable) -- Medium voltage Conductor
+    if ($feature.assetgroup == 921) {
+        var colorkey = 14
+        //read color from table
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 22}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+        var sql = 'OBJECTID = ' + colorkey
+        var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+        return result.Colour
+    }
+    // GetColour (for HV Sch Connector) -- Medium voltage Connector line
+    if ($feature.assetgroup == 929) {
+        var colorkey = 14
+        //read color from table
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 22}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+        var sql = 'OBJECTID = ' + colorkey
+        var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+        return result.Colour
+    }
+    // GetColour (for LV Sch Cable) -- Low voltage Conductor
+    if ($feature.assetgroup == 920) {
+        var colorkey = 14
+        //read color from table
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+        var sql = 'OBJECTID = ' + colorkey
+        var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+        return result.Colour
+    }
+    // GetColour (for LV Sch Busbar) -- Low voltage Busbar
+    if ($feature.assetgroup == 924) {
+        var colorkey = 14
+        //read color from table
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+        var sql = 'OBJECTID = ' + colorkey
+        var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+        return result.Colour
+    }
+    // GetColour (for LV Sch Connector) -- Low voltage Connector line
+    if ($feature.assetgroup == 928) {
+        var colorkey = 14
+        //read color from table
+        if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+        else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+        var sql = 'OBJECTID = ' + colorkey
+        var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+        return result.Colour
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicLine_Cal_09,Return appropriate symbolid for given attribute,CALCULATION,,symbolfid,TRUE,TRUE,FALSE,TRUE,"// SymbolID (for HV Sch Cable) -- Medium voltage Conductor
+if ($feature.assetgroup == 921) {
+    if($originalFeature.lifecyclestatus!=$feature.lifecyclestatus){
+        var symid = 1
+            //read color from table
+            if (DomainName($feature,""circuittype"") == ""Interconnector""){
+                if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 683}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 684}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 685}
+            }else{
+                if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 686}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 687}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 688}
+            }
+            return symid
+    }
+   }
+   // SymbolID (for LV Sch Cable) -- Low voltage Conductor
+   if ($feature.assetgroup == 920) {
+    if($originalFeature.lifecyclestatus!=$feature.lifecyclestatus){
+        var symid = 7
+            if ($feature.ASSETTYPE == 0){ //UNKNOWN
+                if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 689}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 690}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 691}
+            }else if ($feature.ASSETTYPE == 880){ //UNDERGROUND
+                if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 692}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 693}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 694}
+            }else if ($feature.ASSETTYPE == 881){ //OVERHEAD
+                if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 695}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 696}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 697}
+            }else if ($feature.ASSETTYPE == 886){ // SUBMARINE
+                if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 698}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 699}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 700}
+            }else if ($feature.namefeaturetype == 573){ // Interconnector
+                if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 683}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 684}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 685}
+            }else{
+                if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 701}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 702}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 703}
+            }
+            return symid
+    }
+   }
+   // SymbolID (for HV busbar) -- Medium voltage Busbar
+   if ($feature.assetgroup == 925) {
+    if ($originalFeature.symbolfid!=682) {
+        return 682
+    } 
+   }
+   // SymbolID (for LV busbar) -- Low voltage Busbar
+   if ($feature.assetgroup == 924) {
+    if ($originalFeature.symbolfid!=682) {
+        return 682
+    } 
+   }
+   // SymbolID (for LV Sch Cable/Connector) -- Low voltage Connector line
+   if ($feature.assetgroup == 928) {
+    // if($originalFeature.lifecyclestatus!=$feature.lifecyclestatus){
+        var symid = 7
+            if ($feature.ASSETTYPE == 0){ //UNKNOWN
+                if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 689}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 690}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 691}
+            }else if ($feature.ASSETTYPE == 880){ //UNDERGROUND
+                if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 692}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 693}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 694}
+            }else if ($feature.ASSETTYPE == 881){ //OVERHEAD
+                if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 695}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 696}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 697}
+            }else if ($feature.ASSETTYPE == 886){ // SUBMARINE
+                if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 698}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 699}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 700}
+            }else{
+                if (DomainName($feature,'lifecyclestatus') == ""INS""){symid = 701}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){symid = 702}
+                else if (DomainName($feature, 'lifecyclestatus') == ""PPR""){symid = 703}
+            }
+            return symid
+    // }
+   }",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicLine_Cal_10,update display field by asset group,CALCULATION,,displayfieldtext,TRUE,TRUE,FALSE,TRUE,"if ($feature.lifecyclestatus != $originalfeature.lifecyclestatus || $feature.NameAsset != $originalfeature.NameAsset){
+var asset_group = DomainName($feature, ""assetgroup"")
+var output_s_list = []
+var OBJECTID = 'OID' + $feature.OBJECTID
+var referenceobjectparentid = $feature.referenceobjectparentid
+var lifecyclestatus = '(' + DomainName($feature, ""lifecyclestatus"") + ')'
+var NameAsset = $feature.NameAsset
+ if (Includes(['Medium voltage Busbar', 'Low voltage Busbar'], asset_group)) {
+     Push(output_s_list, referenceobjectparentid)
+ Push(output_s_list, NameAsset)
+ Push(output_s_list, lifecyclestatus)
+ Push(output_s_list, OBJECTID)
+}
+if (Includes(['Medium voltage Conductor', 'Low voltage Conductor', 'Low voltage Connector line'], asset_group)) {
+     Push(output_s_list, NameAsset)
+ Push(output_s_list, lifecyclestatus)
+ Push(output_s_list, OBJECTID)
+}
+var output_s = """"
+for (var s in output_s_list){
+    if (s != """") {
+        output_s += output_s_list[s] + "" ""
+    }
+}
+return output_s
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Sch_Conductor_Cal_02,Based on C_MVCABMATL. materialcoredescription is CODETEXT and selected by user. materialcore is CODECODE and updated by attribute rule.,CALCULATION,Medium voltage Conductor,materialcore,TRUE,TRUE,FALSE,TRUE,"var materialCoreDescription = $feature.materialcoredescription
+    var mvCableMatlFeatures = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.C_MVCABMATL"",[""*""],false)
+    var targetmvCableMatlFeatures = Filter(mvCableMatlFeatures, ""materialcoredescription = @materialCoreDescription"")
+    if(count(targetmvCableMatlFeatures) == 1){
+        return first(targetmvCableMatlFeatures).materialcore
+    }",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MV_Sch_Conductor_Cal_03,Update pilc cable for transformer cable,CALCULATION,Medium voltage Conductor,pilccable,TRUE,TRUE,FALSE,TRUE,"var originLifeCycleStatus = $originalfeature.lifecyclestatus
+var originNameAsset = $originalfeature.nameasset
+var currentLifeCycleStatus = $feature.lifecyclestatus
+var currentNameAsset = $feature.nameasset
+var materialCore = $feature.materialcore
+var unknownType = [""NOT LOADED"",""UNKNOWN"",""OTHER""]
+var pilcCable = $feature.pilccable
+if(currentLifeCycleStatus == 6 && currentNameAsset == ""0""){
+    if(includes(unknownType,materialCore)==true){
+        if(pilcCable!=""-200""){
+            return ""-200""
+        }
+    }else if(find(""X"",materialCore)== -1 && find(""ABC"",materialCore)== -1){
+        if(pilcCable != ""400""){
+            return ""400""
+        }
+    }else{
+        if(pilcCable != ""500""){
+            return ""500""
+        }
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+SchematicLine_Val_01,"Check the MV features’ Operating Voltage (kV) cannot greater than the Rated HV Volt (kV). 
+
+ ",VALIDATION,,,TRUE,FALSE,FALSE,FALSE,"var featureAssetGroupDesc = DomainName($feature, ""ASSETGROUP"", $feature.ASSETGROUP)
+if (Find(""Medium voltage"", featureAssetGroupDesc, 0) != -1) {
+    var opV = $feature.voltagelimitmaxoperating
+    var raV = $feature.voltagelimitmaxrating
+    if (opV > raV) {
+        return false
+    }
+    else {
+        return true
+    }
+} else {
+    return true
+}",99310,The operating voltage is higher than the Rated voltage,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"

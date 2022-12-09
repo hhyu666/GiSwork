@@ -1,0 +1,284 @@
+﻿NAME,DESCRIPTION,TYPE,SUBTYPE,FIELD,ISEDITABLE,TRIGGERINSERT,TRIGGERDELETE,TRIGGERUPDATE,SCRIPTEXPRESSION,ERRORNUMBER,ERRORMESSAGE,EXCLUDECLIENTEVALUATION,ISENABLED,BATCH,SEVERITY,TAGS,CATEGORY,CHECKPARAMETERS
+Tube_Cal_02,"Update the Duct Tube Display Size to XS, S, M, L, XL according to Tube Duct Size.",CALCULATION,Tube,displaysize,TRUE,TRUE,FALSE,TRUE,"var tubeSize = $feature.dimdiameter
+When(tubeSize <= 125,""400"", tubeSize>125 && tubeSize <= 175, ""500"", tubeSize>175 && tubeSize<=225, ""600"", tubeSize >225 && tubeSize<= 500, ""700"",tubeSize>500, ""800"",null )",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Tube_Cal_01,"If having an XL tube in the duct boundary, reassign the other tube containment to be contained by this XL tube, also check that not allowed to add an XL tube if a duct boundary already contained an XL Tube.",CALCULATION,Tube,,TRUE,TRUE,FALSE,TRUE,"var tubeSize = $feature.dimdiameter
+if(tubeSize > 500){
+    //Get container of the tube
+    var containedDuctBoundary = FeatureSetByAssociation($feature, ""container"")
+    if(count(containedDuctBoundary) == 1 ){
+        var ductBoundaryFeatures = FeatureSetByName($datastore,""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.StructureBoundary"",[""*""],false)
+        var containerDuctBoundaryGlobalID = first(containedDuctBoundary).globalid
+        var containerDuctBoundary = Filter(ductBoundaryFeatures, ""GLOBALID = @containerDuctBoundaryGlobalID"")
+        if(count(containerDuctBoundary) == 1){
+            var contentFeature = FeatureSetByAssociation(First(containerDuctBoundary),""content"")
+            var contentTubes = Filter(contentFeature, ""className = 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.StructureEdgeObject'"")
+            var contentGlobalIDArray = []
+            var contentAssociationObjectIDArray = []
+            var i = 0
+            if(count(contentTubes)>0){
+                for(var contentTube in contentTubes){
+                    var contentTubeGlobalID = contentTube.globalid
+                    var contentTubeAssociationObjectID = contentTube.OID
+                    if(contentTubeGlobalID != $feature.GLOBALID){
+                        contentGlobalIDArray[i] = contentTubeGlobalID
+                        contentAssociationObjectIDArray[i] = contentTubeAssociationObjectID
+                        i++
+                    }
+                }
+                var tubeFeatures = FeatureSetByName($datastore,""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.StructureEdgeObject"",[""*""],false)
+                var contentGlobalIDTurpe = replace(replace(replace(Text(contentGlobalIDArray),""["",""(""),""]"","")""),'""',""'"")
+                var whereClause = ""GLOBALID in "" + contentGlobalIDTurpe + "" AND dimdiameter > 500""
+                var xlContentTubes = Filter(tubeFeatures, whereClause)
+                if(count(xlContentTubes) == 0){
+                    var deleteObjectArray = []
+                    var updateObjectArray = []
+                    var a = 0
+                    var b = 0
+                    for(var contentGlobalID in contentGlobalIDArray){
+                        var updateObject = {""objectID"":contentGlobalIDArray[contentGlobalID],""associationType"":""content""}
+                        updateObjectArray[a++] = updateObject
+                    }
+                    for(var contentAssociationObjectID in contentAssociationObjectIDArray){
+                        var deleteObject = {""objectID"":contentAssociationObjectIDArray[contentAssociationObjectID]}
+                        deleteObjectArray[b++] = deleteObject
+                    }
+                    return {
+                        ""edit"":[{
+                            'className':'^UN_Association',
+                            'deletes':deleteObjectArray
+                        },
+                        {'className':'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.StructureEdgeObject',
+                        'updates':updateObjectArray}]
+                    }
+                }else{
+                    return{
+                     ""errorMessage"":""Duct Boundary contains more than one XL tubes.""
+                    }
+                }
+            }        
+        }
+    }
+}",,,TRUE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Tube_Cal_03,Update Blockage to the container - Duct boundary if the tube’s Blockage has changed.,CALCULATION,Tube,,TRUE,TRUE,FALSE,TRUE,"function GetAssoicatedFeatureSet(associatedFeatures, targetLocateFeatureClass) {
+    var associatedFeaturesGlobalIDArray = []
+    for (var associatedFeature in associatedFeatures) {
+        Push(associatedFeaturesGlobalIDArray, associatedFeature.GLOBALID)
+    }
+    var globalIDTurpe = replace(replace(replace(Text(associatedFeaturesGlobalIDArray), ""["", ""(""), ""]"", "")""), '""', ""'"")
+    var whereClause = ""GLOBALID in "" + globalIDTurpe
+    var associatedFeatureClassFeatures = Filter(targetLocateFeatureClass, whereClause)
+    return associatedFeatureClassFeatures
+}
+function GetUpdateObject(structureBoundaryFeature, structureEdgeObject, isBlockedCodeValueArray, tubeBlockageFlagValue) {
+    var blockageFlagYes = ""400""
+    var blockageFlagNo = ""500""
+    var containerStructureBoundaryFeatureGlobalID = structureBoundaryFeature.GLOBALID
+    var containerStructureBoundaryFeatureBlockage = structureBoundaryFeature.blockage
+    if (includes(isBlockedCodeValueArray, tubeBlockageFlagValue) == true) {
+        if (containerStructureBoundaryFeatureBlockage != blockageFlagYes) {
+            return {
+                ""GLOBALID"": containerStructureBoundaryFeatureGlobalID,
+                ""attributes"": { ""blockage"": blockageFlagYes }
+            }
+        } else {
+            return
+        }
+    } else {
+        var contentFeatures = FeatureSetByAssociation(structureBoundaryFeature, ""content"")
+        if (count(contentFeatures) > 0) {
+            var contentTubeFeatures = GetAssoicatedFeatureSet(contentFeatures, structureEdgeObject)
+            if (count(contentTubeFeatures) == 1) {
+                var contentTubeFeature = First(contentTubeFeatures)
+                var contentTubeInTubeFeatures = FeatureSetByAssociation(contentTubeFeature, ""content"")
+                if (count(contentTubeInTubeFeatures) > 0) {
+                    var featuresWithinContentTube = GetAssoicatedFeatureSet(contentTubeInTubeFeatures, structureEdgeObject)
+                    if (count(featuresWithinContentTube) > 0) {
+                        var blockageFlagArray = []
+                        for (var featureWithinContentTube in featuresWithinContentTube) {
+                            if (includes(isBlockedCodeValueArray, featureWithinContentTube.blockage) == true) {
+                                push(blockageFlagArray, true)
+                            } else {
+                                push(blockageFlagArray, false)
+                            }
+                        }
+                        if (includes(blockageFlagArray, true) == true) {
+                            if (containerStructureBoundaryFeatureBlockage != blockageFlagYes) {
+                                return {
+                                    ""GLOBALID"": containerStructureBoundaryFeatureGlobalID,
+                                    ""attributes"": { ""blockage"": blockageFlagYes }
+                                }
+                            } else {
+                                return
+                            }
+                        } else {
+                            if (containerStructureBoundaryFeatureBlockage != blockageFlagNo) {
+                                return {
+                                    ""GLOBALID"": containerStructureBoundaryFeatureGlobalID,
+                                    ""attributes"": { ""blockage"": blockageFlagNo }
+                                }
+                            } else {
+                                return
+                            }
+                        }
+                    }
+                } else {
+                    if (containerStructureBoundaryFeatureBlockage != blockageFlagNo) {
+                        return {
+                            ""GLOBALID"": containerStructureBoundaryFeatureGlobalID,
+                            ""attributes"": { ""blockage"": blockageFlagNo }
+                        }
+                    } else {
+                        return
+                    }
+                }
+            } else if (count(contentTubeFeatures) > 1) {
+                for (var contentTubeFeature in contentTubeFeatures) {
+                    var blockageFlagArray = []
+                    if (includes(isBlockedCodeValueArray, contentTubeFeature.blockage) == true) {
+                        push(blockageFlagArray, true)
+                    } else {
+                        push(blockageFlagArray, false)
+                    }
+                    if (includes(blockageFlagArray, true) == true) {
+                        if (containerStructureBoundaryFeatureBlockage != blockageFlagYes) {
+                            return {
+                                ""GLOBALID"": containerStructureBoundaryFeatureGlobalID,
+                                ""attributes"": { ""blockage"": blockageFlagYes }
+                            }
+                        } else {
+                            return
+                        }
+                    } else {
+                        if (containerStructureBoundaryFeatureBlockage != blockageFlagNo) {
+                            return {
+                                ""GLOBALID"": containerStructureBoundaryFeatureGlobalID,
+                                ""attributes"": { ""blockage"": blockageFlagNo }
+                            }
+                        } else {
+                            return
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+var blockage = $feature.blockage
+var virtualTube = $feature.virtualtube
+var isBlockedCodeValueArray = [""400"", ""500"", ""600""]
+var updateObject = {}
+var containerFeatures = FeatureSetByAssociation($feature, ""container"")
+if (count(containerFeatures) > 0 && virtualTube == ""500"") {
+    var structureBoundaryFeatures = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.StructureBoundary"", [""*""], false)
+    var structureEdgeFeatures = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.StructureEdgeObject"", [""*""], false)
+    var containerStructureBoundaryFeatures = Filter(containerFeatures, ""className = 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.StructureBoundary'"")
+    var containerEdgeFeatures = Filter(containerFeatures, ""className = 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.StructureEdgeObject'"")
+    if (count(containerStructureBoundaryFeatures) == 1) {
+        containerStructureBoundaryFeatures = GetAssoicatedFeatureSet(containerStructureBoundaryFeatures, structureBoundaryFeatures)
+        if (count(containerStructureBoundaryFeatures) == 1) {
+            var containerStructureBoundaryFeature = First(containerStructureBoundaryFeatures)
+            updateObject = GetUpdateObject(containerStructureBoundaryFeature, structureEdgeFeatures, isBlockedCodeValueArray, blockage)
+        }
+    } else if (count(containerEdgeFeatures) == 1) {
+        containerEdgeFeatures = GetAssoicatedFeatureSet(containerEdgeFeatures, structureEdgeFeatures)
+        if (count(containerEdgeFeatures) == 1) {
+            var containerEdgeFeature = First(containerEdgeFeatures)
+            var tubeContainerStructureBoundaryFeatures = FeatureSetByAssociation(containerEdgeFeature, ""container"")
+            if (count(tubeContainerStructureBoundaryFeatures) == 1) {
+                tubeContainerStructureBoundaryFeatures = GetAssoicatedFeatureSet(tubeContainerStructureBoundaryFeatures, structureBoundaryFeatures)
+                if (count(tubeContainerStructureBoundaryFeatures) == 1) {
+                    var tubeContainerStructureBoundaryFeature = First(tubeContainerStructureBoundaryFeatures)
+                    updateObject = GetUpdateObject(tubeContainerStructureBoundaryFeature, structureEdgeFeatures, isBlockedCodeValueArray, blockage)
+                }
+            }
+        }
+    }
+    for (var key in updateObject) { }
+    if (isEmpty(key) != true) {
+        return {
+            'edit': [{
+                'className': 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.StructureBoundary',
+                'updates': updateObject
+            }]
+        }
+    }
+}",,,TRUE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Tube_Cal_04,Update the Total number of Tube(s) to the container - duct boundary.,CALCULATION,Tube,,TRUE,TRUE,FALSE,TRUE,"function FindFeaturesInFeatureClass(featureClass,containedFeature, isFilterVirtaul){
+    var contentFeatureGlobalIDArray = []
+    var i = 0 
+    for (var contentFeature in containedFeature) {
+        contentFeatureGlobalIDArray[i++] = contentFeature.globalID
+    }
+    var contentGlobalIDTurpe = replace(replace(replace(Text(contentFeatureGlobalIDArray), ""["", ""(""), ""]"", "")""), '""', ""'"")
+    var whereClauseContainedTube = when(isFilterVirtaul == false,""GLOBALID in "" + contentGlobalIDTurpe, isFilterVirtaul == true, ""GLOBALID in "" + contentGlobalIDTurpe+ ""AND virtualtube = '500'"","""")
+    var contentFeatures = Filter(featureClass, whereClauseContainedTube)
+    return contentFeatures
+}
+var containerFeatures = FeatureSetByAssociation($feature, ""container"")
+var numberOfContainedTube = 0
+if(count(containerFeatures)>0){
+    var edgeObjectFeatures = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.StructureEdgeObject"", [""*""], false)
+    var boundaryFeatures = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.StructureBoundary"", [""*""], false)
+    var containerBoundaryFeatures = Filter(containerFeatures,""className = 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.StructureBoundary'"")
+    var containerBoundaryFeature = {}
+    if(count(containerBoundaryFeatures) == 1){
+        containerBoundaryFeature = First(FindFeaturesInFeatureClass(boundaryFeatures, containerBoundaryFeatures,false))
+    }else{
+        var containerTubeFeatures = Filter(containerFeatures,""className = 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.StructureEdgeObject'"")
+        if(count(containerTubeFeatures)==1){
+            var containerTubeFeature = First(FindFeaturesInFeatureClass(edgeObjectFeatures, containerTubeFeatures,false))
+            var tubeContainerFeatures = FeatureSetByAssociation(containerTubeFeature, ""container"")
+            if(count(tubeContainerFeatures)==1){
+               containerBoundaryFeature = First(FindFeaturesInFeatureClass(boundaryFeatures, tubeContainerFeatures,false))
+            }
+        }
+    }
+    var contentFeatures = FeatureSetByAssociation(containerBoundaryFeature, ""content"")
+    if (Count(contentFeatures) > 0) {
+        var containerBoundaryFeatureGlobalID = containerBoundaryFeature.globalID
+        var containedTubeFeatures = FindFeaturesInFeatureClass(edgeObjectFeatures, contentFeatures,false)
+        if (count(containedTubeFeatures) > 0) {
+            var nonVirtualTubeFeatures = FindFeaturesInFeatureClass(edgeObjectFeatures, contentFeatures,true)
+            numberOfContainedTube = count(nonVirtualTubeFeatures)
+            if(count(containedTubeFeatures)==1){
+                var tubeInTubeFeatures = FeatureSetByAssociation(first(containedTubeFeatures),""content"")
+                if(count(tubeInTubeFeatures)>0){
+                    var contatinedTubeInTubeFeatures = FindFeaturesInFeatureClass(edgeObjectFeatures,tubeInTubeFeatures,false)
+                    if(count(contatinedTubeInTubeFeatures)>0){
+                        var nonvirtaulcontatinedTubeInTubeFeatures = FindFeaturesInFeatureClass(edgeObjectFeatures,tubeInTubeFeatures,true)
+                        numberOfContainedTube = numberOfContainedTube + count(nonvirtaulcontatinedTubeInTubeFeatures)
+                    }
+                }
+            }
+        }
+        return {
+            'edit': [{
+                'className': 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.StructureBoundary',
+                'updates': [{
+                    'globalID': containerBoundaryFeatureGlobalID,
+                    'attributes': {
+                        'numbercontainercapacity': numberOfContainedTube
+                    }
+                }]
+            }]
+        }
+    }
+}",,,TRUE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+updateDisplayField,update display field by asset group,CALCULATION,,displayfieldtext,TRUE,TRUE,FALSE,TRUE,"var asset_group = DomainName($feature, ""assetgroup"")
+var output_s_list = []
+if ($feature.lifecyclestatus != $originalfeature.lifecyclestatus || $feature.NameAsset != $originalfeature.NameAsset){
+var OBJECTID = 'OID' + $feature.OBJECTID
+var endtype = $feature.endtype
+var lifecyclestatus = '(' + DomainName($feature, ""lifecyclestatus"") + ')'
+var NameAsset = $feature.NameAsset
+Push(output_s_list, NameAsset)
+Push(output_s_list, lifecyclestatus)
+Push(output_s_list, OBJECTID)
+var output_s = """"
+for (var s in output_s_list){
+    if (s != """") {
+        output_s += output_s + "" ""
+    }
+}
+return output_s
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"

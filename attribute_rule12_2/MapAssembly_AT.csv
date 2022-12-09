@@ -1,0 +1,602 @@
+﻿NAME,DESCRIPTION,TYPE,SUBTYPE,FIELD,ISEDITABLE,TRIGGERINSERT,TRIGGERDELETE,TRIGGERUPDATE,SCRIPTEXPRESSION,ERRORNUMBER,ERRORMESSAGE,EXCLUDECLIENTEVALUATION,ISENABLED,BATCH,SEVERITY,TAGS,CATEGORY,CHECKPARAMETERS
+Controls_assembly_LV_Cal_01,Update Equipment Type Abv. by LVIO Type /Equipment Type Description,CALCULATION,Controls assembly Low voltage,nameproduct,TRUE,TRUE,FALSE,TRUE,"var nameproductvariant = $feature.nameproductvariant
+var lvIOMappingTable = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.C_LVIOTYPE"",[""*""],false)
+var mappedRecords = Filter(lvIOMappingTable, ""nameproductvariant = @nameproductvariant"")
+var featureNameProduct = $feature.nameproduct
+if(count(mappedRecords)==1){
+    var targetNameProduct = first(mappedRecords).nameproduct
+    if(targetNameProduct != featureNameProduct){
+    return targetNameProduct
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Controls_assembly_LV_Cal_02,Update Asset Type of the contained LV Cutouts,CALCULATION,Controls assembly Low voltage,,TRUE,TRUE,FALSE,TRUE,"var contentFeatures = FeatureSetByAssociation($feature,""Content"")
+if(count(contentFeatures) == 4){
+    var deviceFeatures = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.MapDevice"",[""*""],false)
+    var eqType = $feature.nameproductvariant
+    var updateObjectArray = []
+    var i = 0
+    for(var contentFeature in contentFeatures){
+        var contentFeatureGlobalID = contentFeature.globalid
+        var deviceFeature = Filter(deviceFeatures, ""GLOBALID = @contentFeatureGlobalID"")
+        if(count(deviceFeature)> 0){
+            var mappingTable = FeatureSetByName($datastore,""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_LV_CutoutAssetTypeMapping"",[""*""],false)
+            var deviceFeatureNodePosition = First(deviceFeature).nodeposition
+            var deviceFeatureAssetType = First(deviceFeature).ASSETTYPE
+            var targetUpdateRow = Filter(mappingTable,""nameproductmanufacturer = @eqType AND nodeposition =@deviceFeatureNodePosition"")
+            if(count(targetUpdateRow) == 1){
+                var targetUpdateAssetType = First(targetUpdateRow).ASSETTYPE
+                if(targetUpdateAssetType !=deviceFeatureAssetType ){
+                    var updateObject = {'globalID':contentFeatureGlobalID,'attributes':{'ASSETTYPE':targetUpdateAssetType}}
+                    updateObjectArray[i++] = updateObject
+                }
+            }
+        }
+    }
+    if(count(updateObjectArray)>0){
+    return{
+        'edit':[{
+            'className':'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.MapDevice',
+            'updates':updateObjectArray
+        }]
+    }
+}
+}",,,TRUE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Controls_assembly_LV_Cal_03,Update isSubfusingRequired to null if “subnetworkName” is Unknown or “lifecyclestatus” is  non-INS or the corresponding subnetwork line “is Dirty” is Yes.,CALCULATION,Controls assembly Low voltage,issubfusingrequired,TRUE,TRUE,FALSE,TRUE,"var subnetworkName = $feature.subnetworkname
+var lifeCycleStatus = $feature.lifecyclestatus
+var isSubfusingRequired = $feature.issubfusingrequired
+if(subnetworkName == ""Unknown"" || lifecyclestatus == 6){
+    if(isEmpty(isSubfusingRequired) != true ){
+        return null
+    }
+}else if(subnetworkName != ""Unknown""){
+    var subnetworkFeatures = FeatureSetByName($datastore,""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.MapSubnetLine"",[""*""],false)
+    var targetSubnetworkFeatures = Filter(subnetworkFeatures,""SUBNETWORKNAME = @subnetworkName"")
+    if(count(targetSubnetworkFeatures)==1){
+        if(first(targetSubnetworkFeatures).ISDIRTY != 0){
+            if(isEmpty(isSubfusingRequired) != true ){
+                return null
+            }
+        }
+    }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Electric_substation_MV_Cal_01,"Assign substation no and substation name to the contained device features which are MV Circuit Breaker Primary, MV Meter Point, MV Switchgear, MV Transformer, LV Disconnector, LV Switchgear, and LV Transformer End.",CALCULATION,Electric substation Medium voltage,,TRUE,TRUE,FALSE,TRUE,"function GenerateObject(globalID, nameasset, existingreferenceobjectparentid, namelocation, existingNameLocation, breakerAssetGroup) {
+    var updateObject = {}
+    var attributes = {}
+    if (isempty(nameasset) != true) {
+        if (breakerAssetGroup == 0) {
+            if (nameasset != existingreferenceobjectparentid) {
+                attributes[""referenceobjectparentid""] = nameasset
+            }
+        }
+        else {
+            var referenceobjectparentidDomainCode = DomainCode(contentFeature, ""referenceobjectparentid"", nameasset, breakerAssetGroup)
+            if (referenceobjectparentidDomainCode != existingreferenceobjectparentid) {
+                attributes[""referenceobjectparentid""] = referenceobjectparentidDomainCode
+            }
+        }
+    }
+    if (isempty(namelocation) != true) {
+        if (namelocation != existingNameLocation) {
+            attributes[""namelocation""] = namelocation
+        }
+    }
+    for (var i in attributes) { }
+    if (isempty(i)) {
+        return
+    }
+    else {
+        updateObject[""GLOBALID""] = globalID
+        updateObject[""attributes""] = attributes
+        return updateObject
+    }
+}
+var assetGroup = $feature.ASSETGROUP
+var nameasset = trim($feature.nameasset)
+var namelocation = trim($feature.namelocation)
+if (assetGroup == 904) {
+    //Find the MV substation contained features.
+    var contentFeatures = FeatureSetByAssociation($feature, ""content"")
+    if (((nameasset != null && nameasset != """") || (namelocation != null && namelocation != """")) && count(contentFeatures) > 0) {
+        var mapAssemblyFeatureClass = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.MapAssembly"", [""*""], false)
+        var mapDeviceFeatureClass = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.MapDevice"", [""*""], false)
+        //Get the contained features' global id.
+        var globalIDIndex = 0
+        var contentFeaturesGlobalIDArray = []
+        for (var contentFeature in contentFeatures) {
+            contentFeaturesGlobalIDArray[globalIDIndex++] = contentFeature.globalid
+        }
+        var contentFeaturesGlobalIDtupe = replace(replace(replace(Text(contentFeaturesGlobalIDArray), ""["", ""(""), ""]"", "")""), '""', ""'"")
+        var whereClause = ""GLOBALID in "" + contentFeaturesGlobalIDtupe + ""AND ASSETGROUP <> 771""
+        //Find the contained non Breaker features by the globalid and asset group.
+        var contentDeviceFeaturesWithoutBreaker = Filter(mapDeviceFeatureClass, whereClause)
+        var updateObjectArray = []
+        var i = 0
+        if (count(contentDeviceFeaturesWithoutBreaker) > 0) {
+            for (var contentDeviceFeature in contentDeviceFeaturesWithoutBreaker) {
+                //Append the contained non breaker features' Global ID, MV subtation's name asset and MV subtation's name location to the update object array
+                updateObjectArray[i++] = GenerateObject(contentDeviceFeature.GLOBALID, nameasset, contentDeviceFeature.referenceobjectparentid, namelocation, contentDeviceFeature.namelocation, 0)
+            }
+        }
+        var breakerAssetGroup = 771
+        whereClause = ""GLOBALID in "" + contentFeaturesGlobalIDtupe + ""AND ASSETGROUP = "" + breakerAssetGroup
+        var contentDeviceFeaturesWithBreaker = Filter(mapDeviceFeatureClass, whereClause)
+        if (count(contentDeviceFeaturesWithBreaker) > 0) {
+            for (var contentFeature in contentDeviceFeaturesWithBreaker) {
+                //Append the contained breaker features' Global ID, MV subtation's name asset and MV subtation's name location to the update object array
+                updateObjectArray[i++] = GenerateObject(contentFeature.GLOBALID, nameasset, contentFeature.referenceobjectparentid, namelocation, contentFeature.namelocation, breakerAssetGroup)
+            }
+        }
+        //Find whether the MV substation has contained Control Assembly MV (RMU).
+        whereClause = ""GLOBALID in "" + contentFeaturesGlobalIDtupe
+        var contentMapAssemblyFeatures = Filter(mapAssemblyFeatureClass, whereClause)
+        if (count(contentMapAssemblyFeatures) > 0) {
+            for (var contentMapAssemblyFeature in contentMapAssemblyFeatures) {
+                //Get the contents of the Control Assembly MV
+                var contentFeaturesInMapAssembly = FeatureSetByAssociation(contentMapAssemblyFeature, ""content"")
+                if (count(contentFeaturesInMapAssembly) > 0) {
+                    //Get the contents' global ID.
+                    globalIDIndex = 0
+                    var contentFeatureInMapAssemblyGlobalIDArray = []
+                    for (var contentFeatureInMapAssembly in contentFeaturesInMapAssembly) {
+                        contentFeatureInMapAssemblyGlobalIDArray[globalIDIndex++] = contentFeatureInMapAssembly.globalid
+                    }
+                    var contentFeatureInMapAssemblyGlobalIDtupe = replace(replace(replace(Text(contentFeatureInMapAssemblyGlobalIDArray), ""["", ""(""), ""]"", "")""), '""', ""'"")
+                    whereClause = ""GLOBALID in "" + contentFeatureInMapAssemblyGlobalIDtupe
+                    //Get the contents' device features by the contents' global ID
+                    var contentDeviceFeaturesWithinMapAssembly = Filter(mapDeviceFeatureClass, whereClause)
+                    if (count(contentDeviceFeaturesWithinMapAssembly) > 0) {
+                        for (var contentDeviceFeatureWithinMapAssembly in contentDeviceFeaturesWithinMapAssembly) {
+                            //Append the Control assembly contained device features' Global ID, MV subtation's name asset and MV subtation's name location to the update object array
+                            updateObjectArray[i++] = GenerateObject(contentDeviceFeatureWithinMapAssembly.GLOBALID, nameasset, contentDeviceFeatureWithinMapAssembly.referenceobjectparentid, namelocation, contentDeviceFeatureWithinMapAssembly.namelocation, 0)
+                        }
+                    }
+                }
+            }
+        }
+        if (count(updateObjectArray) > 0) {
+            var updateObjectArrayRemoveNull = []
+            i = 0
+            for (var updateObject in updateObjectArray) {
+                var contentUpdateObject = updateObjectArray[updateObject]
+                if (isempty(contentUpdateObject) != true) {
+                    updateObjectArrayRemoveNull[i++] = contentUpdateObject
+                }
+            }
+            if (count(updateObjectArrayRemoveNull) > 0) {
+                return {
+                    'edit': [{
+                        'className': 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.MapDevice',
+                        'updates': updateObjectArrayRemoveNull
+                    }]
+                }
+            }
+        }
+    }
+}",,,TRUE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Electric_substation_MV_Cal_02,"Assign substation no and substation name to the contained line features which are MV Busbar, LV Busbar. ",CALCULATION,Electric substation Medium voltage,,TRUE,TRUE,FALSE,TRUE,"var nameasset = trim($feature.nameasset)
+var namelocation = trim($feature.namelocation)
+var contentFeatures = FeatureSetByAssociation($feature, ""content"")
+if((IsEmpty(nameasset) != true || IsEmpty(namelocation) != true) && Count(contentFeatures) > 0){
+    var mapLineFeatures = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.MapLine"", [""*""], false)
+    var i = 0
+    var updateObjectArray = []
+    var contentFeaturesGlobalIDArray = []
+    for (var contentFeature in contentFeatures) {
+        contentFeaturesGlobalIDArray[i++] = contentFeature.globalid
+    }
+    var contentFeaturesGlobalIDtupe = replace(replace(replace(Text(contentFeaturesGlobalIDArray), ""["", ""(""), ""]"", "")""), '""', ""'"")
+    var whereClause = ""GLOBALID in "" + contentFeaturesGlobalIDtupe
+    var contentMapFeatures = Filter(mapLineFeatures, whereClause)
+    if (count(contentMapFeatures) > 0) {
+        i = 0
+        for (var contentMapFeature in contentMapFeatures) {
+            var updateObject = {}
+            var attributesObject = {}
+            if (nameasset != contentMapFeature.referenceobjectparentid) {
+                attributesObject['referenceobjectparentid'] = nameasset
+            }
+            if (namelocation != contentMapFeature.namelocation) {
+                attributesObject['namelocation'] = namelocation
+            }
+            for (var object in attributesObject) { }
+            if (IsEmpty(object) != true) {
+                updateObject['globalid'] = contentMapFeature.GLOBALID
+                updateObject['attributes'] = attributesObject
+                updateObjectArray[i++] = updateObject
+            }
+        }
+        if (count(updateObjectArray) > 0) {
+            return {
+                ""edit"": [{
+                    ""className"": ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.MapLine"",
+                    'updates': updateObjectArray
+                }]
+            }
+        }
+    }
+}",,,TRUE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Electric_substation_MV_Cal_03,"Assign substation no and substation name to the contained junction features which are MV Customer service point, LV Customer service point.",CALCULATION,Electric substation Medium voltage,,TRUE,TRUE,FALSE,TRUE,"var nameasset = trim($feature.nameasset)
+var namelocation = trim($feature.namelocation)
+var contentFeatures = FeatureSetByAssociation($feature, ""content"")
+if((IsEmpty(nameasset) != true || IsEmpty(namelocation) != true) && Count(contentFeatures) > 0){
+    var mapJunctionFeatures = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.MapJunction"", [""*""], false)
+    var i = 0
+    var updateObjectArray = []
+    var contentFeaturesGlobalIDArray = []
+    for (var contentFeature in contentFeatures) {
+        contentFeaturesGlobalIDArray[i++] = contentFeature.globalid
+    }
+    var contentFeaturesGlobalIDtupe = replace(replace(replace(Text(contentFeaturesGlobalIDArray), ""["", ""(""), ""]"", "")""), '""', ""'"")
+    var whereClause = ""GLOBALID in "" + contentFeaturesGlobalIDtupe
+    var contentMapFeatures = Filter(mapJunctionFeatures, whereClause)
+    if (count(contentMapFeatures) > 0) {
+        i = 0
+        for (var contentMapFeature in contentMapFeatures) {
+            var updateObject = {}
+            var attributesObject = {}
+            if (nameasset != contentMapFeature.referenceobjectparentid) {
+                attributesObject['referenceobjectparentid'] = nameasset
+            }
+            if (namelocation != contentMapFeature.namelocation) {
+                attributesObject['namelocation'] = namelocation
+            }
+            for (var object in attributesObject) { }
+            if (IsEmpty(object) != true) {
+                updateObject['globalid'] = contentMapFeature.GLOBALID
+                updateObject['attributes'] = attributesObject
+                updateObjectArray[i++] = updateObject
+            }
+        }
+        if (count(updateObjectArray) > 0) {
+            return {
+                ""edit"": [{
+                    ""className"": ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.MapJunction"",
+                    'updates': updateObjectArray
+                }]
+            }
+        }
+    }
+}",,,TRUE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Electric_substation_MV_Cal_04,Update Load Statistics Info,CALCULATION,Electric substation Medium voltage,referenceloadstat,TRUE,TRUE,FALSE,TRUE,"var nameAsset = $feature.nameasset
+if(nameAsset == ""0"" || $feature.lifecyclestatus != 6){
+    if($originalFeature.referenceloadstat== """"){
+        return 
+    }
+    return """"
+}
+if(IsEmpty(nameAsset)){
+    if($originalFeature.referenceloadstat== """"){
+        return 
+    }
+    return """"
+}
+var referenceLoadStat = First(Filter(FeatureSetByName($datastore, ""HKE_System_Config"", ['*'], true), ""configKey = 'SubDetailReferenceLoadStatURL'"")).configValue + ""?SSCODE="" + nameAsset
+if($originalFeature.referenceloadstat == referenceLoadStat){
+    return
+}
+return referenceLoadStat",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Electric_switching_location_LV_Cal_01,Build the containment association between Structure Cabinet Boundary and Electric Switching location LV if they intersect.,CALCULATION,Electric switching location Low voltage,,TRUE,TRUE,FALSE,FALSE,"//////////// LV Map Pill point (Electric distribution Switch board assembly)
+// Electric distibution cabinet low voltage
+var Association = FeatureSetByAssociation($feature, ""container"")
+if(count(Association) == 0){
+var structureBoundaryFeatures = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.StructureBoundary"")
+var subtype = 171
+cabinetBoundaryFeatures   = Filter(structureBoundaryFeatures, ""ASSETGROUP= @subtype"")
+var intersectedFeatures = Intersects(cabinetBoundaryFeatures  , $feature)
+if (Count(intersectedFeatures) == 1) {
+        return {
+            'edit': [{
+                'className': 'StructureBoundary',
+                'updates': [{
+                    ""globalID"": first(intersectedFeatures).globalID,
+                    ""associationType"": 'container'
+                }]
+            }]
+        }
+}
+}",,,TRUE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MapAssembly_Cal_01,Update the TR substation’s substation name based on the standalone table - “C_SUBNAME”.,CALCULATION,,namelocationdetails,TRUE,TRUE,FALSE,TRUE,"var validAssetGroup = [904,902,905]
+if(includes(validAssetGroup, $feature.ASSETGROUP)){
+var nameasset = trim($feature.nameasset)
+var substationMappingTable = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.C_SUBNAME"",[""*""],false)
+var mappedRecords = Filter(substationMappingTable, ""nameassetsubstation = @nameasset"")
+if(count(mappedRecords)==1){
+    return first(mappedRecords).namelocationdetailssubstation
+}
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MapAssembly_Cal_02,Calcuate X corrdinate (3 d.p.) and save in Grid X1 Coordinate field,CALCULATION,,envelopex1,TRUE,TRUE,FALSE,TRUE,Geometry($feature).x,,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MapAssembly_Cal_03,Calcuate y corrdinate of point feature (3 d.p.) and save in Grid Y1 Coordinate field,CALCULATION,,envelopey1,TRUE,TRUE,FALSE,TRUE,Geometry($feature).y,,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MapAssembly_Cal_04,Update environment to Misc. Graphic Parent,CALCULATION,,,TRUE,TRUE,FALSE,TRUE,"var miscGraphicsParentTable = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_MiscGraphicsParent"",[""*""],false)
+var featureGlobalID = $feature.GLOBALID
+var Relatedgraphicparents = Filter(miscGraphicsParentTable, ""hkeParentGlobalId = @featureGlobalID"")
+if (count(Relatedgraphicparents) > 0) {
+    var updateObjecetArray = []
+    for (var Relatedgraphicparent in Relatedgraphicparents) {
+        var RelatedgraphicparentGlobalID = Relatedgraphicparent.GLOBALID
+        var RelatedgraphicparentEnv = Relatedgraphicparent.hkeEnvironment
+        var assetGroup = $feature.ASSETGROUP
+        var voltage = $feature.voltagelimitmaxoperating
+        var updateObject = {}
+        var environment = 0
+        if(assetGroup == 904 || assetGroup == 907 || assetGroup == 914) {  //Electric substation Medium voltage (904), Electric switching substation Medium voltage (905), Controls assembly Medium voltage (914)
+            if(voltage == 11000) environment = 200 //MV Map 11kV
+            else environment = 300 //MV Map 22kV
+        } 
+        else if(assetGroup == 780 || assetGroup == 911 || assetGroup == 915) {  //Electric substation Low voltage (780), Electric switching location Low voltage (911), Controls assembly Low voltage (915)
+            environment = 500 //LV Map
+        } 
+        else if(assetGroup == 902 || assetGroup == 905) { //Electric switching substation Transmission (905)
+            if(voltage == 66000) {
+                environment = 1500 //TR 66kV
+            }
+            else if(voltage == 132000) {
+                environment = 1400 //TR 132kV
+            } 
+            else if(voltage == 275000) {
+                environment = 1300 //TR 275kV
+            } 
+            else {
+                environment = -300
+            } 
+        } 
+        else {
+            environment = -300
+        }
+        if (RelatedgraphicparentEnv != environment) {
+            updateObject[""GLOBALID""] = RelatedgraphicparentGlobalID
+            updateObject[""attributes""] = { ""hkeEnvironment"": environment }
+            Push(updateObjecetArray, updateObject)
+        }
+    }
+    if (count(updateObjecetArray) > 0) {
+        return {
+            'edit': [{
+                'className': 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.HKE_MiscGraphicsParent',
+                'updates': updateObjecetArray
+            }]
+        }
+    }
+}",,,TRUE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MapAssembly_Cal_05,Update the UNC life cycle status based on the HK Electric life cycle status.,CALCULATION,,statenetworklifecyclenormal,TRUE,TRUE,FALSE,TRUE,"if (DomainName($feature, ""lifecyclestatus"") == ""INS"") {
+  return 256
+} if (DomainName($feature, ""lifecyclestatus"") == ""PPR"" ||  DomainName($feature, ""lifecyclestatus"") == ""PPX""  ) {
+  return 32
+}  if (DomainName($feature, ""lifecyclestatus"") == ""RES"" || DomainName($feature, ""lifecyclestatus"") == ""SP"" ) {
+  return 1
+} if ( DomainName($feature, ""lifecyclestatus"") == ""PPA"" || DomainName($feature, ""lifecyclestatus"") == ""PPM"" ) {
+  return 2
+}else {
+   return 0
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MapAssembly_Cal_06,Return appropriate symbolid for given attribute,CALCULATION,,symbolfid,TRUE,TRUE,FALSE,TRUE,"// SymbolID (for LV_DPM) -- Electric switching location Low voltage
+if ($feature.assetgroup == 911) {
+  if ($originalFeature.symbolfid!=6) {
+      return 6
+  } 
+}
+// SymbolID (for HV_SUBM) -- Electric substation Medium voltage
+if ($feature.assetgroup == 904) {
+  if ($originalFeature.symbolfid!=64) {
+      return 64
+  } 
+}
+ // S ymbolID (for LV_IO) -- Controls assembly Low voltage
+if ($feature.assetgroup == 915) {
+  if($originalFeature.isratingverified!=$feature.isratingverified){
+    var symid = 0
+    if (DomainName($feature,""isratingverified"") == ""Yes""){symid = 36}
+    else {symid = 37}
+    return symid
+  }
+ }
+// SymbolID (for MV_IO) -- Controls assembly Medium voltage
+if ($feature.assetgroup == 914) {
+  if ($originalFeature.symbolfid!=64) {
+    return 64
+  } 
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MapAssembly_Cal_07,Get colour from table,CALCULATION,,symbolcolor,TRUE,TRUE,FALSE,TRUE,"if ($originalFeature.lifecyclestatus!=$feature.lifecyclestatus||$originalFeature.voltagelimitmaxoperating!=$feature.voltagelimitmaxoperating){
+    // GetColour (for TR_SUB) -- Electric substation Transmission
+        if ($feature.assetgroup == 902) {
+            var colorkey = 14
+            //read color from table
+            if (DomainName($feature,'lifecyclestatus') == ""INS""){
+                if(DomainName($feature,'voltagelimitmaxoperating') == '33 kV' || DomainName($feature,'voltagelimitmaxoperating') == '66 kV'){colorkey = 10}
+                else if (DomainName($feature,'voltagelimitmaxoperating') == '132 kV'){colorkey = 430}
+                else{colorkey = 27}}
+            else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 431}
+            else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 12}
+            var sql = 'OBJECTID = ' + colorkey
+            var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+            return result.Colour
+        }
+        // GetColour (for HV_SUBM) -- Electric substation Medium voltage
+        if ($feature.assetgroup == 904) {
+            var colorkey = 14
+            //read color from table
+            if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 22}
+            else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+            else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 12}
+            var sql = 'OBJECTID = ' + colorkey
+            var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+            return result.Colour
+        }
+        // GetColour (for LV_DPM) -- Electric switching location Low voltage
+        if ($feature.assetgroup == 911) {
+            var colorkey = 14
+            //read color from table
+            if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+            else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+            else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 12}
+            var sql = 'OBJECTID = ' + colorkey
+            var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+            return result.Colour
+        }
+        // GetColour (for LV_IO) -- Controls assembly Low voltage
+        if ($feature.assetgroup == 915) {
+            var colorkey = 14
+            //read color from table
+            if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 24}
+            else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+            else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 12}
+            var sql = 'OBJECTID = ' + colorkey
+            var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+            return result.Colour
+        }
+        // GetColour (for HV_SUBM) -M -- Controls assembly Medium voltage
+        if ($feature.assetgroup == 914) {
+            var colorkey = 14
+            //read color from table
+            if (DomainName($feature,'lifecyclestatus') == ""INS""){colorkey = 22}
+            else if (DomainName($feature, 'lifecyclestatus') == ""PPA"" || DomainName($feature, 'lifecyclestatus') == ""PPM"" || DomainName($feature, 'lifecyclestatus') == ""PPR"" || DomainName($feature, 'lifecyclestatus') == ""PPX""){colorkey = 28}
+            else if (DomainName($feature,'lifecyclestatus') == ""RES""){colorkey = 22}
+            var sql = 'OBJECTID = ' + colorkey
+            var result = First(Filter(FeatureSetByName($datastore,'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.Colour',['*'],false),sql))
+            return result.Colour
+        }
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MapAssembly_Cal_08,update display field by asset group,CALCULATION,,displayfieldtext,TRUE,TRUE,FALSE,TRUE,"var asset_group = DomainName($feature, ""assetgroup"")
+var output_s_list = []
+var OBJECTID = 'OID' + $feature.OBJECTID
+var lifecyclestatus = '(' + DomainName($feature, ""lifecyclestatus"") + ')'
+var NameAsset = $feature.NameAsset
+ if (Includes(['Electric switching substation Transmission', 'Electric substation Transmission', 'Electric substation Medium voltage', 'Controls assembly Medium voltage', 'Electric switching location Low voltage', 'Controls assembly Low voltage'], asset_group)) {
+     Push(output_s_list, NameAsset)
+ Push(output_s_list, lifecyclestatus)
+ Push(output_s_list, OBJECTID)
+}
+var output_s = []
+for (var s in output_s_list){
+    if (s != """") {
+        output_s += output_s_list[s] + "" ""
+    }
+}
+return output_s",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Controls_assembly_LV_Con_01,Verify the value of “Supply point No.”.,CONSTRAINT,Controls assembly Low voltage,,TRUE,TRUE,FALSE,TRUE,"var nameAsset = $feature.nameasset
+if(nameAsset == null){
+    return true
+}
+nameAsset = Trim(nameAsset)
+var length = Count(nameAsset) 
+if(length == 0){
+    return true
+} else{
+    nameAsset = Upper(nameAsset)
+    if(Left(nameAsset, 2) != ""SN""){
+        return false
+    }
+}
+if(length == 8){ 
+    var sum = 0
+    for(var i = 3; i <= 7; i++){
+        var numberValue = Number(Mid(nameAsset, i -1, 1), ""#"")
+        if(isNaN(numberValue)){
+            return false
+        }
+        sum = sum + (10 - i ) * numberValue
+    }
+    var result = 11 - (sum % 11)
+    var checkDigit 
+    if(result == 11){
+        checkDigit  = ""0""
+    } else if(result == 10){
+        checkDigit  = ""A""
+    } else{
+        checkDigit  = Text(result, ""#"")
+    }
+    if(Mid(nameAsset, 7, 1) == checkDigit){
+        return true
+    } else{
+        return false
+    }
+} else if(length == 7){
+    return true
+} else{
+    return false
+}",99210,Invalid Name of asset. Please Try Again!”,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Controls_assembly_LV_Val_01,"Check LV Cutout should contain three node(L, R, and OH) and one LV customer service point.",VALIDATION,Controls assembly Low voltage,,TRUE,FALSE,FALSE,FALSE,"var contentGlobalIDArray = []
+var SeparableConnectorAssetType = 356
+var OHnode = 600
+var Lnode = 400
+var Rnode = 500
+var i = 0
+var contentFeatures = FeatureSetByAssociation($feature, ""content"")
+if(count(contentFeatures)>0){
+    var mapDevice = FeatureSetByName($datastore, ""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.MapDevice"",[""*""],true)
+    var mapJunction = FeatureSetByName($datastore,""NGISDD_Desktop_0926.NGISSD_SQLSERVICE.MapJunction"",[""*""],true)
+    var assetTypeArray = []
+    var nodePositionArray = []
+    for(var contentFeature in contentFeatures){
+        contentGlobalIDArray[i++] = contentFeature.globalID
+    }
+    var contentGlobalIDTurpe = replace(replace(replace(Text(contentGlobalIDArray),""["",""(""),""]"","")""),'""',""'"")
+    var whereClause = ""GLOBALID in "" + contentGlobalIDTurpe
+    var contentjunctionFeatures = Filter(mapJunction, whereClause)
+    var contentdeviceFeatures = Filter(mapDevice, whereClause)
+    if(count(contentjunctionFeatures)==1 && count(contentdeviceFeatures)>0){
+        for(var contentdeviceFeature in contentdeviceFeatures ){
+            Push(assetTypeArray, contentdeviceFeature.ASSETTYPE)
+            Push(nodePositionArray, contentdeviceFeature.nodeposition)
+        }
+        if(includes(assetTypeArray, SeparableConnectorAssetType) == true){
+            return true
+        }
+        if(count(nodePositionArray)==3){
+            if(includes(nodePositionArray,Lnode) == true && includes(nodePositionArray,Rnode)== true && includes(nodePositionArray,OHnode) == true){
+                return true
+            }
+            else{
+                return false
+            }
+        }else{
+            return false
+        }
+    }else{
+        return false
+    }
+}
+else{
+    return false
+}",99315,Invalid LV Cutout,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Controls_assembly_LV_Val_02,"Check if the ""Life Cycle State"" equals to ""INS"" when "" Supply Point No."" is empty.",VALIDATION,Controls assembly Low voltage,,TRUE,FALSE,FALSE,FALSE,"var nameAsset = Trim($feature.nameasset)
+if(IsEmpty(nameAsset)){
+    if($feature.lifecyclestatus == 6){
+        return false
+    }
+}
+return true",99320,No Name of asset Input for In Service Equipment!,FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+MapAssembly_Val_01,"Find the features without the containment association in the Electric substation TR,  Electric substation MV, Electric switching substation TR ,Electric switching location LV,Control Assembly LV and Control Assembly MV. ",VALIDATION,,,TRUE,FALSE,FALSE,FALSE,"/* 
+Electric substation Transmission 902
+Electric substation Medium voltage 904
+Electric switching substation Transmission 905
+Electric switching location Low voltage 911
+Control Assembly Low Voltage  914                    
+Control Assembly Medium Voltage  915
+*/
+var validAssetGroup = [902,904,905,914,915,911]
+var assetGroup = $feature.ASSETGROUP
+if (Includes(validAssetGroup,assetGroup)){
+    var checkArrayWithoutChild = [902,904,905]
+    var checkArrayWithBothSide = [914,915,911]
+    if(includes(checkArrayWithoutChild,assetGroup)){
+        var contentFeatures = FeatureSetByAssociation($feature, ""content"")
+        if(count(contentFeatures)>0){
+            return true
+        }
+        else{
+            return false
+        }
+    }
+    if(includes(checkArrayWithBothSide,assetGroup)){
+        var contentFeatures = FeatureSetByAssociation($feature, ""content"")
+        var containerFeatures = FeatureSetByAssociation($feature, ""container"")
+        if(count(contentFeatures)>0 || count(containerFeatures)>0){
+            return true
+        }
+        else{
+            return false
+        }
+    }
+}else{
+    return true
+}",99301,Invalid feature(Orphan),FALSE,TRUE,TRUE,5,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"

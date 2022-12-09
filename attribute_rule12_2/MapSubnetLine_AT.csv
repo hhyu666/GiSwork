@@ -1,0 +1,54 @@
+﻿NAME,DESCRIPTION,TYPE,SUBTYPE,FIELD,ISEDITABLE,TRIGGERINSERT,TRIGGERDELETE,TRIGGERUPDATE,SCRIPTEXPRESSION,ERRORNUMBER,ERRORMESSAGE,EXCLUDECLIENTEVALUATION,ISENABLED,BATCH,SEVERITY,TAGS,CATEGORY,CHECKPARAMETERS
+MapSubnetLine_Cal_01,"Update the attributes - “No. of Tee-off ”,” Longest Path Length (m)”,” CE-CE Cable ”, “Is 1st leg Cable?”, “Is Sub-fusing required” to null if the subnetwork value of is dirty is equal to Yes.",CALCULATION,,,TRUE,TRUE,FALSE,TRUE,"if($feature.isdirty == 1){
+    var subnetworkName = $feature.SUBNETWORKNAME
+
+    var updateList = []
+    
+    var counter = 0
+
+    var UpdateLineFeatureClass = ""MapLine""
+
+    var UpdateDeviceFeatureClass = ""MapDevice""
+
+    var mapCable = featureSetByName($datastore, ""MapLine"",[""*""],false)
+
+    var mapDevice = featureSetByName($datastore, ""MapDevice"",[""*""],false) 
+
+    var mapCablesInSameSubnetwork = Filter(mapCable, ""SUBNETWORKNAME = @subnetworkName "")
+
+    var mapDevicesInSameSubnetwork = Filter(mapDevice, ""SUBNETWORKNAME = @subnetworkName "")
+
+    var updateobject = {""Edit"":[]}
+
+    if(count(mapCablesInSameSubnetwork)>0){
+        var lineUpdateList = []
+        for(var mapCableInSameSubnetwork in mapCablesInSameSubnetwork ){
+            lineUpdateList[counter++] = {
+                'globalid' : mapCableInSameSubnetwork.globalid,
+                'attributes':{
+                    ""teeoffcount"" : null,
+                    ""firstlegcable"": null,
+                    ""cececable"":null
+                }
+            }
+        }
+        updateObject[""Edit""][0] = {'className':UpdateLineFeatureClass,""updates"":lineUpdateList}
+    }
+    counter = 0
+    if(count(mapDevicesInSameSubnetwork)>0){
+        var deviceUpdateList = []
+        for(var mapDeviceInSameSubnetwork in mapDevicesInSameSubnetwork ){
+            deviceUpdateList[counter++] = {
+                'globalid' : mapDeviceInSameSubnetwork.globalid,
+                'attributes':{
+                    ""dimlongestpath"": null
+                }
+            }
+        }
+            updateObject[""Edit""][count(updateObject[""Edit""])] = {'className':UpdateDeviceFeatureClass,""updates"":deviceUpdateList}
+        
+    }
+    if(count(updateObject[""Edit""]) > 0 ){
+        return updateObject
+    }
+}",,,TRUE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"

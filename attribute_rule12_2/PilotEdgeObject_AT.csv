@@ -1,0 +1,33 @@
+﻿NAME,DESCRIPTION,TYPE,SUBTYPE,FIELD,ISEDITABLE,TRIGGERINSERT,TRIGGERDELETE,TRIGGERUPDATE,SCRIPTEXPRESSION,ERRORNUMBER,ERRORMESSAGE,EXCLUDECLIENTEVALUATION,ISENABLED,BATCH,SEVERITY,TAGS,CATEGORY,CHECKPARAMETERS
+updateDisplayField,update display field by asset group,CALCULATION,,displayfieldtext,TRUE,TRUE,FALSE,TRUE,"var asset_group = DomainName($feature, ""assetgroup"")
+var output_s_list = []
+if ($feature.NameAsset != $originalfeature.NameAsset){
+
+var OBJECTID = 'OID' + $feature.OBJECTID
+var endtype = $feature.endtype
+var NameAsset = $feature.NameAsset
+
+Push(output_s_list, NameAsset)
+Push(output_s_list, OBJECTID)
+ 
+var output_s = """"
+for (var s in output_s_list){
+    if (s != """") {
+        output_s += output_s + "" ""
+    }
+}
+
+return output_s
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+PilotEdgeObject_Cal_01,Delete the Network Route record if it is an orphan. ,CALCULATION,,,TRUE,TRUE,FALSE,TRUE,"var contentFeatures = FeatureSetByAssociation($feature,""content"")
+
+if(count(contentFeatures)==0){
+    return {
+        'edit': [{
+            'className': 'MapEdgeObject',
+              'deletes': [{
+                'objectID': $feature.OBJECTID
+            }]
+        }]
+    }
+}",,,TRUE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
