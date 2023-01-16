@@ -1,0 +1,75 @@
+﻿NAME,DESCRIPTION,TYPE,SUBTYPE,FIELD,ISEDITABLE,TRIGGERINSERT,TRIGGERDELETE,TRIGGERUPDATE,SCRIPTEXPRESSION,ERRORNUMBER,ERRORMESSAGE,EXCLUDECLIENTEVALUATION,ISENABLED,BATCH,SEVERITY,TAGS,CATEGORY,CHECKPARAMETERS
+Manhole_point_Cal_01,"Generate new ""Pit No."" for Underground structure boundary when the value of "" Pit No. "" is 0 or duplicate.",CALCULATION,Manhole point,nameasset,TRUE,TRUE,FALSE,TRUE,"function findMax(numbers) {
+    var maxNum = -Infinity;
+    for (var index in numbers) {
+      if(numbers[index] > maxNum){
+        maxNum = numbers[index]
+      }
+    }
+    return maxNum;
+}
+function generateNewPitNum(assetGroup){
+    var tbl = FeatureSetByName($datastore, 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.StructureJunctionObject')
+    var sql = ""ASSETGROUP = "" + assetGroup + "" AND nameasset <> '0'""
+    var rows = Filter(tbl, sql)
+    var cnt = Count(rows) 
+        if(cnt > 0) {
+            var pitNums = []
+            for(var row in rows){
+                var pitNum = Number(row.nameasset, ""#"")
+                if(IsNan(pitNum)){
+                    continue
+                }
+                Push(pitNums, pitNum)
+            }
+            var newPitNum = findMax(pitNums) + 1
+            return Text(newPitNum + 1, ""#"")
+        }
+    return ""1""
+}
+function IsUniqlePitNum(assetGroup, pitNum){
+    var tbl = FeatureSetByName($datastore, 'NGISDD_Desktop_0926.NGISSD_SQLSERVICE.StructureJunctionObject')
+    pitNum = Number(pitNum, ""#"")
+    var sql = ""ASSETGROUP = "" + assetGroup + "" AND nameasset = '"" + pitNum + ""'""
+    var rows = Filter(tbl, sql)
+    if(Count(rows) > 1) {
+        return false
+    }
+    return true
+}
+var nameAsset = $feature.nameasset
+var assetGroup = 760
+if(IsEmpty(nameAsset) || nameAsset == ""0""){
+    return generateNewPitNum(assetGroup)
+} 
+if(IsUniqlePitNum(assetGroup, nameAsset) == false){
+    return generateNewPitNum(assetGroup)   
+}
+return",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+Manhole_point_Cal_02,Update the field value of “Environment”.,CALCULATION,Manhole point,environment,TRUE,TRUE,FALSE,TRUE,"var environmentCode = 1200
+if(environmentCode == $originalFeature.environment){
+  return
+}
+return environmentCode",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
+StructureJunctionObject_Cal_01,update display field by asset group,CALCULATION,,displayfieldtext,TRUE,TRUE,FALSE,TRUE,"var asset_group = DomainName($feature, ""assetgroup"")
+var output_s_list = []
+if ($feature.lifecyclestatus != $originalfeature.lifecyclestatus || $feature.NameAsset != $originalfeature.NameAsset){
+
+var OBJECTID = 'OID' + $feature.OBJECTID
+var endtype = $feature.endtype
+var lifecyclestatus = '(' + DomainName($feature, ""lifecyclestatus"") + ')'
+var NameAsset = $feature.NameAsset
+
+Push(output_s_list, NameAsset)
+Push(output_s_list, lifecyclestatus)
+Push(output_s_list, OBJECTID)
+ 
+var output_s = """"
+for (var s in output_s_list){
+    if (s != """") {
+        output_s += output_s + "" ""
+    }
+}
+
+return output_s
+}",,,FALSE,TRUE,FALSE,,,0,"{""type"":""PropertySet"",""propertySetItems"":[]}"
